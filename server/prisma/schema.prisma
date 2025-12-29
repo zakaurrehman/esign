@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  name      String
+  password  String
+  documents Document[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Document {
+  id               String         @id @default(uuid())
+  title            String
+  documentType     String         // WRITTEN or UPLOADED
+  htmlContent      String?
+  originalFilename String?
+  pdfPath          String?
+  completedPdfPath String?
+  pageCount        Int            @default(1)
+  documentHash     String?
+  status           String         @default("DRAFT") // DRAFT, PENDING, IN_PROGRESS, COMPLETED, VOIDED
+  expiresAt        DateTime?
+  completedAt      DateTime?
+  userId           String
+  user             User           @relation(fields: [userId], references: [id])
+  recipients       Recipient[]
+  fields           SignatureField[]
+  auditLogs        AuditLog[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+model Recipient {
+  id             String          @id @default(uuid())
+  documentId     String
+  document       Document        @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  name           String
+  email          String
+  signingOrder   Int             @default(1)
+  accessToken    String          @unique @default(uuid())
+  tokenExpiresAt DateTime?
+  status         String          @default("PENDING") // PENDING, SENT, VIEWED, SIGNED, DECLINED
+  viewedAt       DateTime?
+  signedAt       DateTime?
+  ipAddress      String?
+  userAgent      String?
+  fields         SignatureField[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model SignatureField {
+  id            String    @id @default(uuid())
+  documentId    String
+  recipientId   String
+  fieldType     String    // SIGNATURE, INITIALS, DATE, TEXT, CHECKBOX
+  pageNumber    Int
+  xPercent      Float
+  yPercent      Float
+  widthPercent  Float
+  heightPercent Float
+  isRequired    Boolean   @default(true)
+  value         String?
+  completedAt   DateTime?
+  document      Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  recipient     Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  action     String
+  actorEmail String?
+  actorName  String?
+  ipAddress  String?
+  userAgent  String?
+  details    String?
+  createdAt  DateTime @default(now())
+}
