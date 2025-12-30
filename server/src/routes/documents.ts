@@ -27,10 +27,10 @@ import {
 
 const router = Router();
 
-// Configure multer for PDF uploads
+// Configure multer for PDF uploads - using /tmp for Vercel
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../../uploads'));
+    cb(null, '/tmp');
   },
   filename: (req, file, cb) => {
     cb(null, `${uuidv4()}.pdf`);
