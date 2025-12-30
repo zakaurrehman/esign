@@ -41,6 +41,7 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
+    "@vercel/node": "^5.5.16",
     "tsx": "^4.21.0"
   }
 }
