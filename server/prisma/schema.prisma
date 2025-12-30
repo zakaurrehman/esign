@@ -24,6 +24,7 @@ model Document {
   htmlContent      String?
   originalFilename String?
   pdfPath          String?
+  pdfData          String?        @db.Text // Store PDF as base64 for serverless
   completedPdfPath String?
   pageCount        Int            @default(1)
   documentHash     String?

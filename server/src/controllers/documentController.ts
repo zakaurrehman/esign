@@ -54,12 +54,23 @@ export const uploadDocument = async (req: AuthRequest, res: Response) => {
 
     const title = req.body.title || req.file.originalname.replace('.pdf', '');
 
+    // Read the file and convert to base64
+    const pdfBuffer = fs.readFileSync(req.file.path);
+    const pdfData = pdfBuffer.toString('base64');
+
+    // Get page count
+    const pageCount = await getPdfPageCount(req.file.path);
+
+    // Clean up temp file
+    fs.unlinkSync(req.file.path);
+
     const document = await prisma.document.create({
       data: {
         title,
         documentType: 'UPLOADED',
         originalFilename: req.file.originalname,
-        pdfPath: req.file.path,
+        pdfData,
+        pageCount,
         userId: req.user!.id
       }
     });
@@ -90,17 +101,24 @@ export const generatePdf = async (req: AuthRequest, res: Response) => {
     }
 
     const pdfFilename = `${crypto.randomUUID()}.pdf`;
-    const pdfPath = path.join(__dirname, '../../generated', pdfFilename);
+    const pdfPath = path.join('/tmp', pdfFilename);
 
     await generatePdfFromHtml(document.htmlContent, pdfPath);
     const pageCount = await getPdfPageCount(pdfPath);
 
+    // Read PDF and store as base64 in database
+    const pdfBuffer = fs.readFileSync(pdfPath);
+    const pdfData = pdfBuffer.toString('base64');
+
+    // Clean up temp file
+    fs.unlinkSync(pdfPath);
+
     await prisma.document.update({
       where: { id: document.id },
-      data: { pdfPath, pageCount }
+      data: { pdfData, pageCount }
     });
 
-    return res.json({ message: 'PDF generated successfully', pdfPath, pageCount });
+    return res.json({ message: 'PDF generated successfully', pageCount });
   } catch (error) {
     console.error('Generate PDF error:', error);
     return res.status(500).json({ error: 'Failed to generate PDF' });
@@ -201,15 +219,24 @@ export const getPdf = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'Document not found' });
     }
 
-    if (!document.pdfPath || !fs.existsSync(document.pdfPath)) {
-      return res.status(404).json({ error: 'PDF not found' });
+    // Check for PDF data in database first (serverless compatible)
+    if (document.pdfData) {
+      const pdfBuffer = Buffer.from(document.pdfData, 'base64');
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="${document.title}.pdf"`);
+      res.setHeader('Content-Length', pdfBuffer.length);
+      return res.send(pdfBuffer);
     }
 
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `inline; filename="${document.title}.pdf"`);
+    // Fallback to file system (for local development)
+    if (document.pdfPath && fs.existsSync(document.pdfPath)) {
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="${document.title}.pdf"`);
+      const fileStream = fs.createReadStream(document.pdfPath);
+      return fileStream.pipe(res);
+    }
 
-    const fileStream = fs.createReadStream(document.pdfPath);
-    fileStream.pipe(res);
+    return res.status(404).json({ error: 'PDF not found' });
   } catch (error) {
     console.error('Get PDF error:', error);
     return res.status(500).json({ error: 'Failed to get PDF' });

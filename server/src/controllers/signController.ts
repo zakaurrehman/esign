@@ -76,19 +76,28 @@ export const getSigningPdf = async (req: SigningRequest, res: Response) => {
       where: { id: req.recipient!.documentId }
     });
 
-    if (!document || !document.pdfPath) {
-      return res.status(404).json({ error: 'PDF not found' });
+    if (!document) {
+      return res.status(404).json({ error: 'Document not found' });
     }
 
-    if (!fs.existsSync(document.pdfPath)) {
-      return res.status(404).json({ error: 'PDF file not found' });
+    // Check for PDF data in database first (serverless compatible)
+    if (document.pdfData) {
+      const pdfBuffer = Buffer.from(document.pdfData, 'base64');
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="${document.title}.pdf"`);
+      res.setHeader('Content-Length', pdfBuffer.length);
+      return res.send(pdfBuffer);
     }
 
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `inline; filename="${document.title}.pdf"`);
+    // Fallback to file system (for local development)
+    if (document.pdfPath && fs.existsSync(document.pdfPath)) {
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="${document.title}.pdf"`);
+      const fileStream = fs.createReadStream(document.pdfPath);
+      return fileStream.pipe(res);
+    }
 
-    const fileStream = fs.createReadStream(document.pdfPath);
-    fileStream.pipe(res);
+    return res.status(404).json({ error: 'PDF not found' });
   } catch (error) {
     console.error('Get signing PDF error:', error);
     return res.status(500).json({ error: 'Failed to get PDF' });
