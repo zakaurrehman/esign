@@ -16,6 +16,7 @@ export interface Document {
   htmlContent?: string;
   originalFilename?: string;
   pdfPath?: string;
+  pdfData?: string;
   completedPdfPath?: string;
   pageCount: number;
   status: DocumentStatus;
