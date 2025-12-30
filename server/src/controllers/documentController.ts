@@ -6,7 +6,7 @@ import { generatePdfFromHtml, getPdfPageCount } from '../services/pdfService';
 import { sendEmail, generateSigningEmail } from '../services/emailService';
 import path from 'path';
 import fs from 'fs';
-import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 
 export const listDocuments = async (req: AuthRequest, res: Response) => {
   try {
@@ -89,7 +89,7 @@ export const generatePdf = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Document has no content' });
     }
 
-    const pdfFilename = `${uuidv4()}.pdf`;
+    const pdfFilename = `${crypto.randomUUID()}.pdf`;
     const pdfPath = path.join(__dirname, '../../generated', pdfFilename);
 
     await generatePdfFromHtml(document.htmlContent, pdfPath);

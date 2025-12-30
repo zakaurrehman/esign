@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import path from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 import { auth } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 import { createDocumentSchema, updateDocumentSchema, addRecipientSchema, addFieldSchema, updateFieldSchema } from '../schemas/document';
@@ -33,7 +32,7 @@ const storage = multer.diskStorage({
     cb(null, '/tmp');
   },
   filename: (req, file, cb) => {
-    cb(null, `${uuidv4()}.pdf`);
+    cb(null, `${crypto.randomUUID()}.pdf`);
   }
 });
 
