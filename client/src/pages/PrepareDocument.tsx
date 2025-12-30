@@ -124,7 +124,7 @@ export const PrepareDocument: React.FC = () => {
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (!over || !id || !document?.pdfPath) return;
+    if (!over || !id || (!document?.pdfPath && !document?.pdfData)) return;
 
     const activeData = active.data.current as any;
 

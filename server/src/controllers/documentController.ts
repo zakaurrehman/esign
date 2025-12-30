@@ -442,7 +442,7 @@ export const sendDocument = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Document has already been sent' });
     }
 
-    if (!document.pdfPath) {
+    if (!document.pdfPath && !document.pdfData) {
       return res.status(400).json({ error: 'Document has no PDF. Please generate or upload a PDF first.' });
     }
 
