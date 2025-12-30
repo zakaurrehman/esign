@@ -9,8 +9,8 @@ interface DraggableFieldProps {
   isSelected?: boolean;
   onClick?: () => void;
   onDelete?: () => void;
-  pageWidth: number;
-  pageHeight: number;
+  pageWidth?: number;
+  pageHeight?: number;
 }
 
 const fieldTypeLabels: Record<FieldType, string> = {
@@ -27,9 +27,7 @@ export const DraggableField: React.FC<DraggableFieldProps> = ({
   recipientName,
   isSelected,
   onClick,
-  onDelete,
-  pageWidth,
-  pageHeight
+  onDelete
 }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: field.id,

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { DndContext, DragOverlay, useSensor, useSensors, PointerSensor, useDroppable } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { documentApi, recipientApi, fieldApi } from '../services/api';
-import type { Document, Recipient, SignatureField, FieldType } from '../types/index';
+import type { Document, FieldType } from '../types/index';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
@@ -27,7 +27,7 @@ export const PrepareDocument: React.FC = () => {
   const [isSending, setIsSending] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string>('');
-  const [pageCount, setPageCount] = useState(1);
+  const [, setPageCount] = useState(1);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -220,7 +220,6 @@ export const PrepareDocument: React.FC = () => {
 
   if (!document) return null;
 
-  const selectedRecipient = document.recipients?.find(r => r.id === selectedRecipientId);
   const selectedRecipientIndex = document.recipients?.findIndex(r => r.id === selectedRecipientId) ?? -1;
 
   return (
