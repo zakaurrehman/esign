@@ -1,9 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import authRoutes from '../src/routes/auth';
-import documentRoutes from '../src/routes/documents';
-import signRoutes from '../src/routes/sign';
 
 const app = express();
 
@@ -21,19 +18,48 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/documents', documentRoutes);
-app.use('/sign', signRoutes);
+// Lazy load routes to catch import errors
+let routesLoaded = false;
+let loadError: Error | null = null;
+
+const loadRoutes = async () => {
+  if (routesLoaded) return;
+  try {
+    const authRoutes = (await import('../src/routes/auth')).default;
+    const documentRoutes = (await import('../src/routes/documents')).default;
+    const signRoutes = (await import('../src/routes/sign')).default;
+
+    app.use('/api/auth', authRoutes);
+    app.use('/api/documents', documentRoutes);
+    app.use('/sign', signRoutes);
+    routesLoaded = true;
+  } catch (err) {
+    loadError = err as Error;
+    console.error('Failed to load routes:', err);
+  }
+};
+
+// Initialize routes
+loadRoutes();
 
 // Health check
 app.get('/health', (req: Request, res: Response) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    routesLoaded,
+    loadError: loadError?.message
+  });
 });
 
 // Root route
 app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'E-Sign API Server', status: 'running' });
+  res.json({
+    message: 'E-Sign API Server',
+    status: 'running',
+    routesLoaded,
+    loadError: loadError?.message
+  });
 });
 
 // Error handler
