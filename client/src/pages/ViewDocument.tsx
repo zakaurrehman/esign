@@ -26,7 +26,8 @@ export const ViewDocument: React.FC = () => {
     try {
       const response = await documentApi.get(id);
       setDocument(response.data.document);
-      if (response.data.document.pdfPath) {
+      // Check for either pdfPath or pdfData (serverless stores in database)
+      if (response.data.document.pdfPath || response.data.document.pdfData) {
         setPdfUrl(documentApi.getPdfUrl(id) + `?t=${Date.now()}`);
       }
     } catch (error) {
