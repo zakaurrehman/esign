@@ -1,6 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import authRoutes from '../src/routes/auth';
+import documentRoutes from '../src/routes/documents';
+import signRoutes from '../src/routes/sign';
 
 const app = express();
 
@@ -17,6 +20,11 @@ app.use(cors({
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/documents', documentRoutes);
+app.use('/sign', signRoutes);
 
 // Health check
 app.get('/health', (req: Request, res: Response) => {
