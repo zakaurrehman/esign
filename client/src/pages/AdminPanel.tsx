@@ -5,10 +5,8 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import api from '../services/api';
 import type { User } from '../types/index';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const AdminPanel: React.FC = () => {
   const { isAdmin } = useAuthStore();
@@ -30,10 +28,7 @@ export const AdminPanel: React.FC = () => {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/auth/users`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/api/auth/users');
       setUsers(response.data.users);
     } catch (error: any) {
       toast.error('Failed to load users');
@@ -46,10 +41,7 @@ export const AdminPanel: React.FC = () => {
     e.preventDefault();
     setIsCreating(true);
     try {
-      const token = localStorage.getItem('token');
-      await axios.post(`${API_URL}/auth/users`, newUser, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post('/api/auth/users', newUser);
       toast.success('User created successfully');
       setNewUser({ email: '', name: '', password: '' });
       setShowCreateForm(false);
@@ -66,10 +58,7 @@ export const AdminPanel: React.FC = () => {
       return;
     }
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${API_URL}/auth/users/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/auth/users/${userId}`);
       toast.success('User deleted successfully');
       fetchUsers();
     } catch (error: any) {
