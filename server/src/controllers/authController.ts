@@ -115,6 +115,10 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Cannot delete super admin' });
     }
 
+    // Delete all user's documents first (this will cascade to recipients, fields, audit logs)
+    await prisma.document.deleteMany({ where: { userId } });
+
+    // Now delete the user
     await prisma.user.delete({ where: { id: userId } });
 
     return res.json({ message: 'User deleted successfully' });
