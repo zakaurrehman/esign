@@ -67,6 +67,48 @@ app.get('/health', (req: Request, res: Response) => {
   });
 });
 
+// Database initialization endpoint (run once to set up schema)
+app.get('/init-db', async (req: Request, res: Response) => {
+  try {
+    const { PrismaClient } = await import('@prisma/client');
+    const bcrypt = (await import('bcryptjs')).default;
+    const prisma = new PrismaClient();
+
+    // Run raw SQL to add columns if they don't exist
+    try {
+      await prisma.$executeRaw`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "role" TEXT NOT NULL DEFAULT 'USER'`;
+    } catch (e) {
+      console.log('Role column may already exist or error:', e);
+    }
+
+    try {
+      await prisma.$executeRaw`ALTER TABLE "Document" ADD COLUMN IF NOT EXISTS "pdfData" TEXT`;
+    } catch (e) {
+      console.log('pdfData column may already exist or error:', e);
+    }
+
+    // Create super admin if doesn't exist
+    const existingAdmin = await prisma.user.findUnique({
+      where: { email: 'management@hiredbillingsupport.com' }
+    });
+
+    if (!existingAdmin) {
+      const hashedPassword = await bcrypt.hash('Super_admin123', 10);
+      await prisma.$executeRaw`INSERT INTO "User" (id, email, name, password, role, "createdAt", "updatedAt") VALUES (gen_random_uuid(), 'management@hiredbillingsupport.com', 'Super Admin', ${hashedPassword}, 'SUPER_ADMIN', NOW(), NOW())`;
+      res.json({ success: true, message: 'Database initialized and super admin created' });
+    } else {
+      // Update existing user to have SUPER_ADMIN role
+      await prisma.$executeRaw`UPDATE "User" SET role = 'SUPER_ADMIN' WHERE email = 'management@hiredbillingsupport.com'`;
+      res.json({ success: true, message: 'Database initialized, admin already exists' });
+    }
+
+    await prisma.$disconnect();
+  } catch (error: any) {
+    console.error('Init DB error:', error);
+    res.status(500).json({ error: 'Failed to initialize database', details: error.message });
+  }
+});
+
 // Root route
 app.get('/', (req: Request, res: Response) => {
   res.json({
