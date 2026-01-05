@@ -7,8 +7,8 @@ interface AuthState {
   token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, name: string, password: string) => Promise<void>;
   logout: () => void;
   checkAuth: () => Promise<void>;
 }
@@ -18,39 +18,34 @@ export const useAuthStore = create<AuthState>((set) => ({
   token: localStorage.getItem('token'),
   isLoading: true,
   isAuthenticated: false,
+  isAdmin: false,
 
   login: async (email: string, password: string) => {
     const response = await authApi.login({ email, password });
     const { user, token } = response.data;
     localStorage.setItem('token', token);
-    set({ user, token, isAuthenticated: true });
-  },
-
-  register: async (email: string, name: string, password: string) => {
-    const response = await authApi.register({ email, name, password });
-    const { user, token } = response.data;
-    localStorage.setItem('token', token);
-    set({ user, token, isAuthenticated: true });
+    set({ user, token, isAuthenticated: true, isAdmin: user.role === 'SUPER_ADMIN' });
   },
 
   logout: () => {
     localStorage.removeItem('token');
-    set({ user: null, token: null, isAuthenticated: false });
+    set({ user: null, token: null, isAuthenticated: false, isAdmin: false });
   },
 
   checkAuth: async () => {
     const token = localStorage.getItem('token');
     if (!token) {
-      set({ isLoading: false, isAuthenticated: false });
+      set({ isLoading: false, isAuthenticated: false, isAdmin: false });
       return;
     }
 
     try {
       const response = await authApi.me();
-      set({ user: response.data.user, isAuthenticated: true, isLoading: false });
+      const user = response.data.user;
+      set({ user, isAuthenticated: true, isAdmin: user.role === 'SUPER_ADMIN', isLoading: false });
     } catch {
       localStorage.removeItem('token');
-      set({ user: null, token: null, isAuthenticated: false, isLoading: false });
+      set({ user: null, token: null, isAuthenticated: false, isAdmin: false, isLoading: false });
     }
   }
 }));

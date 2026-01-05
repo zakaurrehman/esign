@@ -4,13 +4,13 @@ import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
 import { Layout } from './components/Layout';
 import { Login } from './pages/Login';
-import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
 import { CreateDocument } from './pages/CreateDocument';
 import { PrepareDocument } from './pages/PrepareDocument';
 import { ViewDocument } from './pages/ViewDocument';
 import { SignDocument } from './pages/SignDocument';
 import { SignComplete, SignDeclined } from './pages/SignComplete';
+import { AdminPanel } from './pages/AdminPanel';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuthStore();
@@ -68,14 +68,6 @@ function App() {
             </PublicRoute>
           }
         />
-        <Route
-          path="/register"
-          element={
-            <PublicRoute>
-              <Register />
-            </PublicRoute>
-          }
-        />
 
         {/* Public signing routes */}
         <Route path="/sign/:documentId/:token" element={<SignDocument />} />
@@ -95,6 +87,7 @@ function App() {
           <Route path="create" element={<CreateDocument />} />
           <Route path="prepare/:id" element={<PrepareDocument />} />
           <Route path="document/:id" element={<ViewDocument />} />
+          <Route path="admin" element={<AdminPanel />} />
         </Route>
       </Routes>
     </BrowserRouter>

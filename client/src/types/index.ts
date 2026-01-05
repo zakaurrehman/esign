@@ -7,6 +7,9 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  role?: string;
+  createdAt?: string;
+  _count?: { documents: number };
 }
 
 export interface Document {

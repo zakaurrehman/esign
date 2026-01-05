@@ -3,7 +3,7 @@ import { Link, useNavigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 
 export const Layout: React.FC = () => {
-  const { user, logout } = useAuthStore();
+  const { user, isAdmin, logout } = useAuthStore();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -33,6 +33,14 @@ export const Layout: React.FC = () => {
                 >
                   + Create Document
                 </Link>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="text-white/90 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-all no-underline"
+                  >
+                    User Management
+                  </Link>
+                )}
               </div>
             </div>
             <div className="flex items-center space-x-4">

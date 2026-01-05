@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -69,12 +69,6 @@ export const Login: React.FC = () => {
               Sign in
             </Button>
           </form>
-          <p className="mt-6 text-center text-sm text-slate-600">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-indigo-600 hover:text-indigo-700 font-semibold">
-              Create account
-            </Link>
-          </p>
         </CardContent>
       </Card>
     </div>
