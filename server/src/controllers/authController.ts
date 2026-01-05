@@ -54,13 +54,16 @@ export const login = async (req: Request, res: Response) => {
       { expiresIn: '7d' }
     );
 
+    // Handle case where role might not exist yet in database
+    const userRole = (user as any).role || 'USER';
+
     return res.json({
-      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      user: { id: user.id, email: user.email, name: user.name, role: userRole },
       token
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Login error:', error);
-    return res.status(500).json({ error: 'Failed to login' });
+    return res.status(500).json({ error: 'Failed to login', details: error.message });
   }
 };
 
