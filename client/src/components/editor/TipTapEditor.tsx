@@ -31,8 +31,10 @@ const FONT_FAMILIES = [
 const FONT_SIZES = ['8', '9', '10', '11', '12', '14', '16', '18', '20', '24', '28', '32', '36', '48', '72'];
 
 const TEXT_COLORS = [
-  '#000000', '#FFFFFF', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF',
-  '#800000', '#008000', '#000080', '#808000', '#800080', '#008080', '#C0C0C0', '#808080'
+  '#000000', '#434343', '#666666', '#999999', '#B7B7B7', '#CCCCCC', '#D9D9D9', '#EFEFEF',
+  '#F3F3F3', '#FFFFFF', '#980000', '#FF0000', '#FF9900', '#FFFF00', '#00FF00', '#00FFFF',
+  '#4A86E8', '#0000FF', '#9900FF', '#FF00FF', '#E6B8AF', '#F4CCCC', '#FCE5CD', '#FFF2CC',
+  '#D9EAD3', '#D0E0E3', '#C9DAF8', '#CFE2F3', '#D9D2E9', '#EAD1DC'
 ];
 
 export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange }) => {
@@ -61,7 +63,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[400px] p-4'
+        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[500px] p-6'
       }
     }
   });
@@ -79,8 +81,10 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className={`px-2.5 py-1.5 rounded text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-        isActive ? 'bg-indigo-100 text-indigo-700 shadow-sm' : 'text-gray-700 hover:bg-gray-100'
+      className={`p-2 rounded-md text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed min-w-[36px] h-9 flex items-center justify-center ${
+        isActive
+          ? 'bg-indigo-600 text-white shadow-md hover:bg-indigo-700'
+          : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
       }`}
       type="button"
     >
@@ -88,16 +92,16 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
     </button>
   );
 
-  const Divider = () => <div className="w-px h-6 bg-gray-300 mx-1" />;
+  const Divider = () => <div className="w-px h-8 bg-gray-200 mx-1" />;
 
   const currentFontFamily = editor.getAttributes('textStyle').fontFamily || 'Arial';
 
   return (
-    <div className="border border-gray-300 rounded-lg overflow-hidden shadow-sm">
+    <div className="border border-gray-200 rounded-xl overflow-hidden shadow-lg bg-white">
       {/* Toolbar */}
-      <div className="bg-gray-50 border-b border-gray-300">
+      <div className="bg-gradient-to-b from-gray-50 to-white border-b border-gray-200">
         {/* First Row - Font Controls */}
-        <div className="flex flex-wrap gap-1 p-2 border-b border-gray-200">
+        <div className="flex flex-wrap items-center gap-1.5 p-3 border-b border-gray-100">
           {/* Font Family Dropdown */}
           <div className="relative">
             <button
@@ -107,16 +111,16 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                 setShowColorPicker(false);
                 setShowHighlightPicker(false);
               }}
-              className="px-3 py-1.5 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 flex items-center gap-2 min-w-[120px]"
+              className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm hover:border-indigo-400 hover:shadow-sm transition-all flex items-center gap-2 min-w-[140px] h-9 font-medium"
               type="button"
             >
-              <span className="truncate">{currentFontFamily}</span>
-              <svg className="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <span className="truncate flex-1 text-left">{currentFontFamily}</span>
+              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </button>
             {showFontMenu && (
-              <div className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded shadow-lg z-10 max-h-64 overflow-y-auto min-w-[160px]">
+              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-80 overflow-y-auto min-w-[180px]">
                 {FONT_FAMILIES.map((font) => (
                   <button
                     key={font}
@@ -124,7 +128,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                       editor.chain().focus().setFontFamily(font).run();
                       setShowFontMenu(false);
                     }}
-                    className="w-full text-left px-3 py-2 hover:bg-indigo-50 text-sm"
+                    className="w-full text-left px-4 py-2.5 hover:bg-indigo-50 hover:text-indigo-700 text-sm transition-colors"
                     style={{ fontFamily: font }}
                     type="button"
                   >
@@ -144,24 +148,23 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                 setShowColorPicker(false);
                 setShowHighlightPicker(false);
               }}
-              className="px-3 py-1.5 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 flex items-center gap-2 min-w-[70px]"
+              className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm hover:border-indigo-400 hover:shadow-sm transition-all flex items-center gap-2 min-w-[70px] h-9 font-medium"
               type="button"
             >
-              <span>12</span>
-              <svg className="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <span className="flex-1 text-left">12</span>
+              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </button>
             {showSizeMenu && (
-              <div className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded shadow-lg z-10 max-h-64 overflow-y-auto">
+              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-80 overflow-y-auto">
                 {FONT_SIZES.map((size) => (
                   <button
                     key={size}
                     onClick={() => {
-                      // TipTap doesn't have built-in font size, we'll use heading or inline styles
                       setShowSizeMenu(false);
                     }}
-                    className="w-full text-left px-3 py-2 hover:bg-indigo-50 text-sm"
+                    className="w-full text-left px-4 py-2.5 hover:bg-indigo-50 hover:text-indigo-700 text-sm transition-colors min-w-[80px]"
                     type="button"
                   >
                     {size}
@@ -179,28 +182,28 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
             isActive={editor.isActive('bold')}
             title="Bold (Ctrl+B)"
           >
-            <strong className="font-bold">B</strong>
+            <strong className="font-bold text-base">B</strong>
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleItalic().run()}
             isActive={editor.isActive('italic')}
             title="Italic (Ctrl+I)"
           >
-            <em className="italic">I</em>
+            <em className="italic text-base">I</em>
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleUnderline().run()}
             isActive={editor.isActive('underline')}
             title="Underline (Ctrl+U)"
           >
-            <u className="underline">U</u>
+            <u className="underline text-base">U</u>
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleStrike().run()}
             isActive={editor.isActive('strike')}
             title="Strikethrough"
           >
-            <s className="line-through">S</s>
+            <s className="line-through text-base">S</s>
           </ToolbarButton>
 
           <Divider />
@@ -211,14 +214,14 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
             isActive={editor.isActive('subscript')}
             title="Subscript"
           >
-            X<sub className="text-xs">2</sub>
+            <span className="text-sm">X<sub className="text-xs">₂</sub></span>
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleSuperscript().run()}
             isActive={editor.isActive('superscript')}
             title="Superscript"
           >
-            X<sup className="text-xs">2</sup>
+            <span className="text-sm">X<sup className="text-xs">²</sup></span>
           </ToolbarButton>
 
           <Divider />
@@ -232,16 +235,17 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                 setShowFontMenu(false);
                 setShowSizeMenu(false);
               }}
-              className="px-2.5 py-1.5 rounded text-sm font-medium text-gray-700 hover:bg-gray-100 flex items-center gap-1"
+              className="p-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 active:bg-gray-200 transition-all min-w-[36px] h-9 flex flex-col items-center justify-center gap-0.5"
               title="Text Color"
               type="button"
             >
-              <span>A</span>
-              <div className="w-4 h-1 bg-red-500 rounded" />
+              <span className="font-bold text-base">A</span>
+              <div className="w-5 h-1 bg-red-500 rounded-full" />
             </button>
             {showColorPicker && (
-              <div className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded shadow-lg z-10 p-2">
-                <div className="grid grid-cols-8 gap-1">
+              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 p-3 min-w-[240px]">
+                <p className="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Text Color</p>
+                <div className="grid grid-cols-10 gap-1.5">
                   {TEXT_COLORS.map((color) => (
                     <button
                       key={color}
@@ -249,7 +253,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                         editor.chain().focus().setColor(color).run();
                         setShowColorPicker(false);
                       }}
-                      className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
+                      className="w-6 h-6 rounded-md border-2 border-gray-200 hover:border-indigo-500 hover:scale-110 transition-all shadow-sm"
                       style={{ backgroundColor: color }}
                       type="button"
                       title={color}
@@ -269,15 +273,19 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                 setShowFontMenu(false);
                 setShowSizeMenu(false);
               }}
-              className="px-2.5 py-1.5 rounded text-sm font-medium text-gray-700 hover:bg-gray-100 flex items-center gap-1"
+              className="p-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 active:bg-gray-200 transition-all min-w-[36px] h-9 flex items-center justify-center"
               title="Highlight Color"
               type="button"
             >
-              <span className="bg-yellow-300 px-1">ab</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                <rect x="6" y="16" width="12" height="2" fill="#FFEB3B" />
+              </svg>
             </button>
             {showHighlightPicker && (
-              <div className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded shadow-lg z-10 p-2">
-                <div className="grid grid-cols-8 gap-1">
+              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 p-3 min-w-[240px]">
+                <p className="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Highlight Color</p>
+                <div className="grid grid-cols-10 gap-1.5">
                   {TEXT_COLORS.map((color) => (
                     <button
                       key={color}
@@ -285,7 +293,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                         editor.chain().focus().setHighlight({ color }).run();
                         setShowHighlightPicker(false);
                       }}
-                      className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
+                      className="w-6 h-6 rounded-md border-2 border-gray-200 hover:border-indigo-500 hover:scale-110 transition-all shadow-sm"
                       style={{ backgroundColor: color }}
                       type="button"
                       title={color}
@@ -297,10 +305,10 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                     editor.chain().focus().unsetHighlight().run();
                     setShowHighlightPicker(false);
                   }}
-                  className="w-full mt-2 px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded"
+                  className="w-full mt-3 px-3 py-2 text-xs font-medium bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
                   type="button"
                 >
-                  No Color
+                  No Highlight
                 </button>
               </div>
             )}
@@ -313,19 +321,21 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
             onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}
             title="Clear Formatting"
           >
-            <span className="text-xs">✗ Format</span>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </ToolbarButton>
         </div>
 
         {/* Second Row - Paragraph Controls */}
-        <div className="flex flex-wrap gap-1 p-2">
+        <div className="flex flex-wrap items-center gap-1.5 p-3">
           {/* Bullet List */}
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             isActive={editor.isActive('bulletList')}
             title="Bullet List"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </ToolbarButton>
@@ -336,7 +346,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
             isActive={editor.isActive('orderedList')}
             title="Numbered List"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
             </svg>
           </ToolbarButton>
@@ -349,7 +359,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
             disabled={!editor.can().liftListItem('listItem')}
             title="Decrease Indent"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
             </svg>
           </ToolbarButton>
@@ -360,7 +370,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
             disabled={!editor.can().sinkListItem('listItem')}
             title="Increase Indent"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
             </svg>
           </ToolbarButton>
@@ -373,7 +383,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
             isActive={editor.isActive({ textAlign: 'left' })}
             title="Align Left"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h10M4 18h16" />
             </svg>
           </ToolbarButton>
@@ -384,7 +394,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
             isActive={editor.isActive({ textAlign: 'center' })}
             title="Align Center"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M7 12h10M4 18h16" />
             </svg>
           </ToolbarButton>
@@ -395,7 +405,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
             isActive={editor.isActive({ textAlign: 'right' })}
             title="Align Right"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M10 12h10M4 18h16" />
             </svg>
           </ToolbarButton>
@@ -406,7 +416,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
             isActive={editor.isActive({ textAlign: 'justify' })}
             title="Justify"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </ToolbarButton>
@@ -419,21 +429,21 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
             isActive={editor.isActive('heading', { level: 1 })}
             title="Heading 1"
           >
-            H1
+            <span className="font-bold">H1</span>
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
             isActive={editor.isActive('heading', { level: 2 })}
             title="Heading 2"
           >
-            H2
+            <span className="font-bold">H2</span>
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
             isActive={editor.isActive('heading', { level: 3 })}
             title="Heading 3"
           >
-            H3
+            <span className="font-bold">H3</span>
           </ToolbarButton>
 
           <Divider />
@@ -444,7 +454,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
             isActive={editor.isActive('blockquote')}
             title="Quote"
           >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z" />
             </svg>
           </ToolbarButton>
@@ -454,7 +464,9 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
             onClick={() => editor.chain().focus().setHorizontalRule().run()}
             title="Horizontal Line"
           >
-            <span className="text-xs">─</span>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 12h16" />
+            </svg>
           </ToolbarButton>
         </div>
       </div>
