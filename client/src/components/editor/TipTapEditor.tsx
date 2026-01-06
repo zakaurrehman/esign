@@ -81,7 +81,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className={`p-2 rounded-md text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed min-w-[36px] h-9 flex items-center justify-center ${
+      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed min-w-[40px] h-10 flex items-center justify-center ${
         isActive
           ? 'bg-indigo-600 text-white shadow-md hover:bg-indigo-700'
           : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
@@ -92,7 +92,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
     </button>
   );
 
-  const Divider = () => <div className="w-px h-8 bg-gray-200 mx-1" />;
+  const Divider = () => <div className="w-px h-8 bg-gray-200 mx-2" />;
 
   const currentFontFamily = editor.getAttributes('textStyle').fontFamily || 'Arial';
 
@@ -101,7 +101,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
       {/* Toolbar */}
       <div className="bg-gradient-to-b from-gray-50 to-white border-b border-gray-200">
         {/* First Row - Font Controls */}
-        <div className="flex flex-wrap items-center gap-1.5 p-3 border-b border-gray-100">
+        <div className="flex flex-wrap items-center gap-2 p-4 border-b border-gray-100">
           {/* Font Family Dropdown */}
           <div className="relative">
             <button
@@ -111,7 +111,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                 setShowColorPicker(false);
                 setShowHighlightPicker(false);
               }}
-              className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm hover:border-indigo-400 hover:shadow-sm transition-all flex items-center gap-2 min-w-[140px] h-9 font-medium"
+              className="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm hover:border-indigo-400 hover:shadow-sm transition-all flex items-center gap-2 min-w-[150px] h-10 font-medium"
               type="button"
             >
               <span className="truncate flex-1 text-left">{currentFontFamily}</span>
@@ -148,7 +148,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                 setShowColorPicker(false);
                 setShowHighlightPicker(false);
               }}
-              className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm hover:border-indigo-400 hover:shadow-sm transition-all flex items-center gap-2 min-w-[70px] h-9 font-medium"
+              className="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm hover:border-indigo-400 hover:shadow-sm transition-all flex items-center gap-2 min-w-[80px] h-10 font-medium"
               type="button"
             >
               <span className="flex-1 text-left">12</span>
@@ -235,7 +235,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                 setShowFontMenu(false);
                 setShowSizeMenu(false);
               }}
-              className="p-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 active:bg-gray-200 transition-all min-w-[36px] h-9 flex flex-col items-center justify-center gap-0.5"
+              className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 active:bg-gray-200 transition-all min-w-[40px] h-10 flex flex-col items-center justify-center gap-0.5"
               title="Text Color"
               type="button"
             >
@@ -273,7 +273,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                 setShowFontMenu(false);
                 setShowSizeMenu(false);
               }}
-              className="p-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 active:bg-gray-200 transition-all min-w-[36px] h-9 flex items-center justify-center"
+              className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 active:bg-gray-200 transition-all min-w-[40px] h-10 flex items-center justify-center"
               title="Highlight Color"
               type="button"
             >
@@ -328,7 +328,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
         </div>
 
         {/* Second Row - Paragraph Controls */}
-        <div className="flex flex-wrap items-center gap-1.5 p-3">
+        <div className="flex flex-wrap items-center gap-2 p-4">
           {/* Bullet List */}
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleBulletList().run()}
