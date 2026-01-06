@@ -1,10 +1,11 @@
 import React from 'react';
-import { Link, useNavigate, Outlet } from 'react-router-dom';
+import { Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 
 export const Layout: React.FC = () => {
   const { user, isAdmin, logout } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -23,20 +24,32 @@ export const Layout: React.FC = () => {
               <div className="ml-10 flex items-center space-x-3">
                 <Link
                   to="/"
-                  className="text-white/90 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-all no-underline"
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all no-underline ${
+                    location.pathname === '/'
+                      ? 'bg-white/20 text-white font-semibold'
+                      : 'text-white/90 hover:text-white hover:bg-white/10'
+                  }`}
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/create"
-                  className="bg-white text-indigo-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-50 transition-all no-underline shadow-md"
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all no-underline shadow-md ${
+                    location.pathname === '/create'
+                      ? 'bg-white text-indigo-700'
+                      : 'bg-white/90 text-indigo-600 hover:bg-white'
+                  }`}
                 >
                   + Create Document
                 </Link>
                 {isAdmin && (
                   <Link
                     to="/admin"
-                    className="text-white/90 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-all no-underline"
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all no-underline ${
+                      location.pathname === '/admin'
+                        ? 'bg-white/20 text-white font-semibold'
+                        : 'text-white/90 hover:text-white hover:bg-white/10'
+                    }`}
                   >
                     User Management
                   </Link>
