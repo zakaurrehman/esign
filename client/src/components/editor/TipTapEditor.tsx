@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useEditor, EditorContent, Extension } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -141,6 +141,35 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
   const [showNumbering, setShowNumbering] = useState(false);
   const [showBorders, setShowBorders] = useState(false);
 
+  const toolbarRef = useRef<HTMLDivElement>(null);
+
+  // Close all dropdowns
+  const closeAllDropdowns = useCallback(() => {
+    setShowFontMenu(false);
+    setShowSizeMenu(false);
+    setShowColorPicker(false);
+    setShowHighlightPicker(false);
+    setShowTextEffects(false);
+    setShowLineSpacing(false);
+    setShowBullets(false);
+    setShowNumbering(false);
+    setShowBorders(false);
+  }, []);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (toolbarRef.current && !toolbarRef.current.contains(event.target as Node)) {
+        closeAllDropdowns();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [closeAllDropdowns]);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -183,7 +212,10 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
     disabled?: boolean;
   }> = ({ onClick, isActive, children, title, disabled }) => (
     <button
-      onClick={onClick}
+      onClick={() => {
+        closeAllDropdowns();
+        onClick();
+      }}
       disabled={disabled}
       title={title}
       className={`px-3 py-2 rounded-lg text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed min-w-[40px] h-10 flex items-center justify-center ${
@@ -205,7 +237,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden shadow-lg bg-white">
       {/* Toolbar */}
-      <div className="bg-gradient-to-b from-gray-50 to-white border-b border-gray-200">
+      <div ref={toolbarRef} className="bg-gradient-to-b from-gray-50 to-white border-b border-gray-200">
         {/* First Row - Font Controls */}
         <div className="flex flex-wrap items-center gap-2 p-4 border-b border-gray-100">
           {/* Font Family Dropdown */}
