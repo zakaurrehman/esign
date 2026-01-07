@@ -177,51 +177,93 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
               </svg>
             </button>
             {showFontMenu && (
-              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-80 overflow-y-auto min-w-[220px]">
-                <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
-                  <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Theme Fonts</p>
-                </div>
-                <button
-                  onClick={() => {
-                    editor.chain().focus().setFontFamily('Calibri').run();
-                    setShowFontMenu(false);
-                  }}
-                  className="w-full text-left px-4 py-2.5 hover:bg-indigo-50 hover:text-indigo-700 text-sm transition-colors border-b border-gray-100"
-                  style={{ fontFamily: 'Calibri' }}
-                  type="button"
-                >
-                  <div className="font-medium">Calibri</div>
-                  <div className="text-xs text-gray-500">Headings</div>
-                </button>
-                <button
-                  onClick={() => {
-                    editor.chain().focus().setFontFamily('Arial').run();
-                    setShowFontMenu(false);
-                  }}
-                  className="w-full text-left px-4 py-2.5 hover:bg-indigo-50 hover:text-indigo-700 text-sm transition-colors border-b border-gray-200"
-                  style={{ fontFamily: 'Arial' }}
-                  type="button"
-                >
-                  <div className="font-medium">Arial</div>
-                  <div className="text-xs text-gray-500">Body</div>
-                </button>
-                <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
-                  <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">All Fonts</p>
-                </div>
-                {FONT_FAMILIES.map((font) => (
+              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 min-w-[280px] overflow-hidden">
+                {/* Theme Fonts Section */}
+                <div className="border-b border-gray-200">
+                  <div className="px-4 py-2.5 bg-gray-50/80">
+                    <p className="text-xs font-bold text-gray-700 tracking-wide">Theme Fonts</p>
+                  </div>
                   <button
-                    key={font}
                     onClick={() => {
-                      editor.chain().focus().setFontFamily(font).run();
+                      editor.chain().focus().setFontFamily('Calibri').run();
                       setShowFontMenu(false);
                     }}
-                    className="w-full text-left px-4 py-2.5 hover:bg-indigo-50 hover:text-indigo-700 text-sm transition-colors"
-                    style={{ fontFamily: font }}
+                    className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors group"
                     type="button"
                   >
-                    {font}
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-light text-base" style={{ fontFamily: 'Calibri' }}>Calibri Light</span>
+                      <span className="text-xs text-gray-500 ml-auto">(Headings)</span>
+                    </div>
                   </button>
-                ))}
+                  <button
+                    onClick={() => {
+                      editor.chain().focus().setFontFamily('Calibri').run();
+                      setShowFontMenu(false);
+                    }}
+                    className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-200 group"
+                    type="button"
+                  >
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-base" style={{ fontFamily: 'Calibri' }}>Calibri</span>
+                      <span className="text-xs text-gray-500 ml-auto">(Body)</span>
+                    </div>
+                  </button>
+                </div>
+
+                {/* Recently Used Fonts Section */}
+                <div className="border-b border-gray-200">
+                  <div className="px-4 py-2.5 bg-gray-50/80">
+                    <p className="text-xs font-bold text-gray-700 tracking-wide">Recently Used Fonts</p>
+                  </div>
+                  <div className="max-h-32 overflow-y-auto">
+                    <button
+                      onClick={() => {
+                        editor.chain().focus().setFontFamily('Arial').run();
+                        setShowFontMenu(false);
+                      }}
+                      className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors"
+                      style={{ fontFamily: 'Arial' }}
+                      type="button"
+                    >
+                      Arial
+                    </button>
+                    <button
+                      onClick={() => {
+                        editor.chain().focus().setFontFamily('Times New Roman').run();
+                        setShowFontMenu(false);
+                      }}
+                      className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-200"
+                      style={{ fontFamily: 'Times New Roman' }}
+                      type="button"
+                    >
+                      Times New Roman
+                    </button>
+                  </div>
+                </div>
+
+                {/* All Fonts Section */}
+                <div>
+                  <div className="px-4 py-2.5 bg-gray-50/80 sticky top-0 z-10">
+                    <p className="text-xs font-bold text-gray-700 tracking-wide">All Fonts</p>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto custom-scrollbar">
+                    {FONT_FAMILIES.map((font) => (
+                      <button
+                        key={font}
+                        onClick={() => {
+                          editor.chain().focus().setFontFamily(font).run();
+                          setShowFontMenu(false);
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors text-[15px]"
+                        style={{ fontFamily: font }}
+                        type="button"
+                      >
+                        {font}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
           </div>
