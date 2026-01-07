@@ -177,10 +177,10 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
               </svg>
             </button>
             {showFontMenu && (
-              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 min-w-[280px] overflow-hidden">
+              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 min-w-[280px] max-h-[400px] overflow-y-auto custom-scrollbar">
                 {/* Theme Fonts Section */}
                 <div className="border-b border-gray-200">
-                  <div className="px-4 py-2.5 bg-gray-50/80">
+                  <div className="px-4 py-2.5 bg-gray-50/80 sticky top-0 z-10">
                     <p className="text-xs font-bold text-gray-700 tracking-wide">Theme Fonts</p>
                   </div>
                   <button
@@ -201,7 +201,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                       editor.chain().focus().setFontFamily('Calibri').run();
                       setShowFontMenu(false);
                     }}
-                    className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-200 group"
+                    className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors group"
                     type="button"
                   >
                     <div className="flex items-baseline gap-2">
@@ -213,33 +213,31 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
 
                 {/* Recently Used Fonts Section */}
                 <div className="border-b border-gray-200">
-                  <div className="px-4 py-2.5 bg-gray-50/80">
+                  <div className="px-4 py-2.5 bg-gray-50/80 sticky top-0 z-10">
                     <p className="text-xs font-bold text-gray-700 tracking-wide">Recently Used Fonts</p>
                   </div>
-                  <div className="max-h-32 overflow-y-auto custom-scrollbar">
-                    <button
-                      onClick={() => {
-                        editor.chain().focus().setFontFamily('Arial').run();
-                        setShowFontMenu(false);
-                      }}
-                      className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors"
-                      style={{ fontFamily: 'Arial' }}
-                      type="button"
-                    >
-                      Arial
-                    </button>
-                    <button
-                      onClick={() => {
-                        editor.chain().focus().setFontFamily('Times New Roman').run();
-                        setShowFontMenu(false);
-                      }}
-                      className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-200"
-                      style={{ fontFamily: 'Times New Roman' }}
-                      type="button"
-                    >
-                      Times New Roman
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => {
+                      editor.chain().focus().setFontFamily('Arial').run();
+                      setShowFontMenu(false);
+                    }}
+                    className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors"
+                    style={{ fontFamily: 'Arial' }}
+                    type="button"
+                  >
+                    Arial
+                  </button>
+                  <button
+                    onClick={() => {
+                      editor.chain().focus().setFontFamily('Times New Roman').run();
+                      setShowFontMenu(false);
+                    }}
+                    className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors"
+                    style={{ fontFamily: 'Times New Roman' }}
+                    type="button"
+                  >
+                    Times New Roman
+                  </button>
                 </div>
 
                 {/* All Fonts Section */}
@@ -247,22 +245,20 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                   <div className="px-4 py-2.5 bg-gray-50/80 sticky top-0 z-10">
                     <p className="text-xs font-bold text-gray-700 tracking-wide">All Fonts</p>
                   </div>
-                  <div className="max-h-64 overflow-y-auto custom-scrollbar">
-                    {FONT_FAMILIES.map((font) => (
-                      <button
-                        key={font}
-                        onClick={() => {
-                          editor.chain().focus().setFontFamily(font).run();
-                          setShowFontMenu(false);
-                        }}
-                        className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors text-[15px]"
-                        style={{ fontFamily: font }}
-                        type="button"
-                      >
-                        {font}
-                      </button>
-                    ))}
-                  </div>
+                  {FONT_FAMILIES.map((font) => (
+                    <button
+                      key={font}
+                      onClick={() => {
+                        editor.chain().focus().setFontFamily(font).run();
+                        setShowFontMenu(false);
+                      }}
+                      className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors text-[15px]"
+                      style={{ fontFamily: font }}
+                      type="button"
+                    >
+                      {font}
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
