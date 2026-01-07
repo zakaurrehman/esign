@@ -216,7 +216,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                   <div className="px-4 py-2.5 bg-gray-50/80">
                     <p className="text-xs font-bold text-gray-700 tracking-wide">Recently Used Fonts</p>
                   </div>
-                  <div className="max-h-32 overflow-y-auto">
+                  <div className="max-h-32 overflow-y-auto custom-scrollbar">
                     <button
                       onClick={() => {
                         editor.chain().focus().setFontFamily('Arial').run();
