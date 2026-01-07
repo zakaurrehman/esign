@@ -177,23 +177,26 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
               </svg>
             </button>
             {showFontMenu && (
-              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 min-w-[280px] max-h-[320px] custom-scrollbar">
+              <div
+                className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 min-w-[280px]"
+                style={{ maxHeight: '320px', overflowY: 'scroll' }}
+              >
                 {/* Theme Fonts Section */}
                 <div className="border-b border-gray-200">
-                  <div className="px-4 py-2.5 bg-gray-50/80 sticky top-0 z-10">
-                    <p className="text-xs font-bold text-gray-700 tracking-wide">Theme Fonts</p>
+                  <div className="px-4 py-2 bg-gray-100">
+                    <p className="text-xs font-bold text-gray-600 uppercase tracking-wide">Theme Fonts</p>
                   </div>
                   <button
                     onClick={() => {
                       editor.chain().focus().setFontFamily('Calibri').run();
                       setShowFontMenu(false);
                     }}
-                    className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors group"
+                    className="w-full text-left px-4 py-2.5 hover:bg-blue-50 transition-colors"
                     type="button"
                   >
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-light text-base" style={{ fontFamily: 'Calibri' }}>Calibri Light</span>
-                      <span className="text-xs text-gray-500 ml-auto">(Headings)</span>
+                    <div className="flex items-center justify-between">
+                      <span className="font-light text-sm" style={{ fontFamily: 'Calibri' }}>Calibri Light</span>
+                      <span className="text-xs text-gray-400">(Headings)</span>
                     </div>
                   </button>
                   <button
@@ -201,27 +204,27 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                       editor.chain().focus().setFontFamily('Calibri').run();
                       setShowFontMenu(false);
                     }}
-                    className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors group"
+                    className="w-full text-left px-4 py-2.5 hover:bg-blue-50 transition-colors"
                     type="button"
                   >
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-base" style={{ fontFamily: 'Calibri' }}>Calibri</span>
-                      <span className="text-xs text-gray-500 ml-auto">(Body)</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm" style={{ fontFamily: 'Calibri' }}>Calibri</span>
+                      <span className="text-xs text-gray-400">(Body)</span>
                     </div>
                   </button>
                 </div>
 
                 {/* Recently Used Fonts Section */}
                 <div className="border-b border-gray-200">
-                  <div className="px-4 py-2.5 bg-gray-50/80 sticky top-0 z-10">
-                    <p className="text-xs font-bold text-gray-700 tracking-wide">Recently Used Fonts</p>
+                  <div className="px-4 py-2 bg-gray-100">
+                    <p className="text-xs font-bold text-gray-600 uppercase tracking-wide">Recently Used Fonts</p>
                   </div>
                   <button
                     onClick={() => {
                       editor.chain().focus().setFontFamily('Arial').run();
                       setShowFontMenu(false);
                     }}
-                    className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors"
+                    className="w-full text-left px-4 py-2.5 hover:bg-blue-50 transition-colors text-sm"
                     style={{ fontFamily: 'Arial' }}
                     type="button"
                   >
@@ -232,7 +235,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                       editor.chain().focus().setFontFamily('Times New Roman').run();
                       setShowFontMenu(false);
                     }}
-                    className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors"
+                    className="w-full text-left px-4 py-2.5 hover:bg-blue-50 transition-colors text-sm"
                     style={{ fontFamily: 'Times New Roman' }}
                     type="button"
                   >
@@ -242,8 +245,8 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
 
                 {/* All Fonts Section */}
                 <div>
-                  <div className="px-4 py-2.5 bg-gray-50/80 sticky top-0 z-10">
-                    <p className="text-xs font-bold text-gray-700 tracking-wide">All Fonts</p>
+                  <div className="px-4 py-2 bg-gray-100">
+                    <p className="text-xs font-bold text-gray-600 uppercase tracking-wide">All Fonts</p>
                   </div>
                   {FONT_FAMILIES.map((font) => (
                     <button
@@ -252,7 +255,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
                         editor.chain().focus().setFontFamily(font).run();
                         setShowFontMenu(false);
                       }}
-                      className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors text-[15px]"
+                      className="w-full text-left px-4 py-2.5 hover:bg-blue-50 transition-colors text-sm"
                       style={{ fontFamily: font }}
                       type="button"
                     >
