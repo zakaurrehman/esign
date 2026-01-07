@@ -489,29 +489,33 @@ a {
 .hover\:opacity-90:hover { opacity: 0.9; }
 
 /* Custom Scrollbar for Font Dropdown */
+.custom-scrollbar {
+  overflow-y: scroll !important;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
-  width: 12px;
+  width: 14px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 8px;
+  background: #e2e8f0;
+  border-radius: 0;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 8px;
-  border: 2px solid #f1f5f9;
+  background: #94a3b8;
+  border-radius: 0;
+  border: 3px solid #e2e8f0;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #64748b;
 }
 
 /* Firefox scrollbar */
 .custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 #f1f5f9;
+  scrollbar-width: auto;
+  scrollbar-color: #94a3b8 #e2e8f0;
 }
 
 /* Sticky positioning */

@@ -177,7 +177,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
               </svg>
             </button>
             {showFontMenu && (
-              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 min-w-[280px] max-h-[400px] overflow-y-auto custom-scrollbar">
+              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 min-w-[280px] max-h-[320px] custom-scrollbar">
                 {/* Theme Fonts Section */}
                 <div className="border-b border-gray-200">
                   <div className="px-4 py-2.5 bg-gray-50/80 sticky top-0 z-10">
