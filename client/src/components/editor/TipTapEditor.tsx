@@ -287,14 +287,14 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
               </svg>
             </button>
             {showSizeMenu && (
-              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-80 overflow-y-auto">
+              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-80 overflow-y-auto custom-scrollbar">
                 {FONT_SIZES.map((size) => (
                   <button
                     key={size}
                     onClick={() => {
                       setShowSizeMenu(false);
                     }}
-                    className="w-full text-left px-4 py-2.5 hover:bg-indigo-50 hover:text-indigo-700 text-sm transition-colors min-w-[100px]"
+                    className="w-full text-left px-4 py-2.5 hover:bg-blue-50 text-sm transition-colors min-w-[100px]"
                     type="button"
                   >
                     {size}
@@ -682,19 +682,19 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
               </svg>
             </button>
             {showLineSpacing && (
-              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-2 min-w-[220px]">
+              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-2 min-w-[220px] max-h-80 overflow-y-auto custom-scrollbar">
                 {LINE_SPACING.map((spacing) => (
                   <button
                     key={spacing.value}
-                    className="w-full text-left px-4 py-2 hover:bg-indigo-50 text-sm flex items-center gap-2"
+                    className="w-full text-left px-4 py-2 hover:bg-blue-50 text-sm flex items-center gap-2"
                   >
                     <span className="flex-1">{spacing.label}</span>
                   </button>
                 ))}
                 <div className="border-t border-gray-200 my-2"></div>
-                <button className="w-full text-left px-4 py-2 hover:bg-indigo-50 text-sm">Line Spacing Options...</button>
-                <button className="w-full text-left px-4 py-2 hover:bg-indigo-50 text-sm">Add Space Before Paragraph</button>
-                <button className="w-full text-left px-4 py-2 hover:bg-indigo-50 text-sm">Remove Space After Paragraph</button>
+                <button className="w-full text-left px-4 py-2 hover:bg-blue-50 text-sm">Line Spacing Options...</button>
+                <button className="w-full text-left px-4 py-2 hover:bg-blue-50 text-sm">Add Space Before Paragraph</button>
+                <button className="w-full text-left px-4 py-2 hover:bg-blue-50 text-sm">Remove Space After Paragraph</button>
               </div>
             )}
           </div>
@@ -768,37 +768,37 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
               </svg>
             </button>
             {showBorders && (
-              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-2 min-w-[200px]">
-                <button className="w-full text-left px-4 py-2 hover:bg-indigo-50 text-sm flex items-center gap-2">
+              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-2 min-w-[200px] max-h-80 overflow-y-auto custom-scrollbar">
+                <button className="w-full text-left px-4 py-2 hover:bg-blue-50 text-sm flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <line x1="3" y1="20" x2="21" y2="20" strokeWidth={2} />
                   </svg>
                   Bottom Border
                 </button>
-                <button className="w-full text-left px-4 py-2 hover:bg-indigo-50 text-sm flex items-center gap-2">
+                <button className="w-full text-left px-4 py-2 hover:bg-blue-50 text-sm flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <line x1="3" y1="4" x2="21" y2="4" strokeWidth={2} />
                   </svg>
                   Top Border
                 </button>
-                <button className="w-full text-left px-4 py-2 hover:bg-indigo-50 text-sm flex items-center gap-2">
+                <button className="w-full text-left px-4 py-2 hover:bg-blue-50 text-sm flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <line x1="4" y1="3" x2="4" y2="21" strokeWidth={2} />
                   </svg>
                   Left Border
                 </button>
-                <button className="w-full text-left px-4 py-2 hover:bg-indigo-50 text-sm flex items-center gap-2">
+                <button className="w-full text-left px-4 py-2 hover:bg-blue-50 text-sm flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <line x1="20" y1="3" x2="20" y2="21" strokeWidth={2} />
                   </svg>
                   Right Border
                 </button>
                 <div className="border-t border-gray-200 my-2"></div>
-                <button className="w-full text-left px-4 py-2 hover:bg-indigo-50 text-sm">No Border</button>
-                <button className="w-full text-left px-4 py-2 hover:bg-indigo-50 text-sm">All Borders</button>
-                <button className="w-full text-left px-4 py-2 hover:bg-indigo-50 text-sm">Outside Borders</button>
+                <button className="w-full text-left px-4 py-2 hover:bg-blue-50 text-sm">No Border</button>
+                <button className="w-full text-left px-4 py-2 hover:bg-blue-50 text-sm">All Borders</button>
+                <button className="w-full text-left px-4 py-2 hover:bg-blue-50 text-sm">Outside Borders</button>
                 <div className="border-t border-gray-200 my-2"></div>
-                <button className="w-full text-left px-4 py-2 hover:bg-indigo-50 text-sm">Borders and Shading...</button>
+                <button className="w-full text-left px-4 py-2 hover:bg-blue-50 text-sm">Borders and Shading...</button>
               </div>
             )}
           </div>
