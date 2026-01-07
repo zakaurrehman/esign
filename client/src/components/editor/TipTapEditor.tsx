@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, Extension } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
@@ -13,6 +13,55 @@ import { Table } from '@tiptap/extension-table';
 import { TableRow } from '@tiptap/extension-table-row';
 import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
+
+// Custom FontSize Extension
+const FontSize = Extension.create({
+  name: 'fontSize',
+
+  addOptions() {
+    return {
+      types: ['textStyle'],
+    };
+  },
+
+  addGlobalAttributes() {
+    return [
+      {
+        types: this.options.types,
+        attributes: {
+          fontSize: {
+            default: null,
+            parseHTML: element => element.style.fontSize?.replace(/['"]+/g, ''),
+            renderHTML: attributes => {
+              if (!attributes.fontSize) {
+                return {};
+              }
+              return {
+                style: `font-size: ${attributes.fontSize}`,
+              };
+            },
+          },
+        },
+      },
+    ];
+  },
+
+  addCommands() {
+    return {
+      setFontSize: (fontSize: string) => ({ chain }: { chain: () => any }) => {
+        return chain()
+          .setMark('textStyle', { fontSize })
+          .run();
+      },
+      unsetFontSize: () => ({ chain }: { chain: () => any }) => {
+        return chain()
+          .setMark('textStyle', { fontSize: null })
+          .removeEmptyTextStyle()
+          .run();
+      },
+    };
+  },
+});
 
 interface TipTapEditorProps {
   content: string;
@@ -98,6 +147,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
       Underline,
       TextStyle,
       FontFamily,
+      FontSize,
       Color,
       Highlight.configure({ multicolor: true }),
       Superscript,
@@ -150,7 +200,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
   const Divider = () => <div className="w-px h-8 bg-gray-200 mx-2" />;
 
   const currentFontFamily = editor.getAttributes('textStyle').fontFamily || 'Arial';
-  const currentFontSize = '12';
+  const currentFontSize = editor.getAttributes('textStyle').fontSize?.replace('pt', '') || '12';
 
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden shadow-lg bg-white">
@@ -286,14 +336,20 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
               </svg>
             </button>
             {showSizeMenu && (
-              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-80 overflow-y-auto custom-scrollbar">
+              <div
+                className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 min-w-[100px]"
+                style={{ maxHeight: '300px', overflowY: 'scroll' }}
+              >
                 {FONT_SIZES.map((size) => (
                   <button
                     key={size}
                     onClick={() => {
+                      (editor.commands as any).setFontSize(`${size}pt`);
                       setShowSizeMenu(false);
                     }}
-                    className="w-full text-left px-4 py-2.5 hover:bg-blue-50 text-sm transition-colors min-w-[100px]"
+                    className={`w-full text-left px-4 py-2.5 hover:bg-blue-50 text-sm transition-colors ${
+                      currentFontSize === size ? 'bg-blue-100 font-semibold' : ''
+                    }`}
                     type="button"
                   >
                     {size}
@@ -306,16 +362,36 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({ content, onChange })
           <Divider />
 
           {/* Increase/Decrease Font Size */}
-          <ToolbarButton onClick={() => {}} title="Increase Font Size">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <text x="2" y="18" fontSize="18" fontWeight="bold" fill="currentColor">A</text>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+          <ToolbarButton
+            onClick={() => {
+              const currentSize = parseInt(currentFontSize) || 12;
+              const sizeIndex = FONT_SIZES.indexOf(String(currentSize));
+              if (sizeIndex < FONT_SIZES.length - 1) {
+                const newSize = FONT_SIZES[sizeIndex + 1] || String(currentSize + 2);
+                (editor.commands as any).setFontSize(`${newSize}pt`);
+              }
+            }}
+            title="Increase Font Size"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <text x="4" y="16" fontSize="14" fontWeight="bold">A</text>
+              <path d="M18 7l-4-4m0 0l-4 4m4-4v8" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/>
             </svg>
           </ToolbarButton>
-          <ToolbarButton onClick={() => {}} title="Decrease Font Size">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <text x="2" y="16" fontSize="14" fill="currentColor">A</text>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          <ToolbarButton
+            onClick={() => {
+              const currentSize = parseInt(currentFontSize) || 12;
+              const sizeIndex = FONT_SIZES.indexOf(String(currentSize));
+              if (sizeIndex > 0) {
+                const newSize = FONT_SIZES[sizeIndex - 1] || String(Math.max(8, currentSize - 2));
+                (editor.commands as any).setFontSize(`${newSize}pt`);
+              }
+            }}
+            title="Decrease Font Size"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <text x="4" y="18" fontSize="11">A</text>
+              <path d="M18 17l-4 4m0 0l-4-4m4 4v-8" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/>
             </svg>
           </ToolbarButton>
 
