@@ -43,10 +43,12 @@ const loadRoutes = async () => {
     const authRoutes = (await import('../src/routes/auth')).default;
     const documentRoutes = (await import('../src/routes/documents')).default;
     const signRoutes = (await import('../src/routes/sign')).default;
+    const templateRoutes = (await import('../src/routes/template')).default;
 
     app.use('/api/auth', authRoutes);
     app.use('/api/documents', documentRoutes);
     app.use('/sign', signRoutes);
+    app.use('/api/templates', templateRoutes);
     routesLoaded = true;
   } catch (err) {
     loadError = err as Error;
