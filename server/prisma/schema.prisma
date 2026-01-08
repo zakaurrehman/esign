@@ -37,6 +37,8 @@ model Document {
   recipients       Recipient[]
   fields           SignatureField[]
   auditLogs        AuditLog[]
+  deletedAt        DateTime?      // Soft delete timestamp
+  deletedBy        String?        // Email of user who deleted it
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 }

@@ -81,9 +81,17 @@ export const AdminPanel: React.FC = () => {
           <h1 className="text-3xl font-bold text-slate-900">User Management</h1>
           <p className="text-slate-600 mt-2">Manage system users and their access</p>
         </div>
-        <Button onClick={() => setShowCreateForm(!showCreateForm)}>
-          {showCreateForm ? 'Cancel' : '+ Create User'}
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            onClick={() => navigate('/admin/documents')}
+            className="bg-indigo-600 hover:bg-indigo-700"
+          >
+            View All Documents
+          </Button>
+          <Button onClick={() => setShowCreateForm(!showCreateForm)}>
+            {showCreateForm ? 'Cancel' : '+ Create User'}
+          </Button>
+        </div>
       </div>
 
       {showCreateForm && (

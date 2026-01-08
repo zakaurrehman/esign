@@ -6,6 +6,7 @@ import { validate } from '../middleware/validate';
 import { createDocumentSchema, updateDocumentSchema, addRecipientSchema, addFieldSchema, updateFieldSchema } from '../schemas/document';
 import {
   listDocuments,
+  listAllDocuments,
   createDocument,
   uploadDocument,
   generatePdf,
@@ -50,6 +51,7 @@ const upload = multer({
 
 // Document routes
 router.get('/', auth, listDocuments);
+router.get('/admin/all', auth, listAllDocuments); // Super Admin: view all documents
 router.post('/', auth, validate(createDocumentSchema), createDocument);
 router.post('/upload', auth, upload.single('file'), uploadDocument);
 router.get('/:id', auth, getDocument);

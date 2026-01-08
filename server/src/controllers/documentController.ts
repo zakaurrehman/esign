@@ -11,7 +11,10 @@ import crypto from 'crypto';
 export const listDocuments = async (req: AuthRequest, res: Response) => {
   try {
     const documents = await prisma.document.findMany({
-      where: { userId: req.user!.id },
+      where: {
+        userId: req.user!.id,
+        deletedAt: null // Only show non-deleted documents
+      },
       include: {
         recipients: { select: { id: true, name: true, email: true, status: true } },
         _count: { select: { fields: true } }
@@ -195,12 +198,14 @@ export const deleteDocument = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Can only delete draft documents' });
     }
 
-    // Delete associated PDF files
-    if (existing.pdfPath && fs.existsSync(existing.pdfPath)) {
-      fs.unlinkSync(existing.pdfPath);
-    }
-
-    await prisma.document.delete({ where: { id: req.params.id } });
+    // Soft delete - mark as deleted with timestamp and user email
+    await prisma.document.update({
+      where: { id: req.params.id },
+      data: {
+        deletedAt: new Date(),
+        deletedBy: req.user!.email
+      }
+    });
 
     return res.json({ message: 'Document deleted' });
   } catch (error) {
@@ -556,5 +561,36 @@ export const getAuditTrail = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Get audit trail error:', error);
     return res.status(500).json({ error: 'Failed to get audit trail' });
+  }
+};
+
+// Super Admin: View all documents (including deleted ones)
+export const listAllDocuments = async (req: AuthRequest, res: Response) => {
+  try {
+    // Check if user is Super Admin
+    if (req.user!.role !== 'SUPER_ADMIN') {
+      return res.status(403).json({ error: 'Access denied. Super Admin only.' });
+    }
+
+    const { includeDeleted } = req.query;
+
+    const documents = await prisma.document.findMany({
+      where: includeDeleted === 'true' ? {} : { deletedAt: null },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true }
+        },
+        recipients: {
+          select: { id: true, name: true, email: true, status: true }
+        },
+        _count: { select: { fields: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    return res.json({ documents });
+  } catch (error) {
+    console.error('List all documents error:', error);
+    return res.status(500).json({ error: 'Failed to list all documents' });
   }
 };
