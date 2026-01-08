@@ -5,12 +5,30 @@ import * as path from 'path';
 async function seedTemplate() {
   try {
     // Read the logo file and convert to base64
-    const logoPath = path.join(__dirname, '../../../HBS logo.jpg');
-    let logoBase64 = '';
+    // Try multiple possible paths for the logo
+    const possiblePaths = [
+      path.join(__dirname, '../../../HBS logo.jpg'),
+      path.join(process.cwd(), 'HBS logo.jpg'),
+      path.join(__dirname, '../../..', 'HBS logo.jpg'),
+      'HBS logo.jpg'
+    ];
 
-    if (fs.existsSync(logoPath)) {
+    let logoBase64 = '';
+    let logoPath = '';
+
+    for (const testPath of possiblePaths) {
+      if (fs.existsSync(testPath)) {
+        logoPath = testPath;
+        break;
+      }
+    }
+
+    if (logoPath) {
       const logoBuffer = fs.readFileSync(logoPath);
       logoBase64 = `data:image/jpeg;base64,${logoBuffer.toString('base64')}`;
+      console.log('✅ Logo file found and converted to base64');
+    } else {
+      console.log('⚠️  Logo file not found, using text-based header');
     }
 
     // Create the HBS letterhead template HTML
