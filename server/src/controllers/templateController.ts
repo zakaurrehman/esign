@@ -1,8 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
-import * as fs from 'fs';
-import * as path from 'path';
+import { HBS_LOGO_BASE64 } from '../constants/hbsLogo';
 
 // Get active template
 export const getActiveTemplate = async (req: AuthRequest, res: Response) => {
@@ -139,24 +138,9 @@ export const seedHBSTemplate = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ error: 'Access denied. Super Admin only.' });
     }
 
-    // Try to find logo file
-    const possiblePaths = [
-      path.join(__dirname, '../../../HBS logo.jpg'),
-      path.join(process.cwd(), 'HBS logo.jpg'),
-      'HBS logo.jpg'
-    ];
-
-    let logoBase64 = '';
-    let logoFound = false;
-
-    for (const testPath of possiblePaths) {
-      if (fs.existsSync(testPath)) {
-        const logoBuffer = fs.readFileSync(testPath);
-        logoBase64 = `data:image/jpeg;base64,${logoBuffer.toString('base64')}`;
-        logoFound = true;
-        break;
-      }
-    }
+    // Use embedded logo
+    const logoBase64 = HBS_LOGO_BASE64;
+    const logoFound = true;
 
     // Create the HBS letterhead template HTML
     const templateHTML = `

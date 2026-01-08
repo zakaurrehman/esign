@@ -1,35 +1,11 @@
 import prisma from '../lib/prisma';
-import * as fs from 'fs';
-import * as path from 'path';
+import { HBS_LOGO_BASE64 } from '../constants/hbsLogo';
 
 async function seedTemplate() {
   try {
-    // Read the logo file and convert to base64
-    // Try multiple possible paths for the logo
-    const possiblePaths = [
-      path.join(__dirname, '../../../HBS logo.jpg'),
-      path.join(process.cwd(), 'HBS logo.jpg'),
-      path.join(__dirname, '../../..', 'HBS logo.jpg'),
-      'HBS logo.jpg'
-    ];
-
-    let logoBase64 = '';
-    let logoPath = '';
-
-    for (const testPath of possiblePaths) {
-      if (fs.existsSync(testPath)) {
-        logoPath = testPath;
-        break;
-      }
-    }
-
-    if (logoPath) {
-      const logoBuffer = fs.readFileSync(logoPath);
-      logoBase64 = `data:image/jpeg;base64,${logoBuffer.toString('base64')}`;
-      console.log('✅ Logo file found and converted to base64');
-    } else {
-      console.log('⚠️  Logo file not found, using text-based header');
-    }
+    // Use embedded logo
+    const logoBase64 = HBS_LOGO_BASE64;
+    console.log('✅ Using embedded HBS logo');
 
     // Create the HBS letterhead template HTML
     const templateHTML = `
