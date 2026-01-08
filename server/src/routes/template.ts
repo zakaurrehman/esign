@@ -5,7 +5,8 @@ import {
   getAllTemplates,
   upsertTemplate,
   setActiveTemplate,
-  deleteTemplate
+  deleteTemplate,
+  seedHBSTemplate
 } from '../controllers/templateController';
 
 const router = Router();
@@ -16,6 +17,7 @@ router.get('/active', auth, getActiveTemplate);
 // Admin routes
 router.get('/', auth, getAllTemplates);
 router.post('/', auth, upsertTemplate);
+router.post('/seed-hbs', auth, seedHBSTemplate);
 router.put('/:id/activate', auth, setActiveTemplate);
 router.delete('/:id', auth, deleteTemplate);
 
