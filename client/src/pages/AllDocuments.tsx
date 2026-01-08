@@ -83,53 +83,7 @@ export default function AllDocuments() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Header */}
-      <nav className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-8">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                E-Sign
-              </h1>
-              <nav className="flex gap-2">
-                <button
-                  onClick={() => navigate('/dashboard')}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  Dashboard
-                </button>
-                <button
-                  onClick={() => navigate('/admin')}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  User Management
-                </button>
-                <button
-                  className="px-4 py-2 text-sm font-medium bg-indigo-50 text-indigo-700 rounded-lg"
-                >
-                  All Documents
-                </button>
-              </nav>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">Super Admin</span>
-              <button
-                onClick={() => {
-                  localStorage.removeItem('token');
-                  navigate('/login');
-                }}
-                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">All Documents</h2>
           <p className="text-gray-600">View and manage all documents from all users</p>
@@ -281,10 +235,9 @@ export default function AllDocuments() {
           </div>
         </div>
 
-        {/* Summary */}
-        <div className="mt-6 text-sm text-gray-600">
-          Showing {filteredDocuments.length} of {documents.length} total documents
-        </div>
+      {/* Summary */}
+      <div className="mt-6 text-sm text-gray-600">
+        Showing {filteredDocuments.length} of {documents.length} total documents
       </div>
     </div>
   );
