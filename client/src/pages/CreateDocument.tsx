@@ -15,7 +15,6 @@ export const CreateDocument: React.FC = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('<p>Start writing your document...</p>');
   const [isLoading, setIsLoading] = useState(false);
-  const [templateContent, setTemplateContent] = useState('');
   const navigate = useNavigate();
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -84,7 +83,6 @@ export const CreateDocument: React.FC = () => {
       }
 
       const data = await response.json();
-      setTemplateContent(data.template.htmlContent);
       setContent(data.template.htmlContent);
       setMode('template');
     } catch (error: any) {
