@@ -221,7 +221,7 @@ export default function AllDocuments() {
                       </td>
                       <td className="px-6 py-4">
                         <button
-                          onClick={() => navigate(`/documents/${doc.id}`)}
+                          onClick={() => navigate(`/document/${doc.id}`)}
                           className="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
                         >
                           View
