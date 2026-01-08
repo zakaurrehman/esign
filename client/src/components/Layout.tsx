@@ -43,16 +43,28 @@ export const Layout: React.FC = () => {
                   + Create Document
                 </Link>
                 {isAdmin && (
-                  <Link
-                    to="/admin"
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all no-underline ${
-                      location.pathname === '/admin'
-                        ? 'bg-white/20 text-white font-semibold'
-                        : 'text-white/90 hover:text-white hover:bg-white/10'
-                    }`}
-                  >
-                    User Management
-                  </Link>
+                  <>
+                    <Link
+                      to="/admin"
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all no-underline ${
+                        location.pathname === '/admin'
+                          ? 'bg-white/20 text-white font-semibold'
+                          : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      User Management
+                    </Link>
+                    <Link
+                      to="/admin/documents"
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all no-underline ${
+                        location.pathname === '/admin/documents'
+                          ? 'bg-white/20 text-white font-semibold'
+                          : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      View All Documents
+                    </Link>
+                  </>
                 )}
               </div>
             </div>
