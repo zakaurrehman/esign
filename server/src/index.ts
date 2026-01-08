@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import documentRoutes from './routes/documents';
 import signRoutes from './routes/sign';
+import templateRoutes from './routes/template';
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/sign', signRoutes);
+app.use('/api/templates', templateRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

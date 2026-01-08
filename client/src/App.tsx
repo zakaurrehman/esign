@@ -12,6 +12,7 @@ import { SignDocument } from './pages/SignDocument';
 import { SignComplete, SignDeclined } from './pages/SignComplete';
 import { AdminPanel } from './pages/AdminPanel';
 import AllDocuments from './pages/AllDocuments';
+import TemplateManagement from './pages/TemplateManagement';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuthStore();
@@ -90,6 +91,7 @@ function App() {
           <Route path="document/:id" element={<ViewDocument />} />
           <Route path="admin" element={<AdminPanel />} />
           <Route path="admin/documents" element={<AllDocuments />} />
+          <Route path="admin/template" element={<TemplateManagement />} />
         </Route>
       </Routes>
     </BrowserRouter>

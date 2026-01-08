@@ -93,3 +93,12 @@ model AuditLog {
   details    String?
   createdAt  DateTime @default(now())
 }
+
+model Template {
+  id          String   @id @default(uuid())
+  name        String
+  htmlContent String   @db.Text
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

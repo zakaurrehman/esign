@@ -8,13 +8,14 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { TipTapEditor } from '../components/editor/TipTapEditor';
 import toast from 'react-hot-toast';
 
-type Mode = 'select' | 'write' | 'upload';
+type Mode = 'select' | 'write' | 'upload' | 'template';
 
 export const CreateDocument: React.FC = () => {
   const [mode, setMode] = useState<Mode>('select');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('<p>Start writing your document...</p>');
   const [isLoading, setIsLoading] = useState(false);
+  const [templateContent, setTemplateContent] = useState('');
   const navigate = useNavigate();
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -70,6 +71,29 @@ export const CreateDocument: React.FC = () => {
     }
   };
 
+  const loadTemplate = async () => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/templates/active`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!response.ok) {
+        throw new Error('No template found');
+      }
+
+      const data = await response.json();
+      setTemplateContent(data.template.htmlContent);
+      setContent(data.template.htmlContent);
+      setMode('template');
+    } catch (error: any) {
+      toast.error('No template available. Please contact your administrator.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (mode === 'select') {
     return (
       <div>
@@ -77,7 +101,7 @@ export const CreateDocument: React.FC = () => {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">Create Document</h1>
           <p className="text-sm text-slate-600 mt-1">Choose how you want to create your document</p>
         </div>
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           <Card className="cursor-pointer hover:shadow-2xl transition-all bg-white rounded-2xl border-2 border-indigo-100 hover:border-indigo-500" onClick={() => setMode('write')}>
             <CardContent className="text-center py-12">
               <div className="bg-gradient-to-br from-indigo-100 to-violet-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -102,6 +126,20 @@ export const CreateDocument: React.FC = () => {
               <h3 className="text-xl font-bold text-slate-900">Upload PDF</h3>
               <p className="mt-2 text-sm text-slate-600">
                 Upload an existing PDF document for signing
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-2xl transition-all bg-white rounded-2xl border-2 border-emerald-100 hover:border-emerald-500" onClick={loadTemplate}>
+            <CardContent className="text-center py-12">
+              <div className="bg-gradient-to-br from-emerald-100 to-teal-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg className="h-10 w-10 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">Use Template</h3>
+              <p className="mt-2 text-sm text-slate-600">
+                Start with company letterhead template
               </p>
             </CardContent>
           </Card>
@@ -155,6 +193,43 @@ export const CreateDocument: React.FC = () => {
                 <span className="ml-2 text-slate-600">Uploading...</span>
               </div>
             )}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (mode === 'template') {
+    return (
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-slate-900">Write on Template</h1>
+          <Button variant="secondary" onClick={() => setMode('select')}>
+            Back
+          </Button>
+        </div>
+
+        <Card className="rounded-2xl">
+          <CardHeader>
+            <Input
+              label="Document Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter document title"
+              required
+            />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <TipTapEditor content={content} onChange={setContent} />
+
+            <div className="flex justify-end space-x-3">
+              <Button variant="secondary" onClick={() => setMode('select')}>
+                Cancel
+              </Button>
+              <Button onClick={handleWriteSubmit} isLoading={isLoading}>
+                Create Document
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
