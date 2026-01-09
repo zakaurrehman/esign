@@ -22,7 +22,8 @@ import {
   deleteField,
   sendDocument,
   voidDocument,
-  getAuditTrail
+  getAuditTrail,
+  convertDocToHtml
 } from '../controllers/documentController';
 
 const router = Router();
@@ -49,9 +50,37 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB
 });
 
+// Configure multer for DOC/DOCX uploads
+const docStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, '/tmp');
+  },
+  filename: (req, file, cb) => {
+    const ext = file.originalname.split('.').pop();
+    cb(null, `${crypto.randomUUID()}.${ext}`);
+  }
+});
+
+const uploadDoc = multer({
+  storage: docStorage,
+  fileFilter: (req, file, cb) => {
+    const validTypes = [
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    if (validTypes.includes(file.mimetype) || file.originalname.match(/\.(doc|docx)$/i)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only DOC/DOCX files are allowed'));
+    }
+  },
+  limits: { fileSize: 10 * 1024 * 1024 }
+});
+
 // Document routes
 router.get('/', auth, listDocuments);
 router.get('/admin/all', auth, listAllDocuments); // Super Admin: view all documents
+router.post('/convert-doc', auth, uploadDoc.single('file'), convertDocToHtml);
 router.post('/', auth, validate(createDocumentSchema), createDocument);
 router.post('/upload', auth, upload.single('file'), uploadDocument);
 router.get('/:id', auth, getDocument);

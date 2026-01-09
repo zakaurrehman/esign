@@ -111,6 +111,60 @@ app.get('/init-db', async (req: Request, res: Response) => {
   }
 });
 
+// Seed template endpoint (public - seeds the HBS template)
+app.get('/seed-template', async (req: Request, res: Response) => {
+  try {
+    const { PrismaClient } = await import('@prisma/client');
+    const { HBS_LOGO_BASE64 } = await import('../src/constants/hbsLogo');
+    const prisma = new PrismaClient();
+
+    // Check if template already exists
+    const existingTemplate = await prisma.template.findFirst({
+      where: { isActive: true }
+    });
+
+    if (existingTemplate) {
+      await prisma.$disconnect();
+      return res.json({ success: true, message: 'Template already exists', template: existingTemplate });
+    }
+
+    // Create the HBS letterhead template HTML
+    const templateHTML = `
+      <div style="min-height: 100vh; display: flex; flex-direction: column; position: relative;">
+        <div style="padding: 40px 60px 20px 60px; border-bottom: 1px solid #e5e7eb;">
+          <img src="${HBS_LOGO_BASE64}" alt="HBS Logo" style="height: 60px; width: auto;" />
+        </div>
+        <div style="flex: 1; padding: 60px 60px 100px 60px;">
+          <p style="font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.5; margin: 0;">
+            [Start writing your document content here...]
+          </p>
+        </div>
+        <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 60px; text-align: center; border-top: 1px solid #e5e7eb; background-color: #ffffff;">
+          <p style="font-family: Calibri, Arial, sans-serif; font-size: 9pt; color: #6b7280; margin: 0;">
+            23209 Blackwell Ave, Port Charlotte, FL 33952 |
+            <a href="mailto:info@hiredbillingsupport.com" style="color: #3b82f6; text-decoration: none;">info@hiredbillingsupport.com</a> |
+            <a href="http://www.hiredbillingsupport.com" style="color: #3b82f6; text-decoration: none;">www.hiredbillingsupport.com</a>
+          </p>
+        </div>
+      </div>
+    `;
+
+    const template = await prisma.template.create({
+      data: {
+        name: 'HBS Company Letterhead',
+        htmlContent: templateHTML,
+        isActive: true
+      }
+    });
+
+    await prisma.$disconnect();
+    res.json({ success: true, message: 'Template seeded successfully', template });
+  } catch (error: any) {
+    console.error('Seed template error:', error);
+    res.status(500).json({ error: 'Failed to seed template', details: error.message });
+  }
+});
+
 // Root route
 app.get('/', (req: Request, res: Response) => {
   res.json({

@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { TipTapEditor } from '../components/editor/TipTapEditor';
 import toast from 'react-hot-toast';
 
-type Mode = 'select' | 'write' | 'upload' | 'template';
+type Mode = 'select' | 'write' | 'upload' | 'template' | 'upload-doc';
 
 export const CreateDocument: React.FC = () => {
   const [mode, setMode] = useState<Mode>('select');
@@ -92,6 +92,59 @@ export const CreateDocument: React.FC = () => {
     }
   };
 
+  const onDropDoc = useCallback(async (acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (!file) return;
+
+    const validTypes = [
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+
+    if (!validTypes.includes(file.type) && !file.name.match(/\.(doc|docx)$/i)) {
+      toast.error('Only DOC/DOCX files are allowed');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/documents/convert-doc`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to convert document');
+      }
+
+      const data = await response.json();
+      setContent(data.htmlContent);
+      setTitle(file.name.replace(/\.(doc|docx)$/i, ''));
+      setMode('template');
+      toast.success('Document converted successfully');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to convert document');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const { getRootProps: getDocRootProps, getInputProps: getDocInputProps, isDragActive: isDocDragActive } = useDropzone({
+    onDrop: onDropDoc,
+    accept: {
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx']
+    },
+    maxFiles: 1,
+    maxSize: 10 * 1024 * 1024
+  });
+
   if (mode === 'select') {
     return (
       <div>
@@ -99,7 +152,7 @@ export const CreateDocument: React.FC = () => {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">Create Document</h1>
           <p className="text-sm text-slate-600 mt-1">Choose how you want to create your document</p>
         </div>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="cursor-pointer hover:shadow-2xl transition-all bg-white rounded-2xl border-2 border-indigo-100 hover:border-indigo-500" onClick={() => setMode('write')}>
             <CardContent className="text-center py-12">
               <div className="bg-gradient-to-br from-indigo-100 to-violet-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -138,6 +191,20 @@ export const CreateDocument: React.FC = () => {
               <h3 className="text-xl font-bold text-slate-900">Use Template</h3>
               <p className="mt-2 text-sm text-slate-600">
                 Start with company letterhead template
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-2xl transition-all bg-white rounded-2xl border-2 border-amber-100 hover:border-amber-500" onClick={() => setMode('upload-doc')}>
+            <CardContent className="text-center py-12">
+              <div className="bg-gradient-to-br from-amber-100 to-orange-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg className="h-10 w-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">Upload DOC</h3>
+              <p className="mt-2 text-sm text-slate-600">
+                Upload a Word document to use as template
               </p>
             </CardContent>
           </Card>
@@ -189,6 +256,50 @@ export const CreateDocument: React.FC = () => {
               <div className="flex items-center justify-center py-4">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
                 <span className="ml-2 text-slate-600">Uploading...</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (mode === 'upload-doc') {
+    return (
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-slate-900">Upload Word Document</h1>
+          <Button variant="secondary" onClick={() => setMode('select')}>
+            Back
+          </Button>
+        </div>
+
+        <Card className="rounded-2xl">
+          <CardContent className="space-y-4">
+            <div
+              {...getDocRootProps()}
+              className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-all ${
+                isDocDragActive ? 'border-amber-500 bg-amber-50' : 'border-slate-300 hover:border-amber-400'
+              }`}
+            >
+              <input {...getDocInputProps()} />
+              <svg className="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              {isDocDragActive ? (
+                <p className="mt-2 text-amber-600 font-medium">Drop the document here...</p>
+              ) : (
+                <>
+                  <p className="mt-2 text-slate-600">Drag and drop a DOC/DOCX file here, or click to select</p>
+                  <p className="mt-1 text-sm text-slate-500">Maximum file size: 10MB</p>
+                </>
+              )}
+            </div>
+
+            {isLoading && (
+              <div className="flex items-center justify-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
+                <span className="ml-2 text-slate-600">Converting document...</span>
               </div>
             )}
           </CardContent>

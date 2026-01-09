@@ -594,3 +594,31 @@ export const listAllDocuments = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({ error: 'Failed to list all documents' });
   }
 };
+
+export const convertDocToHtml = async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const mammoth = await import('mammoth');
+    const filePath = req.file.path;
+
+    const result = await mammoth.convertToHtml({ path: filePath });
+
+    // Clean up temp file
+    fs.unlink(filePath, () => {});
+
+    // Wrap content in styled container
+    const htmlContent = `
+      <div style="font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.5;">
+        ${result.value}
+      </div>
+    `;
+
+    return res.json({ htmlContent, messages: result.messages });
+  } catch (error) {
+    console.error('Convert doc error:', error);
+    return res.status(500).json({ error: 'Failed to convert document' });
+  }
+};
