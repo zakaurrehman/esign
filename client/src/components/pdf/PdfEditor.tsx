@@ -148,6 +148,41 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
       setTextAnnotations([...textAnnotations, newAnnotation]);
       setNewText('');
       setTool('select');
+    } else if (tool === 'edit-existing') {
+      // Find the text item closest to click position
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      // Find text items on current page that are near the click
+      const pageItems = extractedTextItems.filter(item => item.page === currentPage);
+      
+      // Find the closest text item
+      let closestItem: ExtractedTextItem | null = null;
+      let minDistance = Infinity;
+
+      for (const item of pageItems) {
+        // Check if click is within or near the text bounds
+        const itemRight = item.x + item.width;
+        const itemBottom = item.y + item.fontSize;
+        
+        if (clickX >= item.x - 10 && clickX <= itemRight + 10 &&
+            clickY >= item.y - item.fontSize && clickY <= itemBottom + 10) {
+          const distance = Math.sqrt(Math.pow(clickX - item.x, 2) + Math.pow(clickY - item.y, 2));
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestItem = item;
+          }
+        }
+      }
+
+      if (closestItem) {
+        // Set this item to editing mode
+        setExtractedTextItems(extractedTextItems.map(item =>
+          item.id === closestItem!.id ? { ...item, isEditing: true } : { ...item, isEditing: false }
+        ));
+        setSelectedAnnotation(closestItem.id);
+      }
     }
   };
 
@@ -234,15 +269,6 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
 
   const handleMouseUp = () => {
     setIsDragging(false);
-  };
-
-  const handleExtractedTextClick = (id: string) => {
-    if (tool === 'edit-existing') {
-      setExtractedTextItems(extractedTextItems.map(item =>
-        item.id === id ? { ...item, isEditing: true } : { ...item, isEditing: false }
-      ));
-      setSelectedAnnotation(id);
-    }
   };
 
   const handleExtractedTextChange = (id: string, newText: string) => {
@@ -377,9 +403,9 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
   };
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full" style={{ height: '100%', maxHeight: '100vh' }}>
       {/* Toolbar */}
-      <div className="w-64 bg-white border-r border-gray-200 p-4 space-y-4 overflow-y-auto">
+      <div className="w-64 bg-white border-r border-gray-200 p-4 space-y-4 overflow-y-auto flex-shrink-0">
         <div>
           <h3 className="font-semibold text-lg text-gray-900">PDF Annotation Tool</h3>
           <p className="text-xs text-gray-600 mt-1">Add text and images to your PDF</p>
@@ -560,7 +586,7 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
       </div>
 
       {/* PDF Canvas */}
-      <div className="flex-1 bg-gray-100 overflow-auto scrollbar-visible" style={{ scrollbarWidth: 'auto', scrollbarColor: '#6366f1 #e5e7eb' }}>
+      <div className="flex-1 bg-gray-100 overflow-y-auto overflow-x-auto" style={{ maxHeight: 'calc(100vh - 120px)' }}>
         {/* Active Tool Banner */}
         {tool === 'text' && newText && (
           <div className="sticky top-0 z-10 bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-6 py-3 shadow-lg">
@@ -604,7 +630,7 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
-              style={{ cursor: tool === 'text' && newText ? 'crosshair' : 'default' }}
+              style={{ cursor: tool === 'text' && newText ? 'crosshair' : (tool === 'edit-existing' ? 'text' : 'default') }}
             >
               <Page
                 pageNumber={currentPage}
@@ -614,53 +640,26 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
                 renderAnnotationLayer={false}
               />
 
-              {/* Only show extracted text when we have it - this replaces the original PDF text */}
-              {extractedTextItems.length > 0 && extractedTextItems
-                .filter(item => item.page === currentPage)
+              {/* Only show input field when a specific text item is being edited */}
+              {extractedTextItems
+                .filter(item => item.page === currentPage && item.isEditing)
                 .map(item => (
-                  item.isEditing ? (
-                    <input
-                      key={item.id}
-                      type="text"
-                      value={item.text}
-                      onChange={(e) => handleExtractedTextChange(item.id, e.target.value)}
-                      onBlur={() => handleExtractedTextBlur(item.id)}
-                      autoFocus
-                      className="absolute border-2 border-green-500 bg-white px-1 focus:outline-none focus:ring-2 focus:ring-green-600"
-                      style={{
-                        left: item.x,
-                        top: item.y,
-                        fontSize: item.fontSize,
-                        width: Math.max(item.width, 100),
-                        fontFamily: 'Helvetica'
-                      }}
-                    />
-                  ) : (
-                    <div
-                      key={item.id}
-                      className={`absolute ${
-                        tool === 'edit-existing' ? 'cursor-text hover:bg-yellow-100 hover:ring-2 hover:ring-yellow-500' : 'cursor-move'
-                      } ${
-                        selectedAnnotation === item.id ? 'ring-2 ring-green-500 bg-green-50' : ''
-                      }`}
-                      style={{
-                        left: item.x,
-                        top: item.y,
-                        fontSize: item.fontSize,
-                        userSelect: 'none',
-                        padding: '1px 2px',
-                        whiteSpace: 'pre'
-                      }}
-                      onClick={() => handleExtractedTextClick(item.id)}
-                      onMouseDown={(e) => {
-                        if (tool !== 'edit-existing') {
-                          handleAnnotationMouseDown(e, item.id, 'text');
-                        }
-                      }}
-                    >
-                      {item.text}
-                    </div>
-                  )
+                  <input
+                    key={item.id}
+                    type="text"
+                    value={item.text}
+                    onChange={(e) => handleExtractedTextChange(item.id, e.target.value)}
+                    onBlur={() => handleExtractedTextBlur(item.id)}
+                    autoFocus
+                    className="absolute border-2 border-green-500 bg-white px-1 focus:outline-none focus:ring-2 focus:ring-green-600 z-10"
+                    style={{
+                      left: item.x,
+                      top: item.y,
+                      fontSize: item.fontSize,
+                      width: Math.max(item.width + 50, 150),
+                      fontFamily: 'Helvetica'
+                    }}
+                  />
                 ))}
 
               {/* Render text annotations (new text added by user) */}
@@ -714,19 +713,7 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
         </div>
 
         {/* Info Banner */}
-        <div className="max-w-4xl mx-auto mt-4">
-          <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded mb-4">
-            <div className="flex items-start">
-              <svg className="h-5 w-5 text-green-500 mt-0.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div className="text-sm text-green-900">
-                <p className="font-bold mb-2">✅ NOW YOU CAN EDIT EXISTING PDF TEXT!</p>
-                <p className="mb-2">The PDF text has been extracted. Click <strong>"Edit Existing Text"</strong> tool, then click any text on the PDF to edit it.</p>
-                <p className="text-xs">Extracted {extractedTextItems.length} text items from the PDF.</p>
-              </div>
-            </div>
-          </div>
+        <div className="max-w-4xl mx-auto mt-4 mb-8">
           <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
             <div className="flex items-start">
               <svg className="h-5 w-5 text-blue-500 mt-0.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -735,11 +722,10 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
               <div className="text-sm text-blue-800">
                 <p className="font-medium mb-1">How to use:</p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li><strong>Edit Existing Text:</strong> Click "Edit Existing Text" tool (green button), then click on any existing text to modify it</li>
-                  <li><strong>Add New Text:</strong> Select "Add New Text", type your text in the sidebar, then click on the PDF where you want to place it</li>
+                  <li><strong>Edit Existing Text:</strong> Click "Edit Existing Text" button, then click directly on any text in the PDF to edit it</li>
+                  <li><strong>Add New Text:</strong> Select "Add New Text", type your text in the sidebar, then click on the PDF to place it</li>
                   <li><strong>Add Image:</strong> Click "Add Image" to upload and place images on the PDF</li>
-                  <li><strong>Move Items:</strong> Use "Select / Move" tool to drag and reposition any text or images</li>
-                  <li><strong>Delete:</strong> Select an item, then click "Delete Selected" button in the sidebar</li>
+                  <li><strong>Move Items:</strong> Use "Select / Move" tool to drag annotations you've added</li>
                 </ul>
               </div>
             </div>
