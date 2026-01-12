@@ -446,7 +446,21 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
               style={{ cursor: tool === 'text' && newText ? 'crosshair' : 'default' }}
-            >whitespace-pre-wrap ${
+            >
+              <Page
+                pageNumber={currentPage}
+                width={Math.min(window.innerWidth * 0.7, 900)}
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
+              />
+
+              {/* Render text annotations */}
+              {textAnnotations
+                .filter(a => a.page === currentPage)
+                .map(annotation => (
+                  <div
+                    key={annotation.id}
+                    className={`absolute cursor-move whitespace-pre-wrap ${
                       selectedAnnotation === annotation.id ? 'ring-2 ring-indigo-500 bg-indigo-50' : 'hover:ring-1 hover:ring-indigo-300'
                     }`}
                     style={{
@@ -457,22 +471,7 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
                       fontFamily: annotation.fontFamily,
                       userSelect: 'none',
                       maxWidth: '600px',
-                      padding: '2px 4pxns */}
-              {textAnnotations
-                .filter(a => a.page === currentPage)
-                .map(annotation => (
-                  <div
-                    key={annotation.id}
-                    className={`absolute cursor-move ${
-                      selectedAnnotation === annotation.id ? 'ring-2 ring-indigo-500' : ''
-                    }`}
-                    style={{
-                      left: annotation.x,
-                      top: annotation.y,
-                      fontSize: annotation.fontSize,
-                      color: annotation.color,
-                      fontFamily: annotation.fontFamily,
-                      userSelect: 'none'
+                      padding: '2px 4px'
                     }}
                     onMouseDown={(e) => handleAnnotationMouseDown(e, annotation.id, 'text')}
                   >
@@ -487,7 +486,9 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
                   <img
                     key={annotation.id}
                     src={annotation.dataUrl}
-                    alt="Annotation"hover:ring-1 hover:ring-indigo-300'
+                    alt="Annotation"
+                    className={`absolute cursor-move ${
+                      selectedAnnotation === annotation.id ? 'ring-2 ring-indigo-500' : 'hover:ring-1 hover:ring-indigo-300'
                     }`}
                     style={{
                       left: annotation.x,
@@ -496,9 +497,7 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
                       height: annotation.height
                     }}
                     onMouseDown={(e) => handleAnnotationMouseDown(e, annotation.id, 'image')}
-                    draggable={false
-                    }}
-                    onMouseDown={(e) => handleAnnotationMouseDown(e, annotation.id, 'image')}
+                    draggable={false}
                   />
                 ))}
             </div>
