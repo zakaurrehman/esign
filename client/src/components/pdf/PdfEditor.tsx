@@ -30,14 +30,19 @@ interface ImageAnnotation {
 interface ExtractedTextItem {
   id: string;
   text: string;
-  x: number;
-  y: number;
+  originalText: string;  // Original text for comparison
+  x: number;             // Scaled x for display
+  y: number;             // Scaled y for display
+  originalX: number;     // Original PDF x coordinate
+  originalY: number;     // Original PDF y coordinate (from top)
   width: number;
   height: number;
   page: number;
-  fontSize: number;
+  fontSize: number;      // Scaled font size for display
+  originalFontSize: number; // Original PDF font size
   fontName: string;
   isEditing: boolean;
+  isEdited: boolean;     // Track if text was changed
 }
 
 interface PdfEditorProps {
@@ -60,6 +65,7 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isSaving, setIsSaving] = useState(false);
   const [isExtractingText, setIsExtractingText] = useState(false);
+  const [currentScale, setCurrentScale] = useState(1);
 
   // Text tool states
   const [newText, setNewText] = useState('');
@@ -77,6 +83,7 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
     const originalWidth = page.originalWidth;
     const renderedWidth = Math.min(window.innerWidth - 320, 800);
     const scale = renderedWidth / originalWidth;
+    setCurrentScale(scale);
     
     // Extract text only once when first page loads
     if (extractedTextItems.length === 0 && !isExtractingText) {
@@ -99,20 +106,30 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
         textContent.items.forEach((item: any, index: number) => {
           if (item.str.trim()) {
             const transform = item.transform;
-            const x = transform[4] * scale;
-            const y = (viewport.height - transform[5]) * scale;
+            // Original PDF coordinates (bottom-left origin)
+            const originalX = transform[4];
+            const originalPdfY = transform[5]; // Keep raw PDF Y (from bottom)
+            const originalFontSize = Math.round(transform[0]);
+            
+            // Screen coordinates (top-left origin)
+            const screenY = viewport.height - transform[5];
             
             allTextItems.push({
               id: `extracted-${pageNum}-${index}`,
               text: item.str,
-              x: x,
-              y: y,
+              originalText: item.str,
+              x: originalX * scale,
+              y: screenY * scale,
+              originalX: originalX,
+              originalY: originalPdfY, // Store raw PDF Y coordinate
               width: item.width * scale,
-              height: item.height * scale,
+              height: (item.height || transform[0]) * scale,
               page: pageNum,
               fontSize: Math.round(transform[0] * scale),
+              originalFontSize: originalFontSize,
               fontName: item.fontName || 'Helvetica',
-              isEditing: false
+              isEditing: false,
+              isEdited: false
             });
           }
         });
@@ -273,7 +290,7 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
 
   const handleExtractedTextChange = (id: string, newText: string) => {
     setExtractedTextItems(extractedTextItems.map(item =>
-      item.id === id ? { ...item, text: newText } : item
+      item.id === id ? { ...item, text: newText, isEdited: true } : item
     ));
   };
 
@@ -305,47 +322,56 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
       const pdfDoc = await PDFDocument.load(arrayBuffer);
       const pages = pdfDoc.getPages();
 
-      // First, draw white rectangles over extracted text items that were edited or deleted
-      // This "erases" the original text
-      for (const item of extractedTextItems) {
+      // Only process text items that were edited
+      const editedItems = extractedTextItems.filter(item => item.isEdited);
+      
+      for (const item of editedItems) {
         if (item.page <= pages.length) {
           const page = pages[item.page - 1];
-          const { height } = page.getSize();
-          const pdfY = height - item.y - item.height;
+          
+          // Use original PDF coordinates directly
+          // originalY is the raw PDF Y coordinate (from bottom of page)
+          const pdfX = item.originalX;
+          const pdfY = item.originalY;
+          
+          // Calculate text dimensions based on original font size
+          const textWidth = item.originalText.length * item.originalFontSize * 0.6; // Approximate width
+          const textHeight = item.originalFontSize * 1.2;
 
           // Draw white rectangle to cover original text
           page.drawRectangle({
-            x: item.x - 2,
+            x: pdfX - 2,
             y: pdfY - 2,
-            width: item.width + 4,
-            height: item.height + 4,
+            width: textWidth + 10,
+            height: textHeight + 4,
             color: rgb(1, 1, 1),
             borderWidth: 0
           });
 
-          // Redraw the (potentially edited) text
+          // Draw the new edited text at the same position
           page.drawText(item.text, {
-            x: item.x,
+            x: pdfX,
             y: pdfY,
-            size: item.fontSize,
+            size: item.originalFontSize,
             color: rgb(0, 0, 0)
           });
         }
       }
 
-      // Add text annotations
+      // Add text annotations (new text added by user)
       for (const annotation of textAnnotations) {
         if (annotation.page <= pages.length) {
           const page = pages[annotation.page - 1];
           const { height } = page.getSize();
 
-          // Convert y coordinate (top-down to bottom-up)
-          const pdfY = height - annotation.y;
+          // Convert scaled coordinates back to PDF coordinates
+          const pdfX = annotation.x / currentScale;
+          const pdfY = height - (annotation.y / currentScale);
 
           page.drawText(annotation.text, {
-            x: annotation.x,
+            x: pdfX,
             y: pdfY,
-            size: annotation.fontSize,
+            size: annotation.fontSize / currentScale,
             color: rgb(
               parseInt(annotation.color.slice(1, 3), 16) / 255,
               parseInt(annotation.color.slice(3, 5), 16) / 255,
@@ -373,14 +399,17 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
               image = await pdfDoc.embedJpg(imageBytes);
             }
 
-            // Convert y coordinate (top-down to bottom-up)
-            const pdfY = height - annotation.y - annotation.height;
+            // Convert scaled coordinates back to PDF coordinates
+            const pdfX = annotation.x / currentScale;
+            const pdfWidth = annotation.width / currentScale;
+            const pdfHeight = annotation.height / currentScale;
+            const pdfY = height - (annotation.y / currentScale) - pdfHeight;
 
             page.drawImage(image, {
-              x: annotation.x,
+              x: pdfX,
               y: pdfY,
-              width: annotation.width,
-              height: annotation.height
+              width: pdfWidth,
+              height: pdfHeight
             });
           } catch (err) {
             console.error('Failed to embed image:', err);
