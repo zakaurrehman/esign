@@ -27,13 +27,26 @@ interface ImageAnnotation {
   page: number;
 }
 
+interface ExtractedTextItem {
+  id: string;
+  text: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  page: number;
+  fontSize: number;
+  fontName: string;
+  isEditing: boolean;
+}
+
 interface PdfEditorProps {
   file: File;
   onSave: (editedPdfBlob: Blob) => void;
   onCancel: () => void;
 }
 
-type Tool = 'select' | 'text' | 'image';
+type Tool = 'select' | 'text' | 'image' | 'edit-existing';
 
 export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) => {
   const [numPages, setNumPages] = useState<number>(0);
@@ -41,10 +54,12 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
   const [tool, setTool] = useState<Tool>('select');
   const [textAnnotations, setTextAnnotations] = useState<TextAnnotation[]>([]);
   const [imageAnnotations, setImageAnnotations] = useState<ImageAnnotation[]>([]);
+  const [extractedTextItems, setExtractedTextItems] = useState<ExtractedTextItem[]>([]);
   const [selectedAnnotation, setSelectedAnnotation] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isSaving, setIsSaving] = useState(false);
+  const [isExtractingText, setIsExtractingText] = useState(false);
 
   // Text tool states
   const [newText, setNewText] = useState('');
@@ -56,6 +71,51 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
 
   const handleDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
+    extractTextFromPdf();
+  };
+
+  const extractTextFromPdf = async () => {
+    setIsExtractingText(true);
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+      const allTextItems: ExtractedTextItem[] = [];
+
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        const viewport = page.getViewport({ scale: 1 });
+
+        textContent.items.forEach((item: any, index: number) => {
+          if (item.str.trim()) {
+            const transform = item.transform;
+            const x = transform[4];
+            const y = viewport.height - transform[5];
+            
+            allTextItems.push({
+              id: `extracted-${pageNum}-${index}`,
+              text: item.str,
+              x: x,
+              y: y,
+              width: item.width,
+              height: item.height,
+              page: pageNum,
+              fontSize: Math.round(transform[0]),
+              fontName: item.fontName || 'Helvetica',
+              isEditing: false
+            });
+          }
+        });
+      }
+
+      setExtractedTextItems(allTextItems);
+      toast.success(`Extracted ${allTextItems.length} text items. Click "Edit Existing Text" to modify them.`);
+    } catch (error) {
+      console.error('Failed to extract text:', error);
+      toast.error('Could not extract text from PDF');
+    } finally {
+      setIsExtractingText(false);
+    }
   };
 
   const handlePageClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -155,11 +215,36 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
       setImageAnnotations(imageAnnotations.map(a =>
         a.id === selectedAnnotation ? { ...a, x, y } : a
       ));
+    } else if (selectedAnnotation.startsWith('extracted-')) {
+      setExtractedTextItems(extractedTextItems.map(a =>
+        a.id === selectedAnnotation ? { ...a, x, y } : a
+      ));
     }
   };
 
   const handleMouseUp = () => {
     setIsDragging(false);
+  };
+
+  const handleExtractedTextClick = (id: string) => {
+    if (tool === 'edit-existing') {
+      setExtractedTextItems(extractedTextItems.map(item =>
+        item.id === id ? { ...item, isEditing: true } : { ...item, isEditing: false }
+      ));
+      setSelectedAnnotation(id);
+    }
+  };
+
+  const handleExtractedTextChange = (id: string, newText: string) => {
+    setExtractedTextItems(extractedTextItems.map(item =>
+      item.id === id ? { ...item, text: newText } : item
+    ));
+  };
+
+  const handleExtractedTextBlur = (id: string) => {
+    setExtractedTextItems(extractedTextItems.map(item =>
+      item.id === id ? { ...item, isEditing: false } : item
+    ));
   };
 
   const deleteAnnotation = () => {
@@ -169,6 +254,9 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
       setTextAnnotations(textAnnotations.filter(a => a.id !== selectedAnnotation));
     } else if (selectedAnnotation.startsWith('image-')) {
       setImageAnnotations(imageAnnotations.filter(a => a.id !== selectedAnnotation));
+    } else if (selectedAnnotation.startsWith('extracted-')) {
+      setExtractedTextItems(extractedTextItems.filter(a => a.id !== selectedAnnotation));
+      toast.success('Deleted text item');
     }
     setSelectedAnnotation(null);
   };
@@ -180,6 +268,34 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
       const arrayBuffer = await file.arrayBuffer();
       const pdfDoc = await PDFDocument.load(arrayBuffer);
       const pages = pdfDoc.getPages();
+
+      // First, draw white rectangles over extracted text items that were edited or deleted
+      // This "erases" the original text
+      for (const item of extractedTextItems) {
+        if (item.page <= pages.length) {
+          const page = pages[item.page - 1];
+          const { height } = page.getSize();
+          const pdfY = height - item.y - item.height;
+
+          // Draw white rectangle to cover original text
+          page.drawRectangle({
+            x: item.x - 2,
+            y: pdfY - 2,
+            width: item.width + 4,
+            height: item.height + 4,
+            color: rgb(1, 1, 1),
+            borderWidth: 0
+          });
+
+          // Redraw the (potentially edited) text
+          page.drawText(item.text, {
+            x: item.x,
+            y: pdfY,
+            size: item.fontSize,
+            color: rgb(0, 0, 0)
+          });
+        }
+      }
 
       // Add text annotations
       for (const annotation of textAnnotations) {
@@ -277,6 +393,22 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
               </span>
             </button>
             <button
+              onClick={() => setTool('edit-existing')}
+              className={`w-full px-4 py-2 text-left rounded-lg transition-colors ${
+                tool === 'edit-existing' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+              disabled={isExtractingText || extractedTextItems.length === 0}
+            >
+              <span className="flex items-center">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Edit Existing Text
+                {isExtractingText && ' (Loading...)'}
+                {!isExtractingText && extractedTextItems.length > 0 && ` (${extractedTextItems.length})`}
+              </span>
+            </button>
+            <button
               onClick={() => setTool('text')}
               className={`w-full px-4 py-2 text-left rounded-lg transition-colors ${
                 tool === 'text' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -286,7 +418,7 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                Add Text
+                Add New Text
               </span>
             </button>
             <button
@@ -418,8 +550,29 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
       </div>
 
       {/* PDF Canvas */}
-      <div className="flex-1 bg-gray-100 overflow-auto">
-        <div className="flex justify-center p-8">
+      <div className="flex-1 bg-gray-100 overflow-auto scrollbar-visible" style={{ scrollbarWidth: 'auto', scrollbarColor: '#6366f1 #e5e7eb' }}>
+        {/* Active Tool Banner */}
+        {tool === 'text' && newText && (
+          <div className="sticky top-0 z-10 bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-6 py-3 shadow-lg">
+            <div className="flex items-center justify-center">
+              <svg className="w-5 h-5 mr-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
+              </svg>
+              <span className="font-medium">👆 Click anywhere on the PDF below to place: "{newText.substring(0, 40)}{newText.length > 40 ? '...' : ''}"</span>
+            </div>
+          </div>
+        )}
+        {tool === 'edit-existing' && (
+          <div className="sticky top-0 z-10 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 shadow-lg">
+            <div className="flex items-center justify-center">
+              <svg className="w-5 h-5 mr-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              <span className="font-medium">✏️ Edit Mode: Click on any text in the PDF to modify it</span>
+            </div>
+          </div>
+        )}
+        <div className="flex justify-center p-8 min-h-full">
           <Document
             file={file}
             onLoadSuccess={handleDocumentLoadSuccess}
@@ -496,12 +649,72 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
                     draggable={false}
                   />
                 ))}
+
+              {/* Render extracted text items (editable existing PDF text) */}
+              {extractedTextItems
+                .filter(item => item.page === currentPage)
+                .map(item => (
+                  item.isEditing ? (
+                    <input
+                      key={item.id}
+                      type="text"
+                      value={item.text}
+                      onChange={(e) => handleExtractedTextChange(item.id, e.target.value)}
+                      onBlur={() => handleExtractedTextBlur(item.id)}
+                      autoFocus
+                      className={`absolute border-2 border-green-500 bg-white px-1 focus:outline-none focus:ring-2 focus:ring-green-600`}
+                      style={{
+                        left: item.x,
+                        top: item.y,
+                        fontSize: item.fontSize,
+                        width: Math.max(item.width, 100),
+                        fontFamily: 'Helvetica'
+                      }}
+                    />
+                  ) : (
+                    <div
+                      key={item.id}
+                      className={`absolute ${
+                        tool === 'edit-existing' ? 'cursor-text hover:bg-yellow-100 hover:ring-2 hover:ring-yellow-500' : 'cursor-move'
+                      } ${
+                        selectedAnnotation === item.id ? 'ring-2 ring-green-500 bg-green-50' : ''
+                      }`}
+                      style={{
+                        left: item.x,
+                        top: item.y,
+                        fontSize: item.fontSize,
+                        userSelect: 'none',
+                        padding: '1px 2px'
+                      }}
+                      onClick={() => handleExtractedTextClick(item.id)}
+                      onMouseDown={(e) => {
+                        if (tool !== 'edit-existing') {
+                          handleAnnotationMouseDown(e, item.id, 'text');
+                        }
+                      }}
+                    >
+                      {item.text}
+                    </div>
+                  )
+                ))}
             </div>
           </Document>
         </div>
 
         {/* Info Banner */}
         <div className="max-w-4xl mx-auto mt-4">
+          <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded mb-4">
+            <div className="flex items-start">
+              <svg className="h-5 w-5 text-green-500 mt-0.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="text-sm text-green-900">
+                <p className="font-bold mb-2">✅ NOW YOU CAN EDIT EXISTING PDF TEXT!</p>
+                <p className="mb-2">The PDF text has been extracted. Click <strong>"Edit Existing Text"</strong> tool, then click any text on the PDF to edit it.</p>
+                <p className="text-xs">Extracted {extractedTextItems.length} text items from the PDF.</p>
+              </div>
+            </div>
+          </div>
           <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
             <div className="flex items-start">
               <svg className="h-5 w-5 text-blue-500 mt-0.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -510,14 +723,12 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
               <div className="text-sm text-blue-800">
                 <p className="font-medium mb-1">How to use:</p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li><strong>Add Text:</strong> Select "Add Text" tool, enter your text, then click anywhere on the PDF to place it</li>
+                  <li><strong>Edit Existing Text:</strong> Click "Edit Existing Text" tool (green button), then click on any existing text to modify it</li>
+                  <li><strong>Add New Text:</strong> Select "Add New Text", type your text in the sidebar, then click on the PDF where you want to place it</li>
                   <li><strong>Add Image:</strong> Click "Add Image" to upload and place images on the PDF</li>
-                  <li><strong>Move Items:</strong> Use "Select / Move" tool to drag and reposition text or images</li>
-                  <li><strong>Delete:</strong> Select an item, then click "Delete Selected" button</li>
+                  <li><strong>Move Items:</strong> Use "Select / Move" tool to drag and reposition any text or images</li>
+                  <li><strong>Delete:</strong> Select an item, then click "Delete Selected" button in the sidebar</li>
                 </ul>
-                <p className="mt-2 text-xs italic">
-                  ⚠️ Note: This editor adds NEW text/images on top of the PDF. Editing existing PDF text requires OCR technology (coming soon).
-                </p>
               </div>
             </div>
           </div>
