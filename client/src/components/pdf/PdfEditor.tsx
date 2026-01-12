@@ -58,10 +58,6 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
     setNumPages(numPages);
   };
 
-  const handlePageLoadSuccess = () => {
-    // Page loaded successfully
-  };
-
   const handlePageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (tool === 'text' && newText.trim()) {
       const rect = e.currentTarget.getBoundingClientRect();
