@@ -87,6 +87,7 @@ export const fieldApi = {
     yPercent?: number;
     widthPercent?: number;
     heightPercent?: number;
+    pageNumber?: number;
     isRequired?: boolean;
   }) => api.put(`/api/documents/fields/${fieldId}`, data),
   delete: (fieldId: string) => api.delete(`/api/documents/fields/${fieldId}`)
@@ -104,6 +105,21 @@ export const signApi = {
     axios.post(`${API_URL}/sign/${documentId}/${token}/complete`),
   decline: (documentId: string, token: string, data?: { reason?: string }) =>
     axios.post(`${API_URL}/sign/${documentId}/${token}/decline`, data)
+};
+
+// Manager APIs
+export const managerApi = {
+  // Get documents pending approval (for managers)
+  getPendingApprovals: () => api.get('/api/documents/pending-approvals'),
+  // Approve a document
+  approveDocument: (documentId: string) => api.post(`/api/documents/${documentId}/approve`),
+  // Deny a document with feedback
+  denyDocument: (documentId: string, data: { feedback: string }) => 
+    api.post(`/api/documents/${documentId}/deny`, data),
+  // Get managers list (for admin when creating users)
+  getManagers: () => api.get('/api/auth/managers'),
+  // Get team documents (documents from users under this manager)
+  getTeamDocuments: () => api.get('/api/documents/team')
 };
 
 export default api;

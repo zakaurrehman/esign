@@ -1,13 +1,17 @@
 export type DocumentType = 'WRITTEN' | 'UPLOADED';
-export type DocumentStatus = 'DRAFT' | 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'VOIDED';
+export type DocumentStatus = 'DRAFT' | 'PENDING_APPROVAL' | 'APPROVED' | 'DENIED' | 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'VOIDED';
 export type RecipientStatus = 'PENDING' | 'SENT' | 'VIEWED' | 'SIGNED' | 'DECLINED';
 export type FieldType = 'SIGNATURE' | 'INITIALS' | 'DATE' | 'TEXT' | 'CHECKBOX';
+export type UserRole = 'USER' | 'MANAGER' | 'SUPER_ADMIN';
+export type ApprovalStatus = 'PENDING' | 'APPROVED' | 'DENIED';
 
 export interface User {
   id: string;
   email: string;
   name: string;
-  role?: string;
+  role?: UserRole;
+  managerId?: string;
+  manager?: User;
   createdAt?: string;
   _count?: { documents: number };
 }
@@ -23,9 +27,15 @@ export interface Document {
   completedPdfPath?: string;
   pageCount: number;
   status: DocumentStatus;
+  approvalStatus?: ApprovalStatus;
+  managerFeedback?: string;
+  reviewedById?: string;
+  reviewedBy?: User;
+  reviewedAt?: string;
   expiresAt?: string;
   completedAt?: string;
   userId: string;
+  user?: User;
   recipients: Recipient[];
   fields: SignatureField[];
   createdAt: string;

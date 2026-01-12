@@ -11,6 +11,7 @@ import { ViewDocument } from './pages/ViewDocument';
 import { SignDocument } from './pages/SignDocument';
 import { SignComplete, SignDeclined } from './pages/SignComplete';
 import { AdminPanel } from './pages/AdminPanel';
+import { TeamDocuments } from './pages/TeamDocuments';
 import AllDocuments from './pages/AllDocuments';
 import TemplateManagement from './pages/TemplateManagement';
 
@@ -89,6 +90,7 @@ function App() {
           <Route path="create" element={<CreateDocument />} />
           <Route path="prepare/:id" element={<PrepareDocument />} />
           <Route path="document/:id" element={<ViewDocument />} />
+          <Route path="manager/team" element={<TeamDocuments />} />
           <Route path="admin" element={<AdminPanel />} />
           <Route path="admin/documents" element={<AllDocuments />} />
           <Route path="admin/template" element={<TemplateManagement />} />

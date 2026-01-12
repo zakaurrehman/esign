@@ -32,6 +32,7 @@ export const updateFieldSchema = z.object({
   yPercent: z.number().min(0).max(100).optional(),
   widthPercent: z.number().min(0).max(100).optional(),
   heightPercent: z.number().min(0).max(100).optional(),
+  pageNumber: z.number().int().positive().optional(),
   isRequired: z.boolean().optional()
 });
 

@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 
 export const Layout: React.FC = () => {
-  const { user, isAdmin, logout } = useAuthStore();
+  const { user, isAdmin, isManager, logout } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -11,6 +11,14 @@ export const Layout: React.FC = () => {
     logout();
     navigate('/login');
   };
+
+  const getRoleBadge = () => {
+    if (isAdmin) return { text: 'Admin', class: 'bg-purple-500' };
+    if (isManager) return { text: 'Manager', class: 'bg-green-500' };
+    return null;
+  };
+
+  const roleBadge = getRoleBadge();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-violet-50">
@@ -42,6 +50,18 @@ export const Layout: React.FC = () => {
                 >
                   + Create Document
                 </Link>
+                {isManager && (
+                  <Link
+                    to="/manager/team"
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all no-underline ${
+                      location.pathname === '/manager/team'
+                        ? 'bg-white/20 text-white font-semibold'
+                        : 'text-white/90 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    Team Documents
+                  </Link>
+                )}
                 {isAdmin && (
                   <>
                     <Link
@@ -69,7 +89,14 @@ export const Layout: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-white">{user?.name}</span>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-white">{user?.name}</span>
+                {roleBadge && (
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold text-white ${roleBadge.class}`}>
+                    {roleBadge.text}
+                  </span>
+                )}
+              </div>
               <button
                 onClick={handleLogout}
                 className="bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-white/30 transition-all"

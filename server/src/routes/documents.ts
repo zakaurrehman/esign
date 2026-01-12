@@ -23,7 +23,11 @@ import {
   sendDocument,
   voidDocument,
   getAuditTrail,
-  convertDocToHtml
+  convertDocToHtml,
+  getPendingApprovals,
+  approveDocument,
+  denyDocument,
+  getTeamDocuments
 } from '../controllers/documentController';
 
 const router = Router();
@@ -80,6 +84,8 @@ const uploadDoc = multer({
 // Document routes
 router.get('/', auth, listDocuments);
 router.get('/admin/all', auth, listAllDocuments); // Super Admin: view all documents
+router.get('/pending-approvals', auth, getPendingApprovals); // Manager: get pending approvals
+router.get('/team', auth, getTeamDocuments); // Manager: get team documents
 router.post('/convert-doc', auth, uploadDoc.single('file'), convertDocToHtml);
 router.post('/', auth, validate(createDocumentSchema), createDocument);
 router.post('/upload', auth, upload.single('file'), uploadDocument);
@@ -90,6 +96,8 @@ router.get('/:id/pdf', auth, getPdf);
 router.post('/:id/generate-pdf', auth, generatePdf);
 router.post('/:id/send', auth, sendDocument);
 router.post('/:id/void', auth, voidDocument);
+router.post('/:id/approve', auth, approveDocument); // Manager: approve document
+router.post('/:id/deny', auth, denyDocument); // Manager: deny document
 router.get('/:id/audit', auth, getAuditTrail);
 
 // Recipient routes

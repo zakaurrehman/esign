@@ -5,16 +5,27 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import toast from 'react-hot-toast';
-import api from '../services/api';
-import type { User } from '../types/index';
+import api, { managerApi } from '../services/api';
+import type { User, UserRole } from '../types/index';
+
+interface ExtendedUser extends User {
+  _count?: { documents: number; managedUsers?: number };
+}
 
 export const AdminPanel: React.FC = () => {
   const { isAdmin } = useAuthStore();
   const navigate = useNavigate();
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<ExtendedUser[]>([]);
+  const [managers, setManagers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [newUser, setNewUser] = useState({ email: '', name: '', password: '' });
+  const [newUser, setNewUser] = useState({ 
+    email: '', 
+    name: '', 
+    password: '', 
+    role: 'USER' as UserRole,
+    managerId: '' 
+  });
   const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
@@ -24,6 +35,7 @@ export const AdminPanel: React.FC = () => {
       return;
     }
     fetchUsers();
+    fetchManagers();
   }, [isAdmin, navigate]);
 
   const fetchUsers = async () => {
@@ -37,15 +49,29 @@ export const AdminPanel: React.FC = () => {
     }
   };
 
+  const fetchManagers = async () => {
+    try {
+      const response = await managerApi.getManagers();
+      setManagers(response.data.managers);
+    } catch (error: any) {
+      console.error('Failed to load managers');
+    }
+  };
+
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsCreating(true);
     try {
-      await api.post('/api/auth/users', newUser);
+      const payload = {
+        ...newUser,
+        managerId: newUser.role === 'USER' && newUser.managerId ? newUser.managerId : undefined
+      };
+      await api.post('/api/auth/users', payload);
       toast.success('User created successfully');
-      setNewUser({ email: '', name: '', password: '' });
+      setNewUser({ email: '', name: '', password: '', role: 'USER', managerId: '' });
       setShowCreateForm(false);
       fetchUsers();
+      fetchManagers(); // Refresh managers list if we created a new manager
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Failed to create user');
     } finally {
@@ -54,15 +80,38 @@ export const AdminPanel: React.FC = () => {
   };
 
   const handleDeleteUser = async (userId: string, userName: string) => {
-    if (!confirm(`Are you sure you want to delete user "${userName}"?`)) {
+    if (!confirm(`Are you sure you want to delete user "${userName}"? This will also delete all their documents.`)) {
       return;
     }
     try {
       await api.delete(`/api/auth/users/${userId}`);
       toast.success('User deleted successfully');
       fetchUsers();
+      fetchManagers();
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Failed to delete user');
+    }
+  };
+
+  const getRoleBadgeClass = (role: string | undefined) => {
+    switch (role) {
+      case 'SUPER_ADMIN':
+        return 'bg-purple-100 text-purple-800';
+      case 'MANAGER':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-blue-100 text-blue-800';
+    }
+  };
+
+  const getRoleDisplayName = (role: string | undefined) => {
+    switch (role) {
+      case 'SUPER_ADMIN':
+        return 'Super Admin';
+      case 'MANAGER':
+        return 'Manager';
+      default:
+        return 'User';
     }
   };
 
@@ -79,7 +128,7 @@ export const AdminPanel: React.FC = () => {
       <div className="mb-6 flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">User Management</h1>
-          <p className="text-slate-600 mt-2">Manage system users and their access</p>
+          <p className="text-slate-600 mt-2">Manage system users, managers, and their access</p>
         </div>
         <div className="flex gap-3">
           <Button
@@ -119,14 +168,61 @@ export const AdminPanel: React.FC = () => {
                   placeholder="user@example.com"
                 />
               </div>
-              <Input
-                label="Password"
-                type="text"
-                value={newUser.password}
-                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                required
-                placeholder="Temporary password for user"
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label="Password"
+                  type="text"
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                  required
+                  placeholder="Temporary password for user"
+                />
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Role
+                  </label>
+                  <select
+                    value={newUser.role}
+                    onChange={(e) => setNewUser({ ...newUser, role: e.target.value as UserRole, managerId: '' })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  >
+                    <option value="USER">User</option>
+                    <option value="MANAGER">Manager</option>
+                  </select>
+                </div>
+              </div>
+              
+              {newUser.role === 'USER' && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Assign to Manager (Optional)
+                  </label>
+                  <select
+                    value={newUser.managerId}
+                    onChange={(e) => setNewUser({ ...newUser, managerId: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  >
+                    <option value="">No Manager (Direct Send)</option>
+                    {managers.map((manager) => (
+                      <option key={manager.id} value={manager.id}>
+                        {manager.name} ({manager.email})
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-slate-500 mt-1">
+                    If assigned, documents from this user will require manager approval before sending.
+                  </p>
+                </div>
+              )}
+
+              {newUser.role === 'MANAGER' && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p className="text-sm text-green-800">
+                    <strong>Manager Role:</strong> This user will be able to review and approve/deny documents from users assigned to them.
+                  </p>
+                </div>
+              )}
+
               <div className="flex gap-2">
                 <Button type="submit" isLoading={isCreating}>
                   Create User
@@ -143,6 +239,28 @@ export const AdminPanel: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+          <CardContent className="p-4">
+            <div className="text-3xl font-bold">{users.filter(u => u.role === 'USER').length}</div>
+            <div className="text-blue-100">Users</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
+          <CardContent className="p-4">
+            <div className="text-3xl font-bold">{users.filter(u => u.role === 'MANAGER').length}</div>
+            <div className="text-green-100">Managers</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+          <CardContent className="p-4">
+            <div className="text-3xl font-bold">{users.filter(u => u.role === 'SUPER_ADMIN').length}</div>
+            <div className="text-purple-100">Super Admins</div>
+          </CardContent>
+        </Card>
+      </div>
 
       <Card className="bg-white shadow-xl rounded-2xl">
         <CardHeader className="bg-gradient-to-r from-indigo-50 to-violet-50 rounded-t-2xl">
@@ -161,6 +279,9 @@ export const AdminPanel: React.FC = () => {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                     Role
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                    Manager / Team
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                     Documents
@@ -183,15 +304,22 @@ export const AdminPanel: React.FC = () => {
                       {user.email}
                     </td>
                     <td className="px-6 py-4 text-sm">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          user.role === 'SUPER_ADMIN'
-                            ? 'bg-purple-100 text-purple-800'
-                            : 'bg-blue-100 text-blue-800'
-                        }`}
-                      >
-                        {user.role === 'SUPER_ADMIN' ? 'Super Admin' : 'User'}
+                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getRoleBadgeClass(user.role)}`}>
+                        {getRoleDisplayName(user.role)}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-600">
+                      {user.role === 'USER' && user.manager ? (
+                        <span className="text-green-600">
+                          📋 {user.manager.name}
+                        </span>
+                      ) : user.role === 'MANAGER' ? (
+                        <span className="text-blue-600">
+                          👥 {user._count?.managedUsers || 0} team members
+                        </span>
+                      ) : (
+                        <span className="text-slate-400">-</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-600">
                       {user._count?.documents || 0}

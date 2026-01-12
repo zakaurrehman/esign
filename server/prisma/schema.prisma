@@ -8,14 +8,18 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
-  name      String
-  password  String
-  role      String     @default("USER") // USER or SUPER_ADMIN
-  documents Document[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id            String     @id @default(uuid())
+  email         String     @unique
+  name          String
+  password      String
+  role          String     @default("USER") // USER, MANAGER, or SUPER_ADMIN
+  managerId     String?    // For USER role - assigned manager
+  manager       User?      @relation("UserManager", fields: [managerId], references: [id])
+  managedUsers  User[]     @relation("UserManager") // For MANAGER role - users under them
+  documents     Document[] @relation("UserDocuments")
+  reviewedDocs  Document[] @relation("ManagerReviews") // Documents reviewed by this manager
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }
 
 model Document {
@@ -29,11 +33,16 @@ model Document {
   completedPdfPath String?
   pageCount        Int            @default(1)
   documentHash     String?
-  status           String         @default("DRAFT") // DRAFT, PENDING, IN_PROGRESS, COMPLETED, VOIDED
+  status           String         @default("DRAFT") // DRAFT, PENDING_APPROVAL, APPROVED, DENIED, PENDING, IN_PROGRESS, COMPLETED, VOIDED
+  approvalStatus   String?        // PENDING, APPROVED, DENIED
+  managerFeedback  String?        // Feedback from manager if denied
+  reviewedById     String?        // Manager who reviewed
+  reviewedBy       User?          @relation("ManagerReviews", fields: [reviewedById], references: [id])
+  reviewedAt       DateTime?      // When it was reviewed
   expiresAt        DateTime?
   completedAt      DateTime?
   userId           String
-  user             User           @relation(fields: [userId], references: [id])
+  user             User           @relation("UserDocuments", fields: [userId], references: [id])
   recipients       Recipient[]
   fields           SignatureField[]
   auditLogs        AuditLog[]

@@ -8,7 +8,7 @@ import { AuthRequest } from '../middleware/auth';
 // Admin-only user creation endpoint
 export const createUser = async (req: AuthRequest, res: Response) => {
   try {
-    const { email, name, password } = req.body as RegisterInput;
+    const { email, name, password, role, managerId } = req.body;
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -17,14 +17,37 @@ export const createUser = async (req: AuthRequest, res: Response) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Validate role
+    const validRoles = ['USER', 'MANAGER', 'SUPER_ADMIN'];
+    const userRole = validRoles.includes(role) ? role : 'USER';
+
+    // If user role and managerId provided, validate manager exists
+    if (userRole === 'USER' && managerId) {
+      const manager = await prisma.user.findUnique({ where: { id: managerId } });
+      if (!manager || manager.role !== 'MANAGER') {
+        return res.status(400).json({ error: 'Invalid manager selected' });
+      }
+    }
+
     const user = await prisma.user.create({
       data: {
         email,
         name,
         password: hashedPassword,
-        role: 'USER'
+        role: userRole,
+        managerId: userRole === 'USER' ? managerId : null
       },
-      select: { id: true, email: true, name: true, role: true, createdAt: true }
+      select: { 
+        id: true, 
+        email: true, 
+        name: true, 
+        role: true, 
+        managerId: true,
+        manager: {
+          select: { id: true, name: true, email: true }
+        },
+        createdAt: true 
+      }
     });
 
     return res.status(201).json({ user });
@@ -88,8 +111,12 @@ export const listUsers = async (req: AuthRequest, res: Response) => {
         email: true,
         name: true,
         role: true,
+        managerId: true,
+        manager: {
+          select: { id: true, name: true, email: true }
+        },
         createdAt: true,
-        _count: { select: { documents: true } }
+        _count: { select: { documents: true, managedUsers: true } }
       },
       orderBy: { createdAt: 'desc' }
     });
@@ -98,6 +125,77 @@ export const listUsers = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('List users error:', error);
     return res.status(500).json({ error: 'Failed to list users' });
+  }
+};
+
+// Get all managers (for dropdown when creating users)
+export const getManagers = async (req: AuthRequest, res: Response) => {
+  try {
+    const managers = await prisma.user.findMany({
+      where: { role: 'MANAGER' },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        _count: { select: { managedUsers: true } }
+      },
+      orderBy: { name: 'asc' }
+    });
+
+    return res.json({ managers });
+  } catch (error) {
+    console.error('Get managers error:', error);
+    return res.status(500).json({ error: 'Failed to get managers' });
+  }
+};
+
+// Update user (for changing manager assignment)
+export const updateUser = async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const { name, role, managerId } = req.body;
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (user.role === 'SUPER_ADMIN') {
+      return res.status(400).json({ error: 'Cannot modify super admin' });
+    }
+
+    // Validate manager if provided
+    if (managerId) {
+      const manager = await prisma.user.findUnique({ where: { id: managerId } });
+      if (!manager || manager.role !== 'MANAGER') {
+        return res.status(400).json({ error: 'Invalid manager selected' });
+      }
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: name || undefined,
+        role: role || undefined,
+        managerId: role === 'USER' ? managerId : null
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        managerId: true,
+        manager: {
+          select: { id: true, name: true, email: true }
+        },
+        createdAt: true
+      }
+    });
+
+    return res.json({ user: updatedUser });
+  } catch (error) {
+    console.error('Update user error:', error);
+    return res.status(500).json({ error: 'Failed to update user' });
   }
 };
 

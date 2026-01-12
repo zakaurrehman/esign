@@ -122,25 +122,64 @@ export const PrepareDocument: React.FC = () => {
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
+    const { active, over, delta } = event;
 
     if (!over || !id || (!document?.pdfPath && !document?.pdfData)) return;
 
     const activeData = active.data.current as any;
 
-    // Calculate position from drop coordinates
-    const dropArea = window.document.querySelector('.pdf-drop-area');
-    if (!dropArea) return;
+    // Find the PDF page container where we're dropping
+    const pdfPages = window.document.querySelectorAll('.pdf-drop-area .react-pdf__Page');
+    if (pdfPages.length === 0) return;
 
-    const rect = dropArea.getBoundingClientRect();
-    const scrollTop = dropArea.scrollTop || 0;
+    // Get the activator event to find initial position
+    const activatorEvent = (event as any).activatorEvent as MouseEvent | TouchEvent;
+    let startX: number, startY: number;
+    
+    if (activatorEvent instanceof MouseEvent) {
+      startX = activatorEvent.clientX;
+      startY = activatorEvent.clientY;
+    } else if (activatorEvent instanceof TouchEvent) {
+      startX = activatorEvent.touches[0].clientX;
+      startY = activatorEvent.touches[0].clientY;
+    } else {
+      return;
+    }
 
-    // Get the position where the item was dropped relative to the container
-    const dropX = (event as any).activatorEvent?.clientX || 0;
-    const dropY = (event as any).activatorEvent?.clientY || 0;
+    // Calculate final drop position
+    const finalX = startX + delta.x;
+    const finalY = startY + delta.y;
 
-    const xPercent = Math.max(0, Math.min(90, ((dropX - rect.left) / rect.width) * 100));
-    const yPercent = Math.max(0, Math.min(90, ((dropY - rect.top + scrollTop) / rect.height) * 100));
+    // Find which page the drop occurred on and calculate relative position
+    let targetPage = 1;
+    let xPercent = 0;
+    let yPercent = 0;
+
+    for (let i = 0; i < pdfPages.length; i++) {
+      const pageRect = pdfPages[i].getBoundingClientRect();
+      
+      // Check if drop is within this page
+      if (finalX >= pageRect.left && finalX <= pageRect.right &&
+          finalY >= pageRect.top && finalY <= pageRect.bottom) {
+        targetPage = i + 1;
+        
+        // Calculate percentage position within the page
+        xPercent = ((finalX - pageRect.left) / pageRect.width) * 100;
+        yPercent = ((finalY - pageRect.top) / pageRect.height) * 100;
+        
+        // Clamp values to keep field within bounds
+        xPercent = Math.max(0, Math.min(80, xPercent));
+        yPercent = Math.max(0, Math.min(90, yPercent));
+        break;
+      }
+    }
+
+    // If drop wasn't on a specific page, use the first page with approximate position
+    if (xPercent === 0 && yPercent === 0) {
+      const firstPageRect = pdfPages[0].getBoundingClientRect();
+      xPercent = Math.max(0, Math.min(80, ((finalX - firstPageRect.left) / firstPageRect.width) * 100));
+      yPercent = Math.max(0, Math.min(90, ((finalY - firstPageRect.top) / firstPageRect.height) * 100));
+    }
 
     if (activeData.isNew) {
       // Adding new field from palette
@@ -148,7 +187,7 @@ export const PrepareDocument: React.FC = () => {
         await fieldApi.add(id, {
           recipientId: activeData.recipientId,
           fieldType: activeData.type as FieldType,
-          pageNumber: 1, // TODO: Detect which page
+          pageNumber: targetPage,
           xPercent,
           yPercent,
           widthPercent: activeData.type === 'SIGNATURE' ? 20 : 15,
@@ -164,7 +203,8 @@ export const PrepareDocument: React.FC = () => {
       try {
         await fieldApi.update(active.id as string, {
           xPercent,
-          yPercent
+          yPercent,
+          pageNumber: targetPage
         });
         fetchDocument();
       } catch (error: any) {
@@ -186,8 +226,12 @@ export const PrepareDocument: React.FC = () => {
 
     setIsSending(true);
     try {
-      await documentApi.send(id);
-      toast.success('Document sent for signing!');
+      const response = await documentApi.send(id);
+      if (response.data.requiresApproval) {
+        toast.success('Document sent to your manager for approval!', { duration: 5000 });
+      } else {
+        toast.success('Document sent for signing!');
+      }
       navigate('/');
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Failed to send document');

@@ -130,20 +130,62 @@ export const generatePdf = async (req: AuthRequest, res: Response) => {
 
 export const getDocument = async (req: AuthRequest, res: Response) => {
   try {
-    const document = await prisma.document.findFirst({
+    // First try to find document owned by user
+    let document = await prisma.document.findFirst({
       where: {
         id: req.params.id,
         userId: req.user!.id
       },
       include: {
+        user: { select: { id: true, name: true, email: true, managerId: true } },
         recipients: {
           include: {
             fields: true
           }
         },
-        fields: true
+        fields: true,
+        reviewedBy: { select: { id: true, name: true, email: true } }
       }
     });
+
+    // If not found and user is a manager, check if document belongs to their team
+    if (!document && req.user!.role === 'MANAGER') {
+      const teamDocument = await prisma.document.findFirst({
+        where: {
+          id: req.params.id,
+          user: { managerId: req.user!.id }
+        },
+        include: {
+          user: { select: { id: true, name: true, email: true, managerId: true } },
+          recipients: {
+            include: {
+              fields: true
+            }
+          },
+          fields: true,
+          reviewedBy: { select: { id: true, name: true, email: true } }
+        }
+      });
+      document = teamDocument;
+    }
+
+    // If not found and user is admin, allow viewing any document
+    if (!document && req.user!.role === 'SUPER_ADMIN') {
+      const anyDocument = await prisma.document.findFirst({
+        where: { id: req.params.id },
+        include: {
+          user: { select: { id: true, name: true, email: true, managerId: true } },
+          recipients: {
+            include: {
+              fields: true
+            }
+          },
+          fields: true,
+          reviewedBy: { select: { id: true, name: true, email: true } }
+        }
+      });
+      document = anyDocument;
+    }
 
     if (!document) {
       return res.status(404).json({ error: 'Document not found' });
@@ -216,9 +258,27 @@ export const deleteDocument = async (req: AuthRequest, res: Response) => {
 
 export const getPdf = async (req: AuthRequest, res: Response) => {
   try {
-    const document = await prisma.document.findFirst({
+    // First try to find document owned by user
+    let document = await prisma.document.findFirst({
       where: { id: req.params.id, userId: req.user!.id }
     });
+
+    // If not found and user is a manager, check if document belongs to their team
+    if (!document && req.user!.role === 'MANAGER') {
+      document = await prisma.document.findFirst({
+        where: {
+          id: req.params.id,
+          user: { managerId: req.user!.id }
+        }
+      });
+    }
+
+    // If not found and user is admin, allow viewing any document
+    if (!document && req.user!.role === 'SUPER_ADMIN') {
+      document = await prisma.document.findFirst({
+        where: { id: req.params.id }
+      });
+    }
 
     if (!document) {
       return res.status(404).json({ error: 'Document not found' });
@@ -436,15 +496,15 @@ export const sendDocument = async (req: AuthRequest, res: Response) => {
   try {
     const document = await prisma.document.findFirst({
       where: { id: req.params.id, userId: req.user!.id },
-      include: { recipients: true, fields: true }
+      include: { recipients: true, fields: true, user: true }
     });
 
     if (!document) {
       return res.status(404).json({ error: 'Document not found' });
     }
 
-    if (document.status !== 'DRAFT') {
-      return res.status(400).json({ error: 'Document has already been sent' });
+    if (document.status !== 'DRAFT' && document.status !== 'DENIED') {
+      return res.status(400).json({ error: 'Document has already been sent or is pending approval' });
     }
 
     if (!document.pdfPath && !document.pdfData) {
@@ -459,51 +519,335 @@ export const sendDocument = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Document has no signature fields' });
     }
 
-    // Update document status
-    await prisma.document.update({
-      where: { id: document.id },
-      data: { status: 'PENDING' }
+    // Check if user has a manager assigned
+    const user = await prisma.user.findUnique({
+      where: { id: req.user!.id },
+      include: { manager: true }
     });
 
-    // Update first recipient(s) status to SENT (based on signing order)
-    const minOrder = Math.min(...document.recipients.map(r => r.signingOrder));
-    await prisma.recipient.updateMany({
-      where: { documentId: document.id, signingOrder: minOrder },
-      data: { status: 'SENT' }
-    });
+    if (user?.managerId && user?.role === 'USER') {
+      // User has a manager - send for approval first
+      await prisma.document.update({
+        where: { id: document.id },
+        data: { 
+          status: 'PENDING_APPROVAL',
+          approvalStatus: 'PENDING',
+          managerFeedback: null // Clear any previous feedback
+        }
+      });
 
-    // Send email to first recipients
-    const firstRecipients = document.recipients.filter(r => r.signingOrder === minOrder);
-    for (const recipient of firstRecipients) {
-      const signingUrl = `${process.env.FRONTEND_URL}/sign/${document.id}/${recipient.accessToken}`;
-      const emailHtml = generateSigningEmail(
-        recipient.name,
-        document.title,
-        signingUrl,
-        req.user!.name
-      );
+      // Notify manager via email
+      if (user.manager) {
+        const managerEmailHtml = `
+          <h2>Document Pending Your Approval</h2>
+          <p>Hello ${user.manager.name},</p>
+          <p><strong>${req.user!.name}</strong> has submitted a document for your review:</p>
+          <p><strong>Document:</strong> ${document.title}</p>
+          <p><strong>Recipients:</strong> ${document.recipients.map(r => r.name).join(', ')}</p>
+          <p>Please log in to review and approve or deny this document.</p>
+          <a href="${process.env.FRONTEND_URL}" style="background: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Review Document</a>
+        `;
 
-      await sendEmail({
-        to: recipient.email,
-        subject: `Signature Request: ${document.title}`,
-        html: emailHtml
-      }).catch(err => console.error('Failed to send email to', recipient.email, err));
+        await sendEmail({
+          to: user.manager.email,
+          subject: `Document Approval Required: ${document.title}`,
+          html: managerEmailHtml
+        }).catch(err => console.error('Failed to send email to manager', err));
+      }
+
+      await prisma.auditLog.create({
+        data: {
+          documentId: document.id,
+          action: 'SENT_FOR_APPROVAL',
+          actorEmail: req.user!.email,
+          actorName: req.user!.name,
+          details: `Document sent to manager ${user.manager?.name} for approval`
+        }
+      });
+
+      return res.json({ message: 'Document sent to manager for approval', requiresApproval: true });
     }
 
-    await prisma.auditLog.create({
-      data: {
-        documentId: document.id,
-        action: 'DOCUMENT_SENT',
-        actorEmail: req.user!.email,
-        actorName: req.user!.name,
-        details: `Document sent to ${document.recipients.length} recipient(s)`
-      }
-    });
+    // No manager assigned or user is Manager/Admin - send directly
+    await sendDocumentToRecipients(document, req.user!);
 
     return res.json({ message: 'Document sent for signing' });
   } catch (error) {
     console.error('Send document error:', error);
     return res.status(500).json({ error: 'Failed to send document' });
+  }
+};
+
+// Helper function to send document to recipients
+async function sendDocumentToRecipients(document: any, user: any) {
+  // Update document status
+  await prisma.document.update({
+    where: { id: document.id },
+    data: { 
+      status: 'PENDING',
+      approvalStatus: 'APPROVED'
+    }
+  });
+
+  // Update first recipient(s) status to SENT (based on signing order)
+  const minOrder = Math.min(...document.recipients.map((r: any) => r.signingOrder));
+  await prisma.recipient.updateMany({
+    where: { documentId: document.id, signingOrder: minOrder },
+    data: { status: 'SENT' }
+  });
+
+  // Send email to first recipients
+  const firstRecipients = document.recipients.filter((r: any) => r.signingOrder === minOrder);
+  for (const recipient of firstRecipients) {
+    const signingUrl = `${process.env.FRONTEND_URL}/sign/${document.id}/${recipient.accessToken}`;
+    const emailHtml = generateSigningEmail(
+      recipient.name,
+      document.title,
+      signingUrl,
+      user.name
+    );
+
+    await sendEmail({
+      to: recipient.email,
+      subject: `Signature Request: ${document.title}`,
+      html: emailHtml
+    }).catch(err => console.error('Failed to send email to', recipient.email, err));
+  }
+
+  await prisma.auditLog.create({
+    data: {
+      documentId: document.id,
+      action: 'DOCUMENT_SENT',
+      actorEmail: user.email,
+      actorName: user.name,
+      details: `Document sent to ${document.recipients.length} recipient(s)`
+    }
+  });
+}
+
+// Get documents pending approval (for managers)
+export const getPendingApprovals = async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user!.role !== 'MANAGER') {
+      return res.status(403).json({ error: 'Only managers can access pending approvals' });
+    }
+
+    // Get all users managed by this manager
+    const managedUsers = await prisma.user.findMany({
+      where: { managerId: req.user!.id },
+      select: { id: true }
+    });
+
+    const userIds = managedUsers.map(u => u.id);
+
+    // Get documents pending approval from managed users
+    const documents = await prisma.document.findMany({
+      where: {
+        userId: { in: userIds },
+        status: 'PENDING_APPROVAL',
+        approvalStatus: 'PENDING',
+        deletedAt: null
+      },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+        recipients: { select: { id: true, name: true, email: true, status: true } },
+        _count: { select: { fields: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    return res.json({ documents });
+  } catch (error) {
+    console.error('Get pending approvals error:', error);
+    return res.status(500).json({ error: 'Failed to get pending approvals' });
+  }
+};
+
+// Approve a document (manager only)
+export const approveDocument = async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user!.role !== 'MANAGER') {
+      return res.status(403).json({ error: 'Only managers can approve documents' });
+    }
+
+    const document = await prisma.document.findFirst({
+      where: { id: req.params.id },
+      include: { 
+        user: { include: { manager: true } },
+        recipients: true 
+      }
+    });
+
+    if (!document) {
+      return res.status(404).json({ error: 'Document not found' });
+    }
+
+    // Verify this manager manages the document owner
+    if (document.user.managerId !== req.user!.id) {
+      return res.status(403).json({ error: 'You are not the manager for this user' });
+    }
+
+    if (document.status !== 'PENDING_APPROVAL') {
+      return res.status(400).json({ error: 'Document is not pending approval' });
+    }
+
+    // Update document with approval
+    await prisma.document.update({
+      where: { id: document.id },
+      data: {
+        approvalStatus: 'APPROVED',
+        reviewedById: req.user!.id,
+        reviewedAt: new Date()
+      }
+    });
+
+    // Now send to recipients
+    await sendDocumentToRecipients(document, document.user);
+
+    // Notify the document owner
+    const ownerEmailHtml = `
+      <h2>Document Approved</h2>
+      <p>Hello ${document.user.name},</p>
+      <p>Your document "<strong>${document.title}</strong>" has been approved by ${req.user!.name} and sent to recipients for signing.</p>
+      <a href="${process.env.FRONTEND_URL}" style="background: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">View Document</a>
+    `;
+
+    await sendEmail({
+      to: document.user.email,
+      subject: `Document Approved: ${document.title}`,
+      html: ownerEmailHtml
+    }).catch(err => console.error('Failed to send approval email', err));
+
+    await prisma.auditLog.create({
+      data: {
+        documentId: document.id,
+        action: 'DOCUMENT_APPROVED',
+        actorEmail: req.user!.email,
+        actorName: req.user!.name,
+        details: `Document approved by manager and sent to recipients`
+      }
+    });
+
+    return res.json({ message: 'Document approved and sent to recipients' });
+  } catch (error) {
+    console.error('Approve document error:', error);
+    return res.status(500).json({ error: 'Failed to approve document' });
+  }
+};
+
+// Deny a document (manager only)
+export const denyDocument = async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user!.role !== 'MANAGER') {
+      return res.status(403).json({ error: 'Only managers can deny documents' });
+    }
+
+    const { feedback } = req.body;
+
+    if (!feedback || feedback.trim() === '') {
+      return res.status(400).json({ error: 'Feedback is required when denying a document' });
+    }
+
+    const document = await prisma.document.findFirst({
+      where: { id: req.params.id },
+      include: { user: { include: { manager: true } } }
+    });
+
+    if (!document) {
+      return res.status(404).json({ error: 'Document not found' });
+    }
+
+    // Verify this manager manages the document owner
+    if (document.user.managerId !== req.user!.id) {
+      return res.status(403).json({ error: 'You are not the manager for this user' });
+    }
+
+    if (document.status !== 'PENDING_APPROVAL') {
+      return res.status(400).json({ error: 'Document is not pending approval' });
+    }
+
+    // Update document with denial
+    await prisma.document.update({
+      where: { id: document.id },
+      data: {
+        status: 'DENIED',
+        approvalStatus: 'DENIED',
+        managerFeedback: feedback,
+        reviewedById: req.user!.id,
+        reviewedAt: new Date()
+      }
+    });
+
+    // Notify the document owner
+    const ownerEmailHtml = `
+      <h2>Document Requires Changes</h2>
+      <p>Hello ${document.user.name},</p>
+      <p>Your document "<strong>${document.title}</strong>" has been reviewed by ${req.user!.name} and requires changes.</p>
+      <h3>Feedback from Manager:</h3>
+      <div style="background: #fef3c7; padding: 16px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+        ${feedback}
+      </div>
+      <p>Please make the necessary changes and resubmit the document.</p>
+      <a href="${process.env.FRONTEND_URL}" style="background: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Edit Document</a>
+    `;
+
+    await sendEmail({
+      to: document.user.email,
+      subject: `Document Requires Changes: ${document.title}`,
+      html: ownerEmailHtml
+    }).catch(err => console.error('Failed to send denial email', err));
+
+    await prisma.auditLog.create({
+      data: {
+        documentId: document.id,
+        action: 'DOCUMENT_DENIED',
+        actorEmail: req.user!.email,
+        actorName: req.user!.name,
+        details: `Document denied by manager. Feedback: ${feedback}`
+      }
+    });
+
+    return res.json({ message: 'Document denied and user notified' });
+  } catch (error) {
+    console.error('Deny document error:', error);
+    return res.status(500).json({ error: 'Failed to deny document' });
+  }
+};
+
+// Get team documents (for managers - all documents from their team)
+export const getTeamDocuments = async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user!.role !== 'MANAGER') {
+      return res.status(403).json({ error: 'Only managers can access team documents' });
+    }
+
+    // Get all users managed by this manager
+    const managedUsers = await prisma.user.findMany({
+      where: { managerId: req.user!.id },
+      select: { id: true }
+    });
+
+    const userIds = managedUsers.map(u => u.id);
+
+    // Get all documents from managed users
+    const documents = await prisma.document.findMany({
+      where: {
+        userId: { in: userIds },
+        deletedAt: null
+      },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+        recipients: { select: { id: true, name: true, email: true, status: true } },
+        reviewedBy: { select: { id: true, name: true, email: true } },
+        _count: { select: { fields: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    return res.json({ documents });
+  } catch (error) {
+    console.error('Get team documents error:', error);
+    return res.status(500).json({ error: 'Failed to get team documents' });
   }
 };
 
