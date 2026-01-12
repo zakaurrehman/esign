@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { DndContext, DragOverlay, useSensor, useSensors, PointerSensor, useDroppable, DragMoveEvent } from '@dnd-kit/core';
-import type { DragEndEvent } from '@dnd-kit/core';
+import { DndContext, DragOverlay, useSensor, useSensors, PointerSensor, useDroppable } from '@dnd-kit/core';
+import type { DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
 import { documentApi, recipientApi, fieldApi } from '../services/api';
 import type { Document, FieldType } from '../types/index';
 import { Button } from '../components/ui/Button';
