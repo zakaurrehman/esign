@@ -418,8 +418,8 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
       </div>
 
       {/* PDF Canvas */}
-      <div className="flex-1 bg-gray-100 overflow-auto p-8">
-        <div className="flex justify-center">
+      <div className="flex-1 bg-gray-100 overflow-auto">
+        <div className="flex justify-center p-8">
           <Document
             file={file}
             onLoadSuccess={handleDocumentLoadSuccess}
@@ -445,7 +445,7 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
             >
               <Page
                 pageNumber={currentPage}
-                width={Math.min(window.innerWidth * 0.7, 900)}
+                width={Math.min(window.innerWidth - 320, 800)}
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
               />
