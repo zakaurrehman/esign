@@ -71,10 +71,20 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
 
   const handleDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
-    extractTextFromPdf();
   };
 
-  const extractTextFromPdf = async () => {
+  const handlePageLoadSuccess = async (page: any) => {
+    const originalWidth = page.originalWidth;
+    const renderedWidth = Math.min(window.innerWidth - 320, 800);
+    const scale = renderedWidth / originalWidth;
+    
+    // Extract text only once when first page loads
+    if (extractedTextItems.length === 0 && !isExtractingText) {
+      extractTextFromPdf(scale);
+    }
+  };
+
+  const extractTextFromPdf = async (scale: number) => {
     setIsExtractingText(true);
     try {
       const arrayBuffer = await file.arrayBuffer();
@@ -89,18 +99,18 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
         textContent.items.forEach((item: any, index: number) => {
           if (item.str.trim()) {
             const transform = item.transform;
-            const x = transform[4];
-            const y = viewport.height - transform[5];
+            const x = transform[4] * scale;
+            const y = (viewport.height - transform[5]) * scale;
             
             allTextItems.push({
               id: `extracted-${pageNum}-${index}`,
               text: item.str,
               x: x,
               y: y,
-              width: item.width,
-              height: item.height,
+              width: item.width * scale,
+              height: item.height * scale,
               page: pageNum,
-              fontSize: Math.round(transform[0]),
+              fontSize: Math.round(transform[0] * scale),
               fontName: item.fontName || 'Helvetica',
               isEditing: false
             });
@@ -599,11 +609,61 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
               <Page
                 pageNumber={currentPage}
                 width={Math.min(window.innerWidth - 320, 800)}
+                onLoadSuccess={handlePageLoadSuccess}
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
               />
 
-              {/* Render text annotations */}
+              {/* Only show extracted text when we have it - this replaces the original PDF text */}
+              {extractedTextItems.length > 0 && extractedTextItems
+                .filter(item => item.page === currentPage)
+                .map(item => (
+                  item.isEditing ? (
+                    <input
+                      key={item.id}
+                      type="text"
+                      value={item.text}
+                      onChange={(e) => handleExtractedTextChange(item.id, e.target.value)}
+                      onBlur={() => handleExtractedTextBlur(item.id)}
+                      autoFocus
+                      className="absolute border-2 border-green-500 bg-white px-1 focus:outline-none focus:ring-2 focus:ring-green-600"
+                      style={{
+                        left: item.x,
+                        top: item.y,
+                        fontSize: item.fontSize,
+                        width: Math.max(item.width, 100),
+                        fontFamily: 'Helvetica'
+                      }}
+                    />
+                  ) : (
+                    <div
+                      key={item.id}
+                      className={`absolute ${
+                        tool === 'edit-existing' ? 'cursor-text hover:bg-yellow-100 hover:ring-2 hover:ring-yellow-500' : 'cursor-move'
+                      } ${
+                        selectedAnnotation === item.id ? 'ring-2 ring-green-500 bg-green-50' : ''
+                      }`}
+                      style={{
+                        left: item.x,
+                        top: item.y,
+                        fontSize: item.fontSize,
+                        userSelect: 'none',
+                        padding: '1px 2px',
+                        whiteSpace: 'pre'
+                      }}
+                      onClick={() => handleExtractedTextClick(item.id)}
+                      onMouseDown={(e) => {
+                        if (tool !== 'edit-existing') {
+                          handleAnnotationMouseDown(e, item.id, 'text');
+                        }
+                      }}
+                    >
+                      {item.text}
+                    </div>
+                  )
+                ))}
+
+              {/* Render text annotations (new text added by user) */}
               {textAnnotations
                 .filter(a => a.page === currentPage)
                 .map(annotation => (
@@ -648,54 +708,6 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
                     onMouseDown={(e) => handleAnnotationMouseDown(e, annotation.id, 'image')}
                     draggable={false}
                   />
-                ))}
-
-              {/* Render extracted text items (editable existing PDF text) */}
-              {extractedTextItems
-                .filter(item => item.page === currentPage)
-                .map(item => (
-                  item.isEditing ? (
-                    <input
-                      key={item.id}
-                      type="text"
-                      value={item.text}
-                      onChange={(e) => handleExtractedTextChange(item.id, e.target.value)}
-                      onBlur={() => handleExtractedTextBlur(item.id)}
-                      autoFocus
-                      className={`absolute border-2 border-green-500 bg-white px-1 focus:outline-none focus:ring-2 focus:ring-green-600`}
-                      style={{
-                        left: item.x,
-                        top: item.y,
-                        fontSize: item.fontSize,
-                        width: Math.max(item.width, 100),
-                        fontFamily: 'Helvetica'
-                      }}
-                    />
-                  ) : (
-                    <div
-                      key={item.id}
-                      className={`absolute ${
-                        tool === 'edit-existing' ? 'cursor-text hover:bg-yellow-100 hover:ring-2 hover:ring-yellow-500' : 'cursor-move'
-                      } ${
-                        selectedAnnotation === item.id ? 'ring-2 ring-green-500 bg-green-50' : ''
-                      }`}
-                      style={{
-                        left: item.x,
-                        top: item.y,
-                        fontSize: item.fontSize,
-                        userSelect: 'none',
-                        padding: '1px 2px'
-                      }}
-                      onClick={() => handleExtractedTextClick(item.id)}
-                      onMouseDown={(e) => {
-                        if (tool !== 'edit-existing') {
-                          handleAnnotationMouseDown(e, item.id, 'text');
-                        }
-                      }}
-                    >
-                      {item.text}
-                    </div>
-                  )
                 ))}
             </div>
           </Document>
