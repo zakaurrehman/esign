@@ -165,9 +165,9 @@ export const CreateDocument: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-slate-900">Edit PDF</h3>
+              <h3 className="text-xl font-bold text-slate-900">Annotate PDF</h3>
               <p className="mt-2 text-sm text-slate-600">
-                Upload and edit PDF with text and images
+                Add text and images on top of your PDF
               </p>
             </CardContent>
           </Card>
@@ -245,7 +245,7 @@ export const CreateDocument: React.FC = () => {
     return (
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-slate-900">Edit PDF</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Annotate PDF</h1>
           <Button variant="secondary" onClick={() => setMode('select')}>
             Back
           </Button>
@@ -269,7 +269,7 @@ export const CreateDocument: React.FC = () => {
                 <>
                   <p className="mt-2 text-slate-600">Drag and drop a PDF file here, or click to select</p>
                   <p className="mt-1 text-sm text-slate-500">Maximum file size: 10MB</p>
-                  <p className="mt-2 text-sm text-indigo-600 font-medium">✨ You'll be able to add text and images to the PDF</p>
+                  <p className="mt-3 text-sm font-medium text-indigo-600">✨ Add text annotations and images to your PDF</p>
                 </>
               )}
             </div>
@@ -285,7 +285,7 @@ export const CreateDocument: React.FC = () => {
         <div className="h-full flex flex-col">
           <div className="bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-4 flex items-center justify-between">
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-white mb-2">Edit PDF</h1>
+              <h1 className="text-xl font-bold text-white mb-2">Annotate PDF - Add Text & Images</h1>
               <Input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}

@@ -257,8 +257,11 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
   return (
     <div className="flex h-full">
       {/* Toolbar */}
-      <div className="w-64 bg-white border-r border-gray-200 p-4 space-y-4">
-        <h3 className="font-semibold text-lg text-gray-900">PDF Editor</h3>
+      <div className="w-64 bg-white border-r border-gray-200 p-4 space-y-4 overflow-y-auto">
+        <div>
+          <h3 className="font-semibold text-lg text-gray-900">PDF Annotation Tool</h3>
+          <p className="text-xs text-gray-600 mt-1">Add text and images to your PDF</p>
+        </div>
 
         {/* Tool Selection */}
         <div className="space-y-2">
@@ -318,39 +321,54 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
         {tool === 'text' && (
           <div className="space-y-3 pt-4 border-t">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Text</label>
-              <input
-                type="text"
+              <label className="block text-sm font-medium text-gray-700 mb-1">Text Content</label>
+              <textarea
                 value={newText}
                 onChange={(e) => setNewText(e.target.value)}
-                placeholder="Enter text..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="Enter text to add..."
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Font Size</label>
-              <input
-                type="number"
-                value={fontSize}
-                onChange={(e) => setFontSize(Number(e.target.value))}
-                min="8"
-                max="72"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              />
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
+                <select
+                  value={fontSize}
+                  onChange={(e) => setFontSize(Number(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                >
+                  <option value="8">8pt</option>
+                  <option value="10">10pt</option>
+                  <option value="12">12pt</option>
+                  <option value="14">14pt</option>
+                  <option value="16">16pt</option>
+                  <option value="18">18pt</option>
+                  <option value="20">20pt</option>
+                  <option value="24">24pt</option>
+                  <option value="28">28pt</option>
+                  <option value="32">32pt</option>
+                  <option value="36">36pt</option>
+                  <option value="48">48pt</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
+                <input
+                  type="color"
+                  value={textColor}
+                  onChange={(e) => setTextColor(e.target.value)}
+                  className="w-full h-10 border border-gray-300 rounded-lg cursor-pointer"
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
-              <input
-                type="color"
-                value={textColor}
-                onChange={(e) => setTextColor(e.target.value)}
-                className="w-full h-10 border border-gray-300 rounded-lg cursor-pointer"
-              />
-            </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p className="text-xs text-blue-800">
-                💡 Enter text above, then click on the PDF to place it
-              </p>
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-xs font-medium text-blue-900 mb-1">📝 How to add text:</p>
+              <ol className="text-xs text-blue-800 space-y-1 ml-4 list-decimal">
+                <li>Type your text above</li>
+                <li>Click anywhere on the PDF</li>
+                <li>Text will appear at that location</li>
+              </ol>
             </div>
           </div>
         )}
@@ -405,7 +423,7 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
 
       {/* PDF Canvas */}
       <div className="flex-1 bg-gray-100 overflow-auto p-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="flex justify-center">
           <Document
             file={file}
             onLoadSuccess={handleDocumentLoadSuccess}
@@ -414,25 +432,32 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
               </div>
             }
+            error={
+              <div className="text-center p-8 text-red-600">
+                <p>Failed to load PDF. Please try again.</p>
+              </div>
+            }
           >
             <div
               ref={containerRef}
-              className="relative bg-white shadow-2xl"
+              className="relative bg-white shadow-2xl inline-block"
               onClick={handlePageClick}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
               style={{ cursor: tool === 'text' && newText ? 'crosshair' : 'default' }}
-            >
-              <Page
-                pageNumber={currentPage}
-                width={800}
-                onLoadSuccess={handlePageLoadSuccess}
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-              />
-
-              {/* Render text annotations */}
+            >whitespace-pre-wrap ${
+                      selectedAnnotation === annotation.id ? 'ring-2 ring-indigo-500 bg-indigo-50' : 'hover:ring-1 hover:ring-indigo-300'
+                    }`}
+                    style={{
+                      left: annotation.x,
+                      top: annotation.y,
+                      fontSize: annotation.fontSize,
+                      color: annotation.color,
+                      fontFamily: annotation.fontFamily,
+                      userSelect: 'none',
+                      maxWidth: '600px',
+                      padding: '2px 4pxns */}
               {textAnnotations
                 .filter(a => a.page === currentPage)
                 .map(annotation => (
@@ -462,9 +487,7 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
                   <img
                     key={annotation.id}
                     src={annotation.dataUrl}
-                    alt="Annotation"
-                    className={`absolute cursor-move ${
-                      selectedAnnotation === annotation.id ? 'ring-2 ring-indigo-500' : ''
+                    alt="Annotation"hover:ring-1 hover:ring-indigo-300'
                     }`}
                     style={{
                       left: annotation.x,
@@ -473,10 +496,36 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
                       height: annotation.height
                     }}
                     onMouseDown={(e) => handleAnnotationMouseDown(e, annotation.id, 'image')}
+                    draggable={false
+                    }}
+                    onMouseDown={(e) => handleAnnotationMouseDown(e, annotation.id, 'image')}
                   />
                 ))}
             </div>
           </Document>
+        </div>
+
+        {/* Info Banner */}
+        <div className="max-w-4xl mx-auto mt-4">
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+            <div className="flex items-start">
+              <svg className="h-5 w-5 text-blue-500 mt-0.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="text-sm text-blue-800">
+                <p className="font-medium mb-1">How to use:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li><strong>Add Text:</strong> Select "Add Text" tool, enter your text, then click anywhere on the PDF to place it</li>
+                  <li><strong>Add Image:</strong> Click "Add Image" to upload and place images on the PDF</li>
+                  <li><strong>Move Items:</strong> Use "Select / Move" tool to drag and reposition text or images</li>
+                  <li><strong>Delete:</strong> Select an item, then click "Delete Selected" button</li>
+                </ul>
+                <p className="mt-2 text-xs italic">
+                  ⚠️ Note: This editor adds NEW text/images on top of the PDF. Editing existing PDF text requires OCR technology (coming soon).
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
