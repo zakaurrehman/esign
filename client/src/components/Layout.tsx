@@ -64,16 +64,6 @@ export const Layout: React.FC = () => {
                     >
                       View All Documents
                     </Link>
-                    <Link
-                      to="/admin/template"
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all no-underline ${
-                        location.pathname === '/admin/template'
-                          ? 'bg-white/20 text-white font-semibold'
-                          : 'text-white/90 hover:text-white hover:bg-white/10'
-                      }`}
-                    >
-                      Edit Template
-                    </Link>
                   </>
                 )}
               </div>
