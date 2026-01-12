@@ -473,6 +473,14 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
                 {!isExtractingText && extractedTextItems.length > 0 && ` (${extractedTextItems.length})`}
               </span>
             </button>
+            
+            {/* Show count of edited items */}
+            {extractedTextItems.filter(item => item.isEdited).length > 0 && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 text-xs text-yellow-800">
+                <span className="font-medium">✏️ {extractedTextItems.filter(item => item.isEdited).length} text item(s) modified</span>
+                <p className="mt-1 text-yellow-600">Changes shown in real-time. Click "Save & Continue" to apply.</p>
+              </div>
+            )}
             <button
               onClick={() => setTool('text')}
               className={`w-full px-4 py-2 text-left rounded-lg transition-colors ${
@@ -680,7 +688,7 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
                     onChange={(e) => handleExtractedTextChange(item.id, e.target.value)}
                     onBlur={() => handleExtractedTextBlur(item.id)}
                     autoFocus
-                    className="absolute border-2 border-green-500 bg-white px-1 focus:outline-none focus:ring-2 focus:ring-green-600 z-10"
+                    className="absolute border-2 border-green-500 bg-white px-1 focus:outline-none focus:ring-2 focus:ring-green-600 z-20"
                     style={{
                       left: item.x,
                       top: item.y,
@@ -689,6 +697,37 @@ export const PdfEditor: React.FC<PdfEditorProps> = ({ file, onSave, onCancel }) 
                       fontFamily: 'Helvetica'
                     }}
                   />
+                ))}
+
+              {/* Real-time display of edited text items (covers original text) */}
+              {extractedTextItems
+                .filter(item => item.page === currentPage && item.isEdited && !item.isEditing)
+                .map(item => (
+                  <div
+                    key={`edited-${item.id}`}
+                    className="absolute bg-white z-10 cursor-pointer hover:bg-yellow-50 hover:ring-1 hover:ring-yellow-400 transition-colors"
+                    style={{
+                      left: item.x - 2,
+                      top: item.y - 2,
+                      fontSize: item.fontSize,
+                      fontFamily: 'Helvetica',
+                      padding: '2px 4px',
+                      minWidth: Math.max(item.width, item.text.length * item.fontSize * 0.6),
+                      lineHeight: 1.2
+                    }}
+                    onClick={(e) => {
+                      if (tool === 'edit-existing') {
+                        e.stopPropagation();
+                        setExtractedTextItems(extractedTextItems.map(i =>
+                          i.id === item.id ? { ...i, isEditing: true } : { ...i, isEditing: false }
+                        ));
+                        setSelectedAnnotation(item.id);
+                      }
+                    }}
+                    title="Click to edit again"
+                  >
+                    {item.text}
+                  </div>
                 ))}
 
               {/* Render text annotations (new text added by user) */}
