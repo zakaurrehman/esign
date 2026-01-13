@@ -100,7 +100,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
       }
     >
       {Array.from({ length: numPages }, (_, index) => (
-        <div key={index} className="relative mb-4 shadow-lg">
+        <div key={index} className="pdf-page-wrapper relative mb-4 shadow-lg" data-page-number={index + 1}>
           <Page
             pageNumber={index + 1}
             width={width}

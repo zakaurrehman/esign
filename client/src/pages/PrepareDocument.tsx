@@ -144,8 +144,12 @@ export const PrepareDocument: React.FC = () => {
     const dropX = mousePosition.current.x;
     const dropY = mousePosition.current.y;
 
-    // Find the PDF page containers
-    const pdfPages = window.document.querySelectorAll('.pdf-drop-area .react-pdf__Page');
+    console.log('Drop position:', { dropX, dropY });
+
+    // Find the PDF page containers - use our custom class
+    const pdfPages = window.document.querySelectorAll('.pdf-drop-area .pdf-page-wrapper');
+    console.log('Found PDF pages:', pdfPages.length);
+    
     if (pdfPages.length === 0) {
       toast.error('Please drop the field on the PDF document');
       return;
@@ -159,6 +163,7 @@ export const PrepareDocument: React.FC = () => {
 
     for (let i = 0; i < pdfPages.length; i++) {
       const pageRect = pdfPages[i].getBoundingClientRect();
+      console.log(`Page ${i + 1} rect:`, { left: pageRect.left, top: pageRect.top, right: pageRect.right, bottom: pageRect.bottom, width: pageRect.width, height: pageRect.height });
       
       // Check if drop is within this page
       if (dropX >= pageRect.left && dropX <= pageRect.right &&
@@ -173,12 +178,14 @@ export const PrepareDocument: React.FC = () => {
         xPercent = Math.max(2, Math.min(78, xPercent));
         yPercent = Math.max(2, Math.min(92, yPercent));
         foundPage = true;
+        console.log('Found page:', targetPage, 'Position:', { xPercent, yPercent });
         break;
       }
     }
 
     // If not dropped on a page, don't add the field
     if (!foundPage) {
+      console.log('Drop was outside all pages');
       toast.error('Please drop the field on the PDF document');
       return;
     }
