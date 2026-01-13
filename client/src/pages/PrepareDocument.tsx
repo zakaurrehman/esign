@@ -204,7 +204,8 @@ export const PrepareDocument: React.FC = () => {
       console.log('Sending field data to API:', fieldData);
       try {
         const response = await fieldApi.add(id, fieldData);
-        console.log('API response:', response.data);
+        console.log('API response field:', response.data.field);
+        console.log('Saved position - xPercent:', response.data.field.xPercent, 'yPercent:', response.data.field.yPercent);
         toast.success('Field added');
         fetchDocument();
       } catch (error: any) {
@@ -355,10 +356,12 @@ export const PrepareDocument: React.FC = () => {
                   <PdfViewer
                     url={pdfUrl}
                     onLoadSuccess={setPageCount}
-                    renderOverlay={(pageNumber, pageWidth, pageHeight) => (
+                    renderOverlay={(pageNumber, pageWidth, pageHeight) => {
+                      const pageFields = document.fields?.filter(f => f.pageNumber === pageNumber) || [];
+                      console.log(`Rendering page ${pageNumber} fields:`, pageFields.map(f => ({ id: f.id, xPercent: f.xPercent, yPercent: f.yPercent })));
+                      return (
                       <div className="relative w-full h-full">
-                        {document.fields
-                          ?.filter(f => f.pageNumber === pageNumber)
+                        {pageFields
                           .map(field => {
                             const recipientIndex = document.recipients?.findIndex(
                               r => r.id === field.recipientId
@@ -379,7 +382,7 @@ export const PrepareDocument: React.FC = () => {
                             );
                           })}
                       </div>
-                    )}
+                    );}}
                   />
                 </DroppablePdfArea>
               ) : (
