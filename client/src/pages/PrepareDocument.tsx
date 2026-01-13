@@ -16,6 +16,19 @@ import toast from 'react-hot-toast';
 const recipientColors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
 const getRecipientColor = (index: number) => recipientColors[index % recipientColors.length];
 
+// Droppable PDF area component - defined outside to prevent remounting on re-renders
+const DroppablePdfArea: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { setNodeRef } = useDroppable({
+    id: 'pdf-drop-area'
+  });
+
+  return (
+    <div ref={setNodeRef} className="pdf-drop-area overflow-auto max-h-[70vh] bg-gray-100 p-4 rounded">
+      {children}
+    </div>
+  );
+};
+
 export const PrepareDocument: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -265,19 +278,6 @@ export const PrepareDocument: React.FC = () => {
     } finally {
       setIsSending(false);
     }
-  };
-
-  // Droppable PDF area component
-  const DroppablePdfArea: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { setNodeRef } = useDroppable({
-      id: 'pdf-drop-area'
-    });
-
-    return (
-      <div ref={setNodeRef} className="pdf-drop-area overflow-auto max-h-[70vh] bg-gray-100 p-4 rounded">
-        {children}
-      </div>
-    );
   };
 
   if (isLoading) {
