@@ -110,7 +110,8 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
           />
           {renderOverlay && (
             <div
-              className="absolute inset-0 pointer-events-auto"
+              className="absolute pointer-events-auto"
+              style={{ top: 0, left: 0, width: '100%', height: '100%' }}
             >
               {renderOverlay(index + 1, pageSize.width, pageSize.height)}
             </div>

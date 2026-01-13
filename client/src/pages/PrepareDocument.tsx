@@ -362,7 +362,7 @@ export const PrepareDocument: React.FC = () => {
                       const pageFields = document.fields?.filter(f => f.pageNumber === pageNumber) || [];
                       console.log(`Rendering page ${pageNumber} fields:`, pageFields.map(f => ({ id: f.id, xPercent: f.xPercent, yPercent: f.yPercent })));
                       return (
-                      <div className="relative w-full h-full">
+                      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                         {pageFields
                           .map(field => {
                             const recipientIndex = document.recipients?.findIndex(
