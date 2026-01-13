@@ -201,29 +201,45 @@ export const PrepareDocument: React.FC = () => {
         widthPercent: activeData.type === 'SIGNATURE' ? 20 : 15,
         heightPercent: activeData.type === 'SIGNATURE' ? 8 : 5
       };
-      console.log('Sending field data to API:', fieldData);
       try {
         const response = await fieldApi.add(id, fieldData);
-        console.log('API response field:', JSON.stringify(response.data.field, null, 2));
+        // Update local state with new field instead of refetching
+        setDocument(prev => prev ? {
+          ...prev,
+          fields: [...(prev.fields || []), response.data.field]
+        } : null);
         toast.success('Field added');
-        // Fetch and log the updated document
-        const docResponse = await documentApi.get(id);
-        console.log('Updated document fields:', JSON.stringify(docResponse.data.document.fields, null, 2));
-        setDocument(docResponse.data.document);
       } catch (error: any) {
         console.error('API error:', error);
         toast.error(error.response?.data?.error || 'Failed to add field');
       }
     } else {
-      // Moving existing field
+      // Moving existing field - update local state optimistically
+      const fieldId = active.id as string;
+      
+      // Update local state immediately for smooth UX
+      setDocument(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          fields: prev.fields?.map(f => 
+            f.id === fieldId 
+              ? { ...f, xPercent, yPercent, pageNumber: targetPage }
+              : f
+          )
+        };
+      });
+
+      // Then sync with server in background
       try {
-        await fieldApi.update(active.id as string, {
+        await fieldApi.update(fieldId, {
           xPercent,
           yPercent,
           pageNumber: targetPage
         });
-        fetchDocument();
       } catch (error: any) {
+        // Revert on error by refetching
+        fetchDocument();
         toast.error(error.response?.data?.error || 'Failed to move field');
       }
     }
@@ -360,7 +376,6 @@ export const PrepareDocument: React.FC = () => {
                     onLoadSuccess={setPageCount}
                     renderOverlay={(pageNumber, pageWidth, pageHeight) => {
                       const pageFields = document.fields?.filter(f => f.pageNumber === pageNumber) || [];
-                      console.log(`Rendering page ${pageNumber} fields:`, pageFields.map(f => ({ id: f.id, xPercent: f.xPercent, yPercent: f.yPercent })));
                       return (
                       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                         {pageFields
