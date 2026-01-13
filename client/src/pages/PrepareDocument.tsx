@@ -192,19 +192,23 @@ export const PrepareDocument: React.FC = () => {
 
     if (activeData.isNew) {
       // Adding new field from palette
+      const fieldData = {
+        recipientId: activeData.recipientId,
+        fieldType: activeData.type as FieldType,
+        pageNumber: targetPage,
+        xPercent,
+        yPercent,
+        widthPercent: activeData.type === 'SIGNATURE' ? 20 : 15,
+        heightPercent: activeData.type === 'SIGNATURE' ? 8 : 5
+      };
+      console.log('Sending field data to API:', fieldData);
       try {
-        await fieldApi.add(id, {
-          recipientId: activeData.recipientId,
-          fieldType: activeData.type as FieldType,
-          pageNumber: targetPage,
-          xPercent,
-          yPercent,
-          widthPercent: activeData.type === 'SIGNATURE' ? 20 : 15,
-          heightPercent: activeData.type === 'SIGNATURE' ? 8 : 5
-        });
+        const response = await fieldApi.add(id, fieldData);
+        console.log('API response:', response.data);
         toast.success('Field added');
         fetchDocument();
       } catch (error: any) {
+        console.error('API error:', error);
         toast.error(error.response?.data?.error || 'Failed to add field');
       }
     } else {
