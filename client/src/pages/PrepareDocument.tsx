@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DndContext, DragOverlay, useSensor, useSensors, PointerSensor, useDroppable } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
@@ -14,6 +14,7 @@ import { FieldPalette } from '../components/fields/FieldPalette';
 import toast from 'react-hot-toast';
 
 const recipientColors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
+const getRecipientColor = (index: number) => recipientColors[index % recipientColors.length];
 
 export const PrepareDocument: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -144,11 +145,8 @@ export const PrepareDocument: React.FC = () => {
     const dropX = mousePosition.current.x;
     const dropY = mousePosition.current.y;
 
-    console.log('Drop position:', { dropX, dropY });
-
     // Find the PDF page containers - use our custom class
     const pdfPages = window.document.querySelectorAll('.pdf-drop-area .pdf-page-wrapper');
-    console.log('Found PDF pages:', pdfPages.length);
     
     if (pdfPages.length === 0) {
       toast.error('Please drop the field on the PDF document');
@@ -163,7 +161,6 @@ export const PrepareDocument: React.FC = () => {
 
     for (let i = 0; i < pdfPages.length; i++) {
       const pageRect = pdfPages[i].getBoundingClientRect();
-      console.log(`Page ${i + 1} rect:`, { left: pageRect.left, top: pageRect.top, right: pageRect.right, bottom: pageRect.bottom, width: pageRect.width, height: pageRect.height });
       
       // Check if drop is within this page
       if (dropX >= pageRect.left && dropX <= pageRect.right &&
@@ -178,14 +175,12 @@ export const PrepareDocument: React.FC = () => {
         xPercent = Math.max(2, Math.min(78, xPercent));
         yPercent = Math.max(2, Math.min(92, yPercent));
         foundPage = true;
-        console.log('Found page:', targetPage, 'Position:', { xPercent, yPercent });
         break;
       }
     }
 
     // If not dropped on a page, don't add the field
     if (!foundPage) {
-      console.log('Drop was outside all pages');
       toast.error('Please drop the field on the PDF document');
       return;
     }
@@ -271,8 +266,6 @@ export const PrepareDocument: React.FC = () => {
       setIsSending(false);
     }
   };
-
-  const getRecipientColor = (index: number) => recipientColors[index % recipientColors.length];
 
   // Droppable PDF area component
   const DroppablePdfArea: React.FC<{ children: React.ReactNode }> = ({ children }) => {
