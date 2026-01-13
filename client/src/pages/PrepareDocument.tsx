@@ -204,10 +204,12 @@ export const PrepareDocument: React.FC = () => {
       console.log('Sending field data to API:', fieldData);
       try {
         const response = await fieldApi.add(id, fieldData);
-        console.log('API response field:', response.data.field);
-        console.log('Saved position - xPercent:', response.data.field.xPercent, 'yPercent:', response.data.field.yPercent);
+        console.log('API response field:', JSON.stringify(response.data.field, null, 2));
         toast.success('Field added');
-        fetchDocument();
+        // Fetch and log the updated document
+        const docResponse = await documentApi.get(id);
+        console.log('Updated document fields:', JSON.stringify(docResponse.data.document.fields, null, 2));
+        setDocument(docResponse.data.document);
       } catch (error: any) {
         console.error('API error:', error);
         toast.error(error.response?.data?.error || 'Failed to add field');
