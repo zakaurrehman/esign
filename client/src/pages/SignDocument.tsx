@@ -179,7 +179,7 @@ export const SignDocument: React.FC = () => {
               <PdfViewer
                 url={pdfUrl}
                 renderOverlay={(pageNumber) => (
-                  <div className="relative w-full h-full">
+                  <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                     {data.fields
                       .filter(f => f.pageNumber === pageNumber)
                       .map(field => {

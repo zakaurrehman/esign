@@ -144,7 +144,7 @@ export const ViewDocument: React.FC = () => {
                   <PdfViewer
                     url={pdfUrl}
                     renderOverlay={document.status !== 'COMPLETED' ? (pageNumber) => (
-                      <div className="relative w-full h-full">
+                      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                         {document.fields
                           ?.filter((f: SignatureField) => f.pageNumber === pageNumber)
                           .map((field: SignatureField) => {
