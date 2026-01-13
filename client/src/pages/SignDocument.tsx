@@ -24,6 +24,7 @@ export const SignDocument: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeField, setActiveField] = useState<SignatureField | null>(null);
   const [completedFields, setCompletedFields] = useState<Set<string>>(new Set());
+  const [signatureValues, setSignatureValues] = useState<Map<string, string>>(new Map());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDeclineModal, setShowDeclineModal] = useState(false);
   const [declineReason, setDeclineReason] = useState('');
@@ -35,12 +36,17 @@ export const SignDocument: React.FC = () => {
       const response = await signApi.getPage(documentId, token);
       setData(response.data);
 
-      // Mark already completed fields
+      // Mark already completed fields and store their values
       const completed = new Set<string>();
+      const values = new Map<string, string>();
       response.data.fields.forEach((f: SignatureField) => {
-        if (f.completedAt) completed.add(f.id);
+        if (f.completedAt) {
+          completed.add(f.id);
+          if (f.value) values.set(f.id, f.value);
+        }
       });
       setCompletedFields(completed);
+      setSignatureValues(values);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to load document');
     } finally {
@@ -62,6 +68,7 @@ export const SignDocument: React.FC = () => {
       });
 
       setCompletedFields(prev => new Set([...prev, activeField.id]));
+      setSignatureValues(prev => new Map(prev).set(activeField.id, dataUrl));
       setActiveField(null);
       toast.success('Signature applied');
     } catch (err: any) {
@@ -184,6 +191,7 @@ export const SignDocument: React.FC = () => {
                       .filter(f => f.pageNumber === pageNumber)
                       .map(field => {
                         const isCompleted = completedFields.has(field.id);
+                        const signatureValue = signatureValues.get(field.id) || field.value;
                         return (
                           <div
                             key={field.id}
@@ -202,9 +210,9 @@ export const SignDocument: React.FC = () => {
                             }}
                           >
                             {isCompleted ? (
-                              field.value ? (
+                              signatureValue ? (
                                 <img
-                                  src={field.value}
+                                  src={signatureValue}
                                   alt="Signature"
                                   className="max-w-full max-h-full object-contain"
                                 />
