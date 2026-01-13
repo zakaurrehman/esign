@@ -1,3 +1,39 @@
+/* Signature Fonts */
+@font-face {
+  font-family: 'Harmony';
+  src: url('/fonts/Harmony.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'AmericanSignature';
+  src: url('/fonts/AmericanSignature.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'JanettaSilloam';
+  src: url('/fonts/JanettaSilloam.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Purelines';
+  src: url('/fonts/Purelines.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'TheJacklyn';
+  src: url('/fonts/TheJacklyn.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 /* Base Styles */
 *, *::before, *::after {
   box-sizing: border-box;
