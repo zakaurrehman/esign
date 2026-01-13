@@ -3,6 +3,7 @@ import { SigningRequest } from '../middleware/tokenAuth';
 import prisma from '../lib/prisma';
 import fs from 'fs';
 import { sendEmail, generateSigningEmail } from '../services/emailService';
+import { mergeSignaturesIntoPdfData } from '../services/pdfService';
 
 export const getSigningPage = async (req: SigningRequest, res: Response) => {
   try {
@@ -205,24 +206,78 @@ export const completeSigning = async (req: SigningRequest, res: Response) => {
     });
 
     if (pendingRecipients.length === 0) {
-      // All recipients have signed - mark document as completed
-      await prisma.document.update({
+      // All recipients have signed - merge signatures into PDF
+      const document = await prisma.document.findUnique({
         where: { id: req.recipient!.documentId },
-        data: {
-          status: 'COMPLETED',
-          completedAt: new Date()
-        }
+        include: { fields: true }
       });
+
+      if (document?.pdfData) {
+        try {
+          // Get all completed fields with values
+          const completedFields = document.fields.filter(f => f.value && f.completedAt);
+          
+          if (completedFields.length > 0) {
+            const signedPdfData = await mergeSignaturesIntoPdfData(
+              document.pdfData,
+              completedFields.map(f => ({
+                pageNumber: f.pageNumber,
+                xPercent: f.xPercent,
+                yPercent: f.yPercent,
+                widthPercent: f.widthPercent,
+                heightPercent: f.heightPercent,
+                value: f.value!,
+                fieldType: f.fieldType
+              }))
+            );
+
+            // Update document with signed PDF
+            await prisma.document.update({
+              where: { id: req.recipient!.documentId },
+              data: {
+                pdfData: signedPdfData,
+                status: 'COMPLETED',
+                completedAt: new Date()
+              }
+            });
+          } else {
+            await prisma.document.update({
+              where: { id: req.recipient!.documentId },
+              data: {
+                status: 'COMPLETED',
+                completedAt: new Date()
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Failed to merge signatures into PDF:', error);
+          // Still mark as completed even if merge fails
+          await prisma.document.update({
+            where: { id: req.recipient!.documentId },
+            data: {
+              status: 'COMPLETED',
+              completedAt: new Date()
+            }
+          });
+        }
+      } else {
+        // No PDF data, just mark as completed
+        await prisma.document.update({
+          where: { id: req.recipient!.documentId },
+          data: {
+            status: 'COMPLETED',
+            completedAt: new Date()
+          }
+        });
+      }
 
       await prisma.auditLog.create({
         data: {
           documentId: req.recipient!.documentId,
           action: 'DOCUMENT_COMPLETED',
-          details: 'All recipients have signed'
+          details: 'All recipients have signed - signatures merged into PDF'
         }
       });
-
-      // TODO: Trigger PDF merge and distribution job
     } else {
       // Update document to IN_PROGRESS
       await prisma.document.update({

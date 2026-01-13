@@ -50,6 +50,86 @@ export async function generatePdfFromHtml(htmlContent: string, outputPath: strin
   return outputPath;
 }
 
+// Serverless version - works with base64 PDF data
+export async function mergeSignaturesIntoPdfData(
+  pdfBase64: string,
+  signatures: Array<{
+    pageNumber: number;
+    xPercent: number;
+    yPercent: number;
+    widthPercent: number;
+    heightPercent: number;
+    value: string; // base64 image
+    fieldType: string;
+  }>
+): Promise<string> {
+  // Decode base64 PDF
+  const pdfBytes = Buffer.from(pdfBase64, 'base64');
+  const pdfDoc = await PDFDocument.load(pdfBytes);
+  const pages = pdfDoc.getPages();
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+  for (const sig of signatures) {
+    if (!sig.value || sig.pageNumber > pages.length) continue;
+
+    const page = pages[sig.pageNumber - 1];
+    const { width, height } = page.getSize();
+
+    const fieldX = (sig.xPercent / 100) * width;
+    const fieldY = height - (sig.yPercent / 100) * height;
+    const fieldWidth = (sig.widthPercent / 100) * width;
+    const fieldHeight = (sig.heightPercent / 100) * height;
+
+    if (sig.fieldType === 'SIGNATURE' || sig.fieldType === 'INITIALS') {
+      // Embed signature image
+      const base64Data = sig.value.replace(/^data:image\/\w+;base64,/, '');
+      const imageBytes = Buffer.from(base64Data, 'base64');
+
+      let image;
+      try {
+        image = await pdfDoc.embedPng(imageBytes);
+      } catch {
+        try {
+          image = await pdfDoc.embedJpg(imageBytes);
+        } catch {
+          console.error('Failed to embed signature image for field type:', sig.fieldType);
+          continue;
+        }
+      }
+
+      page.drawImage(image, {
+        x: fieldX,
+        y: fieldY - fieldHeight,
+        width: fieldWidth,
+        height: fieldHeight
+      });
+    } else if (sig.fieldType === 'DATE' || sig.fieldType === 'TEXT') {
+      // Draw text
+      page.drawText(sig.value, {
+        x: fieldX + 2,
+        y: fieldY - fieldHeight + 5,
+        size: 10,
+        font,
+        color: rgb(0, 0, 0)
+      });
+    } else if (sig.fieldType === 'CHECKBOX') {
+      // Draw checkmark
+      if (sig.value === 'true' || sig.value === 'checked') {
+        page.drawText('✓', {
+          x: fieldX + 2,
+          y: fieldY - fieldHeight + 2,
+          size: 14,
+          font,
+          color: rgb(0, 0.5, 0)
+        });
+      }
+    }
+  }
+
+  const resultBytes = await pdfDoc.save();
+  return Buffer.from(resultBytes).toString('base64');
+}
+
 export async function mergeSiganturesIntoPdf(
   originalPdfPath: string,
   signatures: Array<{

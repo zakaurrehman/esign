@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DndContext, DragOverlay, useSensor, useSensors, PointerSensor, useDroppable } from '@dnd-kit/core';
-import type { DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
 import { documentApi, recipientApi, fieldApi } from '../services/api';
 import type { Document, FieldType } from '../types/index';
 import { Button } from '../components/ui/Button';
@@ -29,8 +29,17 @@ export const PrepareDocument: React.FC = () => {
   const [pdfUrl, setPdfUrl] = useState<string>('');
   const [, setPageCount] = useState(1);
   
-  // Track the current mouse position during drag
-  const lastMousePosition = useRef<{ x: number; y: number } | null>(null);
+  // Track mouse position globally for accurate drop positioning
+  const mousePosition = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  // Track mouse position globally
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      mousePosition.current = { x: e.clientX, y: e.clientY };
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -124,108 +133,54 @@ export const PrepareDocument: React.FC = () => {
     }
   };
 
-  // Track mouse position during drag for accurate drop calculation
-  const handleDragMove = useCallback((event: DragMoveEvent) => {
-    const { activatorEvent, delta } = event;
-    
-    // Get initial position from activator event
-    let startX = 0, startY = 0;
-    if (activatorEvent instanceof MouseEvent) {
-      startX = activatorEvent.clientX;
-      startY = activatorEvent.clientY;
-    } else if (activatorEvent instanceof TouchEvent && activatorEvent.touches[0]) {
-      startX = activatorEvent.touches[0].clientX;
-      startY = activatorEvent.touches[0].clientY;
-    }
-    
-    // Store the current position
-    lastMousePosition.current = {
-      x: startX + delta.x,
-      y: startY + delta.y
-    };
-  }, []);
-
   const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, activatorEvent, delta } = event;
+    const { active } = event;
 
     if (!id || (!document?.pdfPath && !document?.pdfData)) return;
 
     const activeData = active.data.current as any;
 
+    // Use the tracked mouse position
+    const dropX = mousePosition.current.x;
+    const dropY = mousePosition.current.y;
+
     // Find the PDF page containers
     const pdfPages = window.document.querySelectorAll('.pdf-drop-area .react-pdf__Page');
     if (pdfPages.length === 0) {
-      console.log('No PDF pages found');
+      toast.error('Please drop the field on the PDF document');
       return;
     }
 
-    // Calculate final mouse position
-    let finalX: number, finalY: number;
-    
-    if (lastMousePosition.current) {
-      // Use tracked position from drag move
-      finalX = lastMousePosition.current.x;
-      finalY = lastMousePosition.current.y;
-    } else {
-      // Fallback to calculating from activatorEvent + delta
-      let startX = 0, startY = 0;
-      if (activatorEvent instanceof MouseEvent) {
-        startX = activatorEvent.clientX;
-        startY = activatorEvent.clientY;
-      } else if (activatorEvent instanceof TouchEvent && activatorEvent.touches[0]) {
-        startX = activatorEvent.touches[0].clientX;
-        startY = activatorEvent.touches[0].clientY;
-      }
-      finalX = startX + delta.x;
-      finalY = startY + delta.y;
-    }
-
-    // Reset tracked position
-    lastMousePosition.current = null;
-
-    console.log('Drop coordinates:', { finalX, finalY });
-
     // Find which page the drop occurred on
     let targetPage = 1;
-    let xPercent = 10; // Default fallback
-    let yPercent = 10;
+    let xPercent = 50; // Default center
+    let yPercent = 50;
     let foundPage = false;
 
     for (let i = 0; i < pdfPages.length; i++) {
       const pageRect = pdfPages[i].getBoundingClientRect();
-      console.log(`Page ${i + 1} bounds:`, pageRect);
       
-      // Check if drop is within this page (with some tolerance)
-      if (finalX >= pageRect.left - 10 && finalX <= pageRect.right + 10 &&
-          finalY >= pageRect.top - 10 && finalY <= pageRect.bottom + 10) {
+      // Check if drop is within this page
+      if (dropX >= pageRect.left && dropX <= pageRect.right &&
+          dropY >= pageRect.top && dropY <= pageRect.bottom) {
         targetPage = i + 1;
         
         // Calculate percentage position within the page
-        xPercent = ((finalX - pageRect.left) / pageRect.width) * 100;
-        yPercent = ((finalY - pageRect.top) / pageRect.height) * 100;
+        xPercent = ((dropX - pageRect.left) / pageRect.width) * 100;
+        yPercent = ((dropY - pageRect.top) / pageRect.height) * 100;
         
-        // Clamp values to keep field within bounds
+        // Clamp values to keep field within bounds (accounting for field size)
         xPercent = Math.max(2, Math.min(78, xPercent));
-        yPercent = Math.max(2, Math.min(88, yPercent));
+        yPercent = Math.max(2, Math.min(92, yPercent));
         foundPage = true;
-        
-        console.log('Found target page:', targetPage, 'Position:', { xPercent, yPercent });
         break;
       }
     }
 
-    // If drop wasn't on any page, use the first visible page
-    if (!foundPage && pdfPages.length > 0) {
-      const firstPageRect = pdfPages[0].getBoundingClientRect();
-      // Calculate relative to first page even if outside
-      xPercent = ((finalX - firstPageRect.left) / firstPageRect.width) * 100;
-      yPercent = ((finalY - firstPageRect.top) / firstPageRect.height) * 100;
-      
-      // Clamp to valid range
-      xPercent = Math.max(2, Math.min(78, xPercent));
-      yPercent = Math.max(2, Math.min(88, yPercent));
-      
-      console.log('Using first page fallback:', { xPercent, yPercent });
+    // If not dropped on a page, don't add the field
+    if (!foundPage) {
+      toast.error('Please drop the field on the PDF document');
+      return;
     }
 
     if (activeData.isNew) {
@@ -315,7 +270,7 @@ export const PrepareDocument: React.FC = () => {
   const selectedRecipientIndex = document.recipients?.findIndex(r => r.id === selectedRecipientId) ?? -1;
 
   return (
-    <DndContext sensors={sensors} onDragMove={handleDragMove} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="flex gap-6">
         {/* Left sidebar - Recipients & Fields */}
         <div className="w-72 flex-shrink-0 space-y-4">

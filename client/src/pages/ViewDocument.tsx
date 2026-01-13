@@ -143,7 +143,7 @@ export const ViewDocument: React.FC = () => {
                 <div className="bg-slate-100 p-4 rounded-xl overflow-auto max-h-[75vh]">
                   <PdfViewer
                     url={pdfUrl}
-                    renderOverlay={(pageNumber) => (
+                    renderOverlay={document.status !== 'COMPLETED' ? (pageNumber) => (
                       <div className="relative w-full h-full">
                         {document.fields
                           ?.filter((f: SignatureField) => f.pageNumber === pageNumber)
@@ -186,7 +186,7 @@ export const ViewDocument: React.FC = () => {
                             );
                           })}
                       </div>
-                    )}
+                    ) : undefined}
                   />
                 </div>
               ) : (
