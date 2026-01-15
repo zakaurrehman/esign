@@ -137,7 +137,7 @@ export const AdminPanel: React.FC = () => {
           >
             View All Documents
           </Button>
-          <Button onClick={() => setShowCreateForm(!showCreateForm)}>
+          <Button onClick={() => setShowCreateForm(!showCreateForm)} className="bg-gradient-to-r from-indigo-700 via-blue-600 to-blue-500 text-white font-bold shadow-lg hover:scale-105 hover:from-indigo-800 hover:to-blue-600 transition-transform border-0">
             {showCreateForm ? 'Cancel' : '+ Create User'}
           </Button>
         </div>
@@ -241,7 +241,7 @@ export const AdminPanel: React.FC = () => {
       )}
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="flex flex-row gap-4 mb-6 w-full">
         <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
           <CardContent className="p-4 font-sans">
             <div className="text-3xl font-extrabold text-[#2563eb]">{users.filter(u => u.role === 'USER').length}</div>
