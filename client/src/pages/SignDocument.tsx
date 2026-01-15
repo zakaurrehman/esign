@@ -242,18 +242,18 @@ export const SignDocument: React.FC = () => {
       {/* Signature Modal */}
       <Modal
         isOpen={!!activeField}
-        title={activeField ? `Sign: ${activeField.label || 'Signature'}` : ''}
+        onClose={() => setActiveField(null)}
+        title={activeField ? 'Sign: Signature' : ''}
         size="lg"
       >
         {activeField && (
           <div className="space-y-6 p-2 sm:p-4">
             <div className="mb-2 text-center">
               <span className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold text-lg shadow-lg">
-                {activeField.label || 'Signature'}
+                Signature
               </span>
             </div>
             <SignaturePad
-              field={activeField}
               onSave={handleSignature}
               onCancel={() => setActiveField(null)}
               isLoading={isSubmitting}
