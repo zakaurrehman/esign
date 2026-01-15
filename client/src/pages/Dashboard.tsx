@@ -142,25 +142,25 @@ export const Dashboard: React.FC = () => {
     <div>
       {/* Stats Cards - Responsive and High Contrast */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        <div className="rounded-2xl shadow-2xl bg-gradient-to-br from-indigo-100 to-violet-200 p-6 flex flex-col items-start min-w-0">
-          <span className="text-4xl font-extrabold mb-1 text-slate-900">{completedCount}</span>
-          <span className="font-bold text-lg text-slate-900">Completed</span>
-          <span className="mt-1 text-indigo-700 text-sm">All finished documents</span>
+        <div className="rounded-2xl shadow-2xl bg-blue-50 p-6 flex flex-col items-start min-w-0">
+          <span className="text-4xl font-extrabold mb-1 text-[#22223b]">{completedCount}</span>
+          <span className="font-bold text-lg text-[#22223b]">Completed</span>
+          <span className="mt-1 text-blue-700 text-sm">All finished documents</span>
         </div>
-        <div className="rounded-2xl shadow-2xl bg-gradient-to-br from-orange-100 to-amber-200 p-6 flex flex-col items-start min-w-0">
-          <span className="text-4xl font-extrabold mb-1 text-slate-900">{actionRequiredCount}</span>
-          <span className="font-bold text-lg text-slate-900">Action Required</span>
-          <span className="mt-1 text-orange-700 text-sm">Needs your attention</span>
+        <div className="rounded-2xl shadow-2xl bg-blue-50 p-6 flex flex-col items-start min-w-0">
+          <span className="text-4xl font-extrabold mb-1 text-[#22223b]">{actionRequiredCount}</span>
+          <span className="font-bold text-lg text-[#22223b]">Action Required</span>
+          <span className="mt-1 text-blue-700 text-sm">Needs your attention</span>
         </div>
-        <div className="rounded-2xl shadow-2xl bg-gradient-to-br from-blue-100 to-cyan-100 p-6 flex flex-col items-start min-w-0">
-          <span className="text-4xl font-extrabold mb-1 text-slate-900">{waitingCount}</span>
-          <span className="font-bold text-lg text-slate-900">Waiting for Others</span>
+        <div className="rounded-2xl shadow-2xl bg-blue-50 p-6 flex flex-col items-start min-w-0">
+          <span className="text-4xl font-extrabold mb-1 text-[#22223b]">{waitingCount}</span>
+          <span className="font-bold text-lg text-[#22223b]">Waiting for Others</span>
           <span className="mt-1 text-blue-700 text-sm">Pending manager approval</span>
         </div>
-        <div className="rounded-2xl shadow-2xl bg-gradient-to-br from-pink-100 to-fuchsia-100 p-6 flex flex-col items-start min-w-0">
-          <span className="text-4xl font-extrabold mb-1 text-slate-900">{expiringCount}</span>
-          <span className="font-bold text-lg text-slate-900">Expiring Soon</span>
-          <span className="mt-1 text-pink-700 text-sm">Expiring documents</span>
+        <div className="rounded-2xl shadow-2xl bg-blue-50 p-6 flex flex-col items-start min-w-0">
+          <span className="text-4xl font-extrabold mb-1 text-[#22223b]">{expiringCount}</span>
+          <span className="font-bold text-lg text-[#22223b]">Expiring Soon</span>
+          <span className="mt-1 text-blue-700 text-sm">Expiring documents</span>
         </div>
       </div>
 

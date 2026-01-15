@@ -30,8 +30,8 @@ export const Input: React.FC<InputProps> = ({
       )}
       <input
         id={inputId}
-        className={`w-full px-4 py-3 border rounded-xl shadow focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white/80 transition-all ${
-          error ? 'border-red-500' : 'border-slate-200'
+        className={`w-full px-4 py-3 border rounded-xl shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all text-[#22223b] ${
+          error ? 'border-red-500' : 'border-blue-100'
         } ${label ? 'pt-6' : ''} ${className}`}
         onFocus={e => { setIsFocused(true); props.onFocus?.(e); }}
         onBlur={e => { setIsFocused(false); props.onBlur?.(e); }}

@@ -87,17 +87,17 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
   return (
     <div className="w-full max-w-4xl mx-auto">
       {/* Toolbar area for future controls */}
-      <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-indigo-800 to-violet-800 rounded-t-2xl border border-b-0 border-indigo-900/20 shadow-md">
+      <div className="flex items-center justify-between px-4 py-2 bg-blue-700 rounded-t-2xl border border-b-0 border-blue-800/20 shadow-md">
         <span className="font-semibold text-white text-lg">Document Preview</span>
         {/* Future: Add download, zoom, etc. */}
       </div>
-      <div className="bg-white rounded-b-2xl border border-indigo-200 shadow-2xl overflow-x-auto p-2 sm:p-6">
+      <div className="bg-white rounded-b-2xl border border-blue-100 shadow-2xl overflow-x-auto p-2 sm:p-6">
         <Document
           file={fileData}
           onLoadSuccess={handleLoadSuccess}
           loading={
             <div className="flex items-center justify-center p-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700"></div>
             </div>
           }
           error={
@@ -107,7 +107,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
           }
         >
           {Array.from({ length: numPages }, (_, index) => (
-            <div key={index} className="pdf-page-wrapper relative mb-8 rounded-xl overflow-hidden shadow-lg border border-slate-200 bg-white" data-page-number={index + 1}>
+            <div key={index} className="pdf-page-wrapper relative mb-8 rounded-xl overflow-hidden shadow-lg border border-blue-100 bg-white" data-page-number={index + 1}>
               <Page
                 pageNumber={index + 1}
                 width={width}
