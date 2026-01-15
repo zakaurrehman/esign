@@ -256,7 +256,6 @@ export const SignDocument: React.FC = () => {
             <SignaturePad
               onSave={handleSignature}
               onCancel={() => setActiveField(null)}
-              isLoading={isSubmitting}
             />
           </div>
         )}
