@@ -23,27 +23,31 @@ export const Layout: React.FC = () => {
   return (
     <div className="min-h-screen flex bg-white">
       {/* Sidebar */}
-      <aside className="w-64 h-screen fixed top-0 left-0 bg-gradient-to-br from-indigo-500 via-blue-600 to-blue-800 text-white flex flex-col py-8 px-4 shadow-2xl z-30 select-none">
-        <div className="flex items-center mb-10 px-2">
-          <Link to="/" className="text-2xl font-extrabold tracking-tight flex items-center gap-2 text-white">
-            <span className="mr-1 text-3xl">📝</span> <span className="drop-shadow">E-Sign</span>
+      <aside className="w-64 h-screen fixed top-0 left-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-700 text-white flex flex-col py-6 px-0 shadow-2xl z-30 select-none">
+        <div className="flex flex-col items-center mb-8 px-6">
+          <Link to="/" className="w-full flex items-center gap-3 mb-2">
+            <span className="text-3xl">📝</span>
+            <div>
+              <div className="text-lg font-extrabold tracking-tight text-white drop-shadow">E-Sign</div>
+              <div className="text-xs text-white/70 font-medium -mt-1">Professional e-signature</div>
+            </div>
           </Link>
         </div>
-        <nav className="flex-1">
+        <nav className="flex-1 px-2">
           <ul className="space-y-1">
             <li>
-              <Link to="/" className={`flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/' ? 'bg-white/20 text-white font-bold shadow' : 'hover:bg-white/10 text-white/90'}`}>
+              <Link to="/" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-semibold transition-all ${location.pathname === '/' ? 'bg-white/10 text-yellow-300 font-bold shadow' : 'hover:bg-white/5 text-white/90'}`}>
                 <span className="text-xl">🏠</span> Dashboard
               </Link>
             </li>
             <li>
-              <Link to="/create" className={`flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/create' ? 'bg-white/20 text-white font-bold shadow' : 'hover:bg-white/10 text-white/90'}`}>
+              <Link to="/create" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-semibold transition-all ${location.pathname === '/create' ? 'bg-white/10 text-pink-200 font-bold shadow' : 'hover:bg-white/5 text-white/90'}`}>
                 <span className="text-xl">➕</span> Create Document
               </Link>
             </li>
             {isManager && (
               <li>
-                <Link to="/manager/team" className={`flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/manager/team' ? 'bg-white/20 text-white font-bold shadow' : 'hover:bg-white/10 text-white/90'}`}>
+                <Link to="/manager/team" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-semibold transition-all ${location.pathname === '/manager/team' ? 'bg-white/10 text-green-200 font-bold shadow' : 'hover:bg-white/5 text-white/90'}`}>
                   <span className="text-xl">👥</span> Team Documents
                 </Link>
               </li>
@@ -51,27 +55,35 @@ export const Layout: React.FC = () => {
             {isAdmin && (
               <>
                 <li>
-                  <Link to="/admin" className={`flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/admin' ? 'bg-white/20 text-white font-bold shadow' : 'hover:bg-white/10 text-white/90'}`}>
+                  <Link to="/admin" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-semibold transition-all ${location.pathname === '/admin' ? 'bg-white/10 text-blue-200 font-bold shadow' : 'hover:bg-white/5 text-white/90'}`}>
                     <span className="text-xl">👤</span> User Management
                   </Link>
                 </li>
                 <li>
-                  <Link to="/admin/documents" className={`flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/admin/documents' ? 'bg-white/20 text-white font-bold shadow' : 'hover:bg-white/10 text-white/90'}`}>
+                  <Link to="/admin/documents" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-semibold transition-all ${location.pathname === '/admin/documents' ? 'bg-white/10 text-purple-200 font-bold shadow' : 'hover:bg-white/5 text-white/90'}`}>
                     <span className="text-xl">📄</span> View All Documents
                   </Link>
                 </li>
               </>
             )}
           </ul>
+          <div className="border-t border-white/20 my-6"></div>
         </nav>
-        <div className="mt-auto flex flex-col items-center pt-8">
-          <span className="text-sm font-medium mb-2 text-white/90">{user?.name}</span>
-          {roleBadge && (
-            <span className={`px-3 py-1 rounded-full text-xs font-bold mb-2 bg-white/20 text-white shadow`}>{roleBadge.text}</span>
-          )}
+        <div className="flex flex-col items-center px-6 pb-2 mt-auto">
+          <div className="flex items-center gap-3 w-full mb-2">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 text-white font-bold text-lg">
+              {user?.name?.[0] || 'U'}
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-semibold text-white/90">{user?.name}</div>
+              {roleBadge && (
+                <span className="text-xs font-bold text-white/60">{roleBadge.text}</span>
+              )}
+            </div>
+          </div>
           <button
             onClick={handleLogout}
-            className="w-full bg-white/10 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-white/20 transition-all mt-2"
+            className="w-full bg-white/10 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-white/20 transition-all"
           >
             Logout
           </button>
