@@ -92,7 +92,7 @@ export const Layout: React.FC = () => {
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-h-screen" style={{ marginLeft: '260px' }}>
         {/* Header */}
-        <header className="h-20 bg-blue-700 shadow-lg flex items-center px-8 justify-between border-b-2 border-blue-800/20">
+        <header className="h-20 shadow-lg flex items-center px-8 justify-between border-b-2 border-blue-800/20" style={{ background: 'linear-gradient(to bottom, #312e81 0%, #3730a3 40%, #2563eb 100%)' }}>
           <div className="flex items-center gap-4">
             <span className="text-2xl font-extrabold text-white drop-shadow">E-Sign Platform</span>
             <span className="text-base text-blue-100 font-medium">Professional e-signature solution</span>
