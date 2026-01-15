@@ -242,24 +242,24 @@ export const AdminPanel: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="flex flex-row gap-4 mb-6 w-full">
-        <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
-          <CardContent className="p-4 font-sans">
-            <div className="text-3xl font-extrabold text-[#2563eb]">{users.filter(u => u.role === 'USER').length}</div>
-            <div className="text-lg font-bold text-[#22223b]">Users</div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
-          <CardContent className="p-4 font-sans">
-            <div className="text-3xl font-extrabold text-[#2563eb]">{users.filter(u => u.role === 'MANAGER').length}</div>
-            <div className="text-lg font-bold text-[#22223b]">Managers</div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
-          <CardContent className="p-4 font-sans">
-            <div className="text-3xl font-extrabold text-[#2563eb]">{users.filter(u => u.role === 'SUPER_ADMIN').length}</div>
-            <div className="text-lg font-bold text-[#22223b]">Super Admins</div>
-          </CardContent>
-        </Card>
+          <Card className="flex-1 min-w-[220px] max-w-[260px] h-32 bg-white rounded-2xl shadow-2xl border border-slate-100 flex flex-col items-center justify-center hover:shadow-2xl transition-all">
+            <CardContent className="flex flex-col items-center justify-center font-sans p-0">
+              <div className="text-4xl font-extrabold text-[#2563eb]">{users.filter(u => u.role === 'USER').length}</div>
+              <div className="font-bold text-lg text-[#22223b] mt-2">Users</div>
+            </CardContent>
+          </Card>
+          <Card className="flex-1 min-w-[220px] max-w-[260px] h-32 bg-white rounded-2xl shadow-2xl border border-slate-100 flex flex-col items-center justify-center hover:shadow-2xl transition-all">
+            <CardContent className="flex flex-col items-center justify-center font-sans p-0">
+              <div className="text-4xl font-extrabold text-[#2563eb]">{users.filter(u => u.role === 'MANAGER').length}</div>
+              <div className="font-bold text-lg text-[#22223b] mt-2">Managers</div>
+            </CardContent>
+          </Card>
+          <Card className="flex-1 min-w-[220px] max-w-[260px] h-32 bg-white rounded-2xl shadow-2xl border border-slate-100 flex flex-col items-center justify-center hover:shadow-2xl transition-all">
+            <CardContent className="flex flex-col items-center justify-center font-sans p-0">
+              <div className="text-4xl font-extrabold text-[#2563eb]">{users.filter(u => u.role === 'SUPER_ADMIN').length}</div>
+              <div className="font-bold text-lg text-[#22223b] mt-2">Super Admins</div>
+            </CardContent>
+          </Card>
       </div>
 
       <Card className="bg-white shadow-xl rounded-2xl">
