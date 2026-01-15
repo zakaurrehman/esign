@@ -83,14 +83,14 @@ export default function AllDocuments() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-extrabold text-[#22223b] font-sans mb-2">All Documents</h2>
-          <p className="text-[#2563eb] font-sans">View and manage all documents from all users</p>
+    <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 py-4">
+        <div className="mb-4">
+          <h2 className="text-3xl font-extrabold text-[#22223b] font-sans mb-1">All Documents</h2>
+          <p className="text-[#2563eb] font-sans text-base">View and manage all documents from all users</p>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 p-6 mb-6 font-sans">
+        <div className="bg-white rounded-xl shadow-lg border border-slate-100 p-4 mb-4 font-sans">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -139,7 +139,7 @@ export default function AllDocuments() {
         </div>
 
         {/* Documents Table */}
-        <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden font-sans">
+        <div className="bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden font-sans">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
@@ -236,7 +236,7 @@ export default function AllDocuments() {
         </div>
 
       {/* Summary */}
-      <div className="mt-6 text-sm text-[#2563eb] font-sans">
+      <div className="mt-2 text-sm text-[#2563eb] font-sans">
         Showing {filteredDocuments.length} of {documents.length} total documents
       </div>
     </div>
