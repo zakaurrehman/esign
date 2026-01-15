@@ -78,7 +78,7 @@ export const Layout: React.FC = () => {
         </div>
       </aside>
       {/* Main content area */}
-      <div className="flex-1 flex flex-col min-h-screen ml-64">
+      <div className="flex-1 flex flex-col min-h-screen" style={{ marginLeft: '16rem' }}>
         {/* Header */}
         <header className="h-20 bg-blue-700 shadow-lg flex items-center px-8 justify-between border-b-2 border-blue-800/20">
           <div className="flex items-center gap-4">
