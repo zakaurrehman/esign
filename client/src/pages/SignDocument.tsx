@@ -196,31 +196,35 @@ export const SignDocument: React.FC = () => {
                           <div
                             key={field.id}
                             onClick={() => !isCompleted && setActiveField(field)}
-                            className={`absolute rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all ${
+                            className={`absolute rounded-xl border-2 flex items-center justify-center cursor-pointer transition-all shadow-xl backdrop-blur-md bg-white/60 hover:bg-indigo-100/80 ${
                               isCompleted
-                                ? 'border-green-500 bg-green-50'
-                                : 'border-indigo-500 bg-indigo-50 hover:bg-indigo-100 animate-pulse'
+                                ? 'border-green-500 ring-2 ring-green-300'
+                                : 'border-indigo-400 hover:border-indigo-600'
                             }`}
                             style={{
                               left: `${field.xPercent}%`,
                               top: `${field.yPercent}%`,
                               width: `${field.widthPercent}%`,
                               height: `${field.heightPercent}%`,
-                              pointerEvents: 'auto'
+                              pointerEvents: 'auto',
+                              boxShadow: '0 4px 24px 0 rgba(80,80,180,0.10)'
                             }}
                           >
                             {isCompleted ? (
                               signatureValue ? (
-                                <img
-                                  src={signatureValue}
-                                  alt="Signature"
-                                  className="max-w-full max-h-full object-contain"
-                                />
+                                <div className="relative w-full h-full flex items-center justify-center">
+                                  <img
+                                    src={signatureValue}
+                                    alt="Signature"
+                                    className="max-w-full max-h-full object-contain rounded"
+                                  />
+                                  <span className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-lg border-2 border-white text-lg font-bold">✓</span>
+                                </div>
                               ) : (
-                                <span className="text-green-600 text-xs">✓</span>
+                                <span className="text-green-600 text-lg font-bold">✓</span>
                               )
                             ) : (
-                              <span className="text-indigo-600 text-xs font-semibold">
+                              <span className="text-indigo-700 text-base font-semibold tracking-wide">
                                 Click to sign
                               </span>
                             )}
@@ -238,14 +242,24 @@ export const SignDocument: React.FC = () => {
       {/* Signature Modal */}
       <Modal
         isOpen={!!activeField}
-        onClose={() => setActiveField(null)}
-        title="Add Your Signature"
+        title={activeField ? `Sign: ${activeField.label || 'Signature'}` : ''}
         size="lg"
       >
-        <SignaturePad
-          onSave={handleSignature}
-          onCancel={() => setActiveField(null)}
-        />
+        {activeField && (
+          <div className="space-y-6 p-2 sm:p-4">
+            <div className="mb-2 text-center">
+              <span className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold text-lg shadow-lg">
+                {activeField.label || 'Signature'}
+              </span>
+            </div>
+            <SignaturePad
+              field={activeField}
+              onSave={handleSignature}
+              onCancel={() => setActiveField(null)}
+              isLoading={isSubmitting}
+            />
+          </div>
+        )}
       </Modal>
 
       {/* Decline Modal */}

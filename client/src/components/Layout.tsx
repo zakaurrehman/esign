@@ -21,95 +21,71 @@ export const Layout: React.FC = () => {
   const roleBadge = getRoleBadge();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-violet-50">
-      <nav className="bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link to="/" className="text-xl font-bold text-white tracking-tight">
-                E-Sign
-              </Link>
-              <div className="ml-10 flex items-center space-x-3">
-                <Link
-                  to="/"
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all no-underline ${
-                    location.pathname === '/'
-                      ? 'bg-white/20 text-white font-semibold'
-                      : 'text-white/90 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  to="/create"
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all no-underline shadow-md ${
-                    location.pathname === '/create'
-                      ? 'bg-white text-indigo-700'
-                      : 'bg-white/90 text-indigo-600 hover:bg-white'
-                  }`}
-                >
-                  + Create Document
-                </Link>
-                {isManager && (
-                  <Link
-                    to="/manager/team"
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all no-underline ${
-                      location.pathname === '/manager/team'
-                        ? 'bg-white/20 text-white font-semibold'
-                        : 'text-white/90 hover:text-white hover:bg-white/10'
-                    }`}
-                  >
-                    Team Documents
-                  </Link>
-                )}
-                {isAdmin && (
-                  <>
-                    <Link
-                      to="/admin"
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all no-underline ${
-                        location.pathname === '/admin'
-                          ? 'bg-white/20 text-white font-semibold'
-                          : 'text-white/90 hover:text-white hover:bg-white/10'
-                      }`}
-                    >
-                      User Management
-                    </Link>
-                    <Link
-                      to="/admin/documents"
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all no-underline ${
-                        location.pathname === '/admin/documents'
-                          ? 'bg-white/20 text-white font-semibold'
-                          : 'text-white/90 hover:text-white hover:bg-white/10'
-                      }`}
-                    >
-                      View All Documents
-                    </Link>
-                  </>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-white">{user?.name}</span>
-                {roleBadge && (
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold text-white ${roleBadge.class}`}>
-                    {roleBadge.text}
-                  </span>
-                )}
-              </div>
-              <button
-                onClick={handleLogout}
-                className="bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-white/30 transition-all"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
+    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-indigo-50 to-violet-50">
+      {/* Sidebar */}
+      <aside className="w-64 bg-gradient-to-b from-indigo-700 via-violet-700 to-purple-700 text-white flex flex-col py-8 px-4 shadow-2xl rounded-r-3xl">
+        <div className="flex items-center mb-10">
+          <Link to="/" className="text-2xl font-extrabold tracking-tight text-white">
+            <span className="mr-2">📝</span> E-Sign
+          </Link>
         </div>
-      </nav>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Outlet />
-      </main>
+        <nav className="flex-1">
+          <ul className="space-y-2">
+            <li>
+              <Link to="/" className={`block px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/' ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/90'}`}>Dashboard</Link>
+            </li>
+            <li>
+              <Link to="/create" className={`block px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/create' ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/90'}`}>+ Create Document</Link>
+            </li>
+            {isManager && (
+              <li>
+                <Link to="/manager/team" className={`block px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/manager/team' ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/90'}`}>Team Documents</Link>
+              </li>
+            )}
+            {isAdmin && (
+              <>
+                <li>
+                  <Link to="/admin" className={`block px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/admin' ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/90'}`}>User Management</Link>
+                </li>
+                <li>
+                  <Link to="/admin/documents" className={`block px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/admin/documents' ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/90'}`}>View All Documents</Link>
+                </li>
+              </>
+            )}
+          </ul>
+        </nav>
+        <div className="mt-auto flex flex-col items-center">
+          <span className="text-sm font-medium mb-2">{user?.name}</span>
+          {roleBadge && (
+            <span className={`px-3 py-1 rounded-full text-xs font-bold mb-2 ${roleBadge.class}`}>{roleBadge.text}</span>
+          )}
+          <button
+            onClick={handleLogout}
+            className="w-full bg-white/20 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-white/30 transition-all"
+          >
+            Logout
+          </button>
+        </div>
+      </aside>
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <header className="h-20 bg-white shadow-lg flex items-center px-8 justify-between">
+          <div className="flex items-center gap-4">
+            <span className="text-xl font-bold text-indigo-700">E-Sign Platform</span>
+            <span className="text-sm text-slate-500">Professional e-signature solution</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-base font-semibold text-indigo-700">{user?.name}</span>
+            {roleBadge && (
+              <span className={`px-3 py-1 rounded-full text-xs font-bold ${roleBadge.class}`}>{roleBadge.text}</span>
+            )}
+          </div>
+        </header>
+        <main className="flex-1 px-8 py-8 bg-gradient-to-br from-slate-50 via-indigo-50 to-violet-50">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 };

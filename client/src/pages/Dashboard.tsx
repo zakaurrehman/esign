@@ -131,12 +131,43 @@ export const Dashboard: React.FC = () => {
     );
   }
 
+  // --- Modern Dashboard Redesign ---
+  // Stats Section (top)
+  const completedCount = documents.filter(d => d.status === 'COMPLETED').length;
+  const actionRequiredCount = documents.filter(d => d.status === 'PENDING' || d.status === 'IN_PROGRESS').length;
+  const waitingCount = documents.filter(d => d.status === 'PENDING_APPROVAL').length;
+  const expiringCount = 0; // Placeholder, add logic if you have expiry
+
   return (
     <div>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+        <div className="rounded-2xl shadow-xl bg-gradient-to-br from-indigo-500 to-violet-600 p-6 flex flex-col items-start text-white">
+          <span className="text-3xl font-bold mb-2">{completedCount}</span>
+          <span className="font-semibold text-lg">Completed</span>
+          <span className="mt-2 text-indigo-100">All finished documents</span>
+        </div>
+        <div className="rounded-2xl shadow-xl bg-gradient-to-br from-orange-400 to-amber-500 p-6 flex flex-col items-start text-white">
+          <span className="text-3xl font-bold mb-2">{actionRequiredCount}</span>
+          <span className="font-semibold text-lg">Action Required</span>
+          <span className="mt-2 text-orange-100">Needs your attention</span>
+        </div>
+        <div className="rounded-2xl shadow-xl bg-gradient-to-br from-blue-500 to-cyan-500 p-6 flex flex-col items-start text-white">
+          <span className="text-3xl font-bold mb-2">{waitingCount}</span>
+          <span className="font-semibold text-lg">Waiting for Others</span>
+          <span className="mt-2 text-blue-100">Pending manager approval</span>
+        </div>
+        <div className="rounded-2xl shadow-xl bg-gradient-to-br from-pink-500 to-fuchsia-500 p-6 flex flex-col items-start text-white">
+          <span className="text-3xl font-bold mb-2">{expiringCount}</span>
+          <span className="font-semibold text-lg">Expiring Soon</span>
+          <span className="mt-2 text-pink-100">Expiring documents</span>
+        </div>
+      </div>
+
       {/* Manager: Pending Approvals Section */}
       {isManager && pendingApprovals.length > 0 && (
         <div className="mb-8">
-          <Card className="bg-gradient-to-r from-orange-50 to-amber-50 border-orange-200 shadow-xl rounded-2xl">
+          <Card className="bg-gradient-to-r from-orange-100 to-amber-100 border-orange-200 shadow-xl rounded-2xl">
             <CardHeader className="border-b border-orange-200">
               <div className="flex items-center">
                 <span className="text-2xl mr-3">📋</span>
@@ -149,7 +180,7 @@ export const Dashboard: React.FC = () => {
             <CardContent className="p-0">
               <div className="divide-y divide-orange-200">
                 {pendingApprovals.map((doc) => (
-                  <div key={doc.id} className="p-4 hover:bg-orange-100/50 transition-colors">
+                  <div key={doc.id} className="p-4 hover:bg-orange-200/40 transition-colors rounded-xl">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <h3 className="font-semibold text-slate-900">{doc.title}</h3>
@@ -194,13 +225,14 @@ export const Dashboard: React.FC = () => {
         </div>
       )}
 
+      {/* My Documents Section */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">My Documents</h1>
+          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">My Documents</h1>
           <p className="text-sm text-slate-600 mt-1">Manage and track all your signature documents</p>
         </div>
         <Link to="/create">
-          <Button size="lg">
+          <Button size="lg" className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold shadow-lg hover:scale-105 transition-transform">
             + Create Document
           </Button>
         </Link>
@@ -218,7 +250,7 @@ export const Dashboard: React.FC = () => {
             <p className="mt-2 text-sm text-slate-600 max-w-sm mx-auto">Get started by creating your first document. You can write your own or upload an existing PDF.</p>
             <div className="mt-8">
               <Link to="/create">
-                <Button size="lg">
+                <Button size="lg" className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold shadow-lg hover:scale-105 transition-transform">
                   + Create Your First Document
                 </Button>
               </Link>
@@ -226,87 +258,83 @@ export const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {documents.map((doc) => (
-            <Card key={doc.id} className="hover:shadow-xl transition-all bg-white rounded-xl border-slate-200">
-              <CardContent className="py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3">
-                      <h3 className="text-lg font-semibold text-slate-900">{doc.title}</h3>
-                      <span className={`px-3 py-1 text-xs font-semibold rounded-full ${statusColors[doc.status] || statusColors.DRAFT}`}>
-                        {statusLabels[doc.status] || doc.status}
-                      </span>
-                    </div>
-                    <div className="mt-1 text-sm text-slate-500">
-                      <span>{doc.documentType === 'WRITTEN' ? 'Written' : 'Uploaded'}</span>
-                      <span className="mx-2">•</span>
-                      <span>{doc.recipients?.length || 0} recipient(s)</span>
-                      <span className="mx-2">•</span>
-                      <span>{new Date(doc.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    
-                    {/* Manager Feedback for Denied Documents */}
-                    {doc.status === 'DENIED' && doc.managerFeedback && (
-                      <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3">
-                        <p className="text-xs font-semibold text-red-800 mb-1">Manager Feedback:</p>
-                        <p className="text-sm text-red-700">{doc.managerFeedback}</p>
-                      </div>
-                    )}
-
-                    {/* Pending Approval Info */}
-                    {doc.status === 'PENDING_APPROVAL' && (
-                      <div className="mt-3 bg-orange-50 border border-orange-200 rounded-lg p-3">
-                        <p className="text-sm text-orange-700">
-                          ⏳ This document is waiting for manager approval before being sent to recipients.
-                        </p>
-                      </div>
-                    )}
+            <Card key={doc.id} className="hover:shadow-2xl transition-all bg-white rounded-2xl border-slate-200 border-2">
+              <CardContent className="py-6 px-4 flex flex-col h-full justify-between">
+                <div>
+                  <div className="flex items-center space-x-3 mb-2">
+                    <h3 className="text-xl font-bold text-slate-900">{doc.title}</h3>
+                    <span className={`px-3 py-1 text-xs font-semibold rounded-full ${statusColors[doc.status] || statusColors.DRAFT}`}>
+                      {statusLabels[doc.status] || doc.status}
+                    </span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    {doc.status === 'DRAFT' && (
-                      <>
-                        <Link to={`/prepare/${doc.id}`}>
-                          <Button size="sm">Prepare</Button>
-                        </Link>
-                        <Button variant="danger" size="sm" onClick={() => handleDelete(doc.id)}>
-                          Delete
+                  <div className="mb-2 text-sm text-slate-500">
+                    <span>{doc.documentType === 'WRITTEN' ? 'Written' : 'Uploaded'}</span>
+                    <span className="mx-2">•</span>
+                    <span>{doc.recipients?.length || 0} recipient(s)</span>
+                    <span className="mx-2">•</span>
+                    <span>{new Date(doc.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  {/* Manager Feedback for Denied Documents */}
+                  {doc.status === 'DENIED' && doc.managerFeedback && (
+                    <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3">
+                      <p className="text-xs font-semibold text-red-800 mb-1">Manager Feedback:</p>
+                      <p className="text-sm text-red-700">{doc.managerFeedback}</p>
+                    </div>
+                  )}
+                  {/* Pending Approval Info */}
+                  {doc.status === 'PENDING_APPROVAL' && (
+                    <div className="mt-3 bg-orange-50 border border-orange-200 rounded-lg p-3">
+                      <p className="text-sm text-orange-700">
+                        ⏳ This document is waiting for manager approval before being sent to recipients.
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center space-x-2 mt-4">
+                  {doc.status === 'DRAFT' && (
+                    <>
+                      <Link to={`/prepare/${doc.id}`}>
+                        <Button size="sm">Prepare</Button>
+                      </Link>
+                      <Button variant="danger" size="sm" onClick={() => handleDelete(doc.id)}>
+                        Delete
+                      </Button>
+                    </>
+                  )}
+                  {doc.status === 'DENIED' && (
+                    <>
+                      <Link to={`/prepare/${doc.id}`}>
+                        <Button size="sm" className="bg-orange-600 hover:bg-orange-700">
+                          Edit & Resubmit
                         </Button>
-                      </>
-                    )}
-                    {doc.status === 'DENIED' && (
-                      <>
-                        <Link to={`/prepare/${doc.id}`}>
-                          <Button size="sm" className="bg-orange-600 hover:bg-orange-700">
-                            Edit & Resubmit
-                          </Button>
-                        </Link>
-                        <Button variant="danger" size="sm" onClick={() => handleDelete(doc.id)}>
-                          Delete
-                        </Button>
-                      </>
-                    )}
-                    {doc.status === 'PENDING_APPROVAL' && (
+                      </Link>
+                      <Button variant="danger" size="sm" onClick={() => handleDelete(doc.id)}>
+                        Delete
+                      </Button>
+                    </>
+                  )}
+                  {doc.status === 'PENDING_APPROVAL' && (
+                    <Link to={`/document/${doc.id}`}>
+                      <Button variant="secondary" size="sm">View</Button>
+                    </Link>
+                  )}
+                  {(doc.status === 'PENDING' || doc.status === 'IN_PROGRESS') && (
+                    <>
                       <Link to={`/document/${doc.id}`}>
                         <Button variant="secondary" size="sm">View</Button>
                       </Link>
-                    )}
-                    {(doc.status === 'PENDING' || doc.status === 'IN_PROGRESS') && (
-                      <>
-                        <Link to={`/document/${doc.id}`}>
-                          <Button variant="secondary" size="sm">View</Button>
-                        </Link>
-                        <Button variant="danger" size="sm" onClick={() => handleVoid(doc.id)}>
-                          Void
-                        </Button>
-                      </>
-                    )}
-                    {doc.status === 'COMPLETED' && (
-                      <Link to={`/document/${doc.id}`}>
-                        <Button variant="secondary" size="sm">View</Button>
-                      </Link>
-                    )}
-                  </div>
+                      <Button variant="danger" size="sm" onClick={() => handleVoid(doc.id)}>
+                        Void
+                      </Button>
+                    </>
+                  )}
+                  {doc.status === 'COMPLETED' && (
+                    <Link to={`/document/${doc.id}`}>
+                      <Button variant="secondary" size="sm">View</Button>
+                    </Link>
+                  )}
                 </div>
               </CardContent>
             </Card>

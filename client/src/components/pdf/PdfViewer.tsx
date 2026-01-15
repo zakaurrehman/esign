@@ -85,39 +85,48 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
   }
 
   return (
-    <Document
-      file={fileData}
-      onLoadSuccess={handleLoadSuccess}
-      loading={
-        <div className="flex items-center justify-center p-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
-        </div>
-      }
-      error={
-        <div className="text-center p-8 text-red-600">
-          Failed to load PDF. Please try again.
-        </div>
-      }
-    >
-      {Array.from({ length: numPages }, (_, index) => (
-        <div key={index} className="pdf-page-wrapper relative mb-4 shadow-lg" data-page-number={index + 1}>
-          <Page
-            pageNumber={index + 1}
-            width={width}
-            onLoadSuccess={handlePageLoadSuccess}
-            renderTextLayer={false}
-            renderAnnotationLayer={false}
-          />
-          {renderOverlay && (
-            <div
-              className="absolute pointer-events-auto"
-              style={{ top: 0, left: 0, width: '100%', height: '100%' }}
-            >
-              {renderOverlay(index + 1, pageSize.width, pageSize.height)}
+    <div className="w-full max-w-4xl mx-auto">
+      {/* Toolbar area for future controls */}
+      <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-indigo-100 to-violet-100 rounded-t-2xl border border-b-0 border-indigo-200 shadow-md">
+        <span className="font-semibold text-indigo-700 text-lg">Document Preview</span>
+        {/* Future: Add download, zoom, etc. */}
+      </div>
+      <div className="bg-white rounded-b-2xl border border-indigo-200 shadow-2xl overflow-x-auto p-6">
+        <Document
+          file={fileData}
+          onLoadSuccess={handleLoadSuccess}
+          loading={
+            <div className="flex items-center justify-center p-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
             </div>
-          )}
-        </div>
-      ))}
-    </Document>
+          }
+          error={
+            <div className="text-center p-8 text-red-600">
+              Failed to load PDF. Please try again.
+            </div>
+          }
+        >
+          {Array.from({ length: numPages }, (_, index) => (
+            <div key={index} className="pdf-page-wrapper relative mb-8 rounded-xl overflow-hidden shadow-lg border border-slate-200" data-page-number={index + 1}>
+              <Page
+                pageNumber={index + 1}
+                width={width}
+                onLoadSuccess={handlePageLoadSuccess}
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
+              />
+              {renderOverlay && (
+                <div
+                  className="absolute pointer-events-auto z-10"
+                  style={{ top: 0, left: 0, width: '100%', height: '100%' }}
+                >
+                  {renderOverlay(index + 1, pageSize.width, pageSize.height)}
+                </div>
+              )}
+            </div>
+          ))}
+        </Document>
+      </div>
+    </div>
   );
 };
