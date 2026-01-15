@@ -34,7 +34,7 @@ export const Layout: React.FC = () => {
           </Link>
         </div>
         <nav className="flex-1 px-2">
-          <ul className="space-y-1">
+          <ul className="space-y-1 list-none">
             <li>
               <Link to="/" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-semibold transition-all ${location.pathname === '/' ? 'bg-white/10 text-yellow-300 font-bold shadow' : 'hover:bg-white/5 text-white/90'}`}>
                 <span className="text-xl">🏠</span> Dashboard
