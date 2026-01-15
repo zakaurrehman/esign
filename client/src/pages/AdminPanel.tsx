@@ -137,7 +137,7 @@ export const AdminPanel: React.FC = () => {
           >
             View All Documents
           </Button>
-          <Button onClick={() => setShowCreateForm(!showCreateForm)} className="bg-gradient-to-r from-indigo-700 via-blue-600 to-blue-500 text-white font-bold shadow-lg hover:scale-105 hover:from-indigo-800 hover:to-blue-600 transition-transform border-0">
+          <Button onClick={() => setShowCreateForm(!showCreateForm)} className="bg-gradient-to-r from-indigo-700 via-blue-600 to-blue-500 text-black font-bold shadow-lg hover:scale-105 hover:from-indigo-800 hover:to-blue-600 transition-transform border-0">
             {showCreateForm ? 'Cancel' : '+ Create User'}
           </Button>
         </div>
