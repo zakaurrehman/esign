@@ -23,7 +23,7 @@ export const Layout: React.FC = () => {
   return (
     <div className="min-h-screen flex bg-white">
       {/* Sidebar */}
-      <aside className="w-64 h-screen sticky top-0 left-0 bg-gradient-to-br from-indigo-500 via-blue-600 to-blue-800 text-white flex flex-col py-8 px-4 shadow-2xl z-30 select-none">
+      <aside className="w-64 h-screen fixed top-0 left-0 bg-gradient-to-br from-indigo-500 via-blue-600 to-blue-800 text-white flex flex-col py-8 px-4 shadow-2xl z-30 select-none">
         <div className="flex items-center mb-10 px-2">
           <Link to="/" className="text-2xl font-extrabold tracking-tight flex items-center gap-2 text-white">
             <span className="mr-1 text-3xl">📝</span> <span className="drop-shadow">E-Sign</span>
@@ -78,7 +78,7 @@ export const Layout: React.FC = () => {
         </div>
       </aside>
       {/* Main content area */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen ml-64">
         {/* Header */}
         <header className="h-20 bg-blue-700 shadow-lg flex items-center px-8 justify-between border-b-2 border-blue-800/20">
           <div className="flex items-center gap-4">
