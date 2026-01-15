@@ -140,27 +140,27 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div>
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-        <div className="rounded-2xl shadow-xl bg-gradient-to-br from-indigo-500 to-violet-600 p-6 flex flex-col items-start text-white">
-          <span className="text-3xl font-bold mb-2">{completedCount}</span>
-          <span className="font-semibold text-lg">Completed</span>
-          <span className="mt-2 text-indigo-100">All finished documents</span>
+      {/* Stats Cards - Responsive and High Contrast */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <div className="rounded-2xl shadow-2xl bg-gradient-to-br from-indigo-700 to-violet-700 p-6 flex flex-col items-start text-white min-w-0">
+          <span className="text-4xl font-extrabold mb-1 drop-shadow">{completedCount}</span>
+          <span className="font-bold text-lg">Completed</span>
+          <span className="mt-1 text-indigo-200 text-sm">All finished documents</span>
         </div>
-        <div className="rounded-2xl shadow-xl bg-gradient-to-br from-orange-400 to-amber-500 p-6 flex flex-col items-start text-white">
-          <span className="text-3xl font-bold mb-2">{actionRequiredCount}</span>
-          <span className="font-semibold text-lg">Action Required</span>
-          <span className="mt-2 text-orange-100">Needs your attention</span>
+        <div className="rounded-2xl shadow-2xl bg-gradient-to-br from-orange-600 to-amber-500 p-6 flex flex-col items-start text-white min-w-0">
+          <span className="text-4xl font-extrabold mb-1 drop-shadow">{actionRequiredCount}</span>
+          <span className="font-bold text-lg">Action Required</span>
+          <span className="mt-1 text-orange-100 text-sm">Needs your attention</span>
         </div>
-        <div className="rounded-2xl shadow-xl bg-gradient-to-br from-blue-500 to-cyan-500 p-6 flex flex-col items-start text-white">
-          <span className="text-3xl font-bold mb-2">{waitingCount}</span>
-          <span className="font-semibold text-lg">Waiting for Others</span>
-          <span className="mt-2 text-blue-100">Pending manager approval</span>
+        <div className="rounded-2xl shadow-2xl bg-gradient-to-br from-blue-700 to-cyan-500 p-6 flex flex-col items-start text-white min-w-0">
+          <span className="text-4xl font-extrabold mb-1 drop-shadow">{waitingCount}</span>
+          <span className="font-bold text-lg">Waiting for Others</span>
+          <span className="mt-1 text-blue-100 text-sm">Pending manager approval</span>
         </div>
-        <div className="rounded-2xl shadow-xl bg-gradient-to-br from-pink-500 to-fuchsia-500 p-6 flex flex-col items-start text-white">
-          <span className="text-3xl font-bold mb-2">{expiringCount}</span>
-          <span className="font-semibold text-lg">Expiring Soon</span>
-          <span className="mt-2 text-pink-100">Expiring documents</span>
+        <div className="rounded-2xl shadow-2xl bg-gradient-to-br from-pink-600 to-fuchsia-600 p-6 flex flex-col items-start text-white min-w-0">
+          <span className="text-4xl font-extrabold mb-1 drop-shadow">{expiringCount}</span>
+          <span className="font-bold text-lg">Expiring Soon</span>
+          <span className="mt-1 text-pink-100 text-sm">Expiring documents</span>
         </div>
       </div>
 
@@ -226,13 +226,13 @@ export const Dashboard: React.FC = () => {
       )}
 
       {/* My Documents Section */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">My Documents</h1>
-          <p className="text-sm text-slate-600 mt-1">Manage and track all your signature documents</p>
+          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-700 to-violet-700 bg-clip-text text-transparent">My Documents</h1>
+          <p className="text-base text-slate-700 mt-1">Manage and track all your signature documents</p>
         </div>
         <Link to="/create">
-          <Button size="lg" className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold shadow-lg hover:scale-105 transition-transform">
+          <Button size="lg" className="bg-gradient-to-r from-indigo-700 to-violet-700 text-white font-bold shadow-lg hover:scale-105 transition-transform">
             + Create Document
           </Button>
         </Link>

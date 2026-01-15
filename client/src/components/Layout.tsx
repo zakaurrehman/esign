@@ -21,9 +21,9 @@ export const Layout: React.FC = () => {
   const roleBadge = getRoleBadge();
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-indigo-50 to-violet-50">
+    <div className="min-h-screen flex bg-gradient-to-br from-slate-100 via-indigo-100 to-violet-200">
       {/* Sidebar */}
-      <aside className="w-64 bg-gradient-to-b from-indigo-700 via-violet-700 to-purple-700 text-white flex flex-col py-8 px-4 shadow-2xl rounded-r-3xl">
+      <aside className="w-64 min-h-screen bg-gradient-to-b from-indigo-800 via-violet-800 to-purple-900 text-white flex flex-col py-8 px-4 shadow-2xl rounded-r-3xl border-r-2 border-indigo-900/20">
         <div className="flex items-center mb-10">
           <Link to="/" className="text-2xl font-extrabold tracking-tight text-white">
             <span className="mr-2">📝</span> E-Sign
@@ -68,21 +68,21 @@ export const Layout: React.FC = () => {
         </div>
       </aside>
       {/* Main content area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-h-screen">
         {/* Header */}
-        <header className="h-20 bg-white shadow-lg flex items-center px-8 justify-between">
+        <header className="h-20 bg-gradient-to-r from-indigo-900 via-violet-900 to-purple-900 shadow-lg flex items-center px-8 justify-between border-b-2 border-indigo-900/20">
           <div className="flex items-center gap-4">
-            <span className="text-xl font-bold text-indigo-700">E-Sign Platform</span>
-            <span className="text-sm text-slate-500">Professional e-signature solution</span>
+            <span className="text-2xl font-extrabold text-white drop-shadow">E-Sign Platform</span>
+            <span className="text-base text-indigo-200 font-medium">Professional e-signature solution</span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-base font-semibold text-indigo-700">{user?.name}</span>
+            <span className="text-base font-semibold text-white">{user?.name}</span>
             {roleBadge && (
-              <span className={`px-3 py-1 rounded-full text-xs font-bold ${roleBadge.class}`}>{roleBadge.text}</span>
+              <span className={`px-3 py-1 rounded-full text-xs font-bold bg-indigo-700 text-white shadow`}>{roleBadge.text}</span>
             )}
           </div>
         </header>
-        <main className="flex-1 px-8 py-8 bg-gradient-to-br from-slate-50 via-indigo-50 to-violet-50">
+        <main className="flex-1 px-2 sm:px-4 md:px-8 py-8 bg-gradient-to-br from-slate-100 via-indigo-50 to-violet-100 min-h-screen">
           <Outlet />
         </main>
       </div>
