@@ -23,45 +23,45 @@ export const Layout: React.FC = () => {
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-slate-100 via-indigo-100 to-violet-200">
       {/* Sidebar */}
-      <aside className="w-64 min-h-screen bg-gradient-to-b from-indigo-800 via-violet-800 to-purple-900 text-white flex flex-col py-8 px-4 shadow-2xl rounded-r-3xl border-r-2 border-indigo-900/20">
+      <aside className="w-64 min-h-screen bg-gradient-to-b from-indigo-100 via-violet-100 to-purple-100 text-black flex flex-col py-8 px-4 shadow-2xl rounded-r-3xl border-r-2 border-indigo-900/20">
         <div className="flex items-center mb-10">
-          <Link to="/" className="text-2xl font-extrabold tracking-tight text-white">
+              <Link to="/" className="text-2xl font-extrabold tracking-tight text-black">
             <span className="mr-2">📝</span> E-Sign
           </Link>
         </div>
         <nav className="flex-1">
           <ul className="space-y-2">
             <li>
-              <Link to="/" className={`block px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/' ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/90'}`}>Dashboard</Link>
+              <Link to="/" className={`block px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/' ? 'bg-black/10 text-black font-bold' : 'hover:bg-black/5 text-black/80'}`}>Dashboard</Link>
             </li>
             <li>
-              <Link to="/create" className={`block px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/create' ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/90'}`}>+ Create Document</Link>
+              <Link to="/create" className={`block px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/create' ? 'bg-black/10 text-black font-bold' : 'hover:bg-black/5 text-black/80'}`}>+ Create Document</Link>
             </li>
             {isManager && (
               <li>
-                <Link to="/manager/team" className={`block px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/manager/team' ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/90'}`}>Team Documents</Link>
+                <Link to="/manager/team" className={`block px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/manager/team' ? 'bg-black/10 text-black font-bold' : 'hover:bg-black/5 text-black/80'}`}>Team Documents</Link>
               </li>
             )}
             {isAdmin && (
               <>
                 <li>
-                  <Link to="/admin" className={`block px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/admin' ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/90'}`}>User Management</Link>
+                  <Link to="/admin" className={`block px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/admin' ? 'bg-black/10 text-black font-bold' : 'hover:bg-black/5 text-black/80'}`}>User Management</Link>
                 </li>
                 <li>
-                  <Link to="/admin/documents" className={`block px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/admin/documents' ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/90'}`}>View All Documents</Link>
+                  <Link to="/admin/documents" className={`block px-4 py-3 rounded-xl font-semibold transition-all ${location.pathname === '/admin/documents' ? 'bg-black/10 text-black font-bold' : 'hover:bg-black/5 text-black/80'}`}>View All Documents</Link>
                 </li>
               </>
             )}
           </ul>
         </nav>
         <div className="mt-auto flex flex-col items-center">
-          <span className="text-sm font-medium mb-2">{user?.name}</span>
+          <span className="text-sm font-medium mb-2 text-black">{user?.name}</span>
           {roleBadge && (
-            <span className={`px-3 py-1 rounded-full text-xs font-bold mb-2 ${roleBadge.class}`}>{roleBadge.text}</span>
+            <span className={`px-3 py-1 rounded-full text-xs font-bold mb-2 bg-black text-white`}>{roleBadge.text}</span>
           )}
           <button
             onClick={handleLogout}
-            className="w-full bg-white/20 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-white/30 transition-all"
+            className="w-full bg-black/10 text-black px-4 py-2 rounded-xl text-sm font-semibold hover:bg-black/20 transition-all"
           >
             Logout
           </button>
