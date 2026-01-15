@@ -23,7 +23,7 @@ export const Layout: React.FC = () => {
   return (
     <div className="min-h-screen flex bg-white">
       {/* Sidebar */}
-      <aside className="w-64 h-screen fixed top-0 left-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-700 text-white flex flex-col py-6 px-0 shadow-2xl z-30 select-none">
+      <aside className="w-64 min-h-screen h-screen fixed inset-0 left-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-700 text-white flex flex-col py-6 px-0 shadow-2xl z-30 select-none">
         <div className="flex flex-col items-center mb-8 px-6">
           <Link to="/" className="w-full flex items-center gap-3 mb-2">
             <span className="text-3xl">📝</span>
