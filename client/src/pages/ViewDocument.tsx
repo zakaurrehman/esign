@@ -66,14 +66,14 @@ export const ViewDocument: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Document Info */}
         <div className="lg:col-span-1 space-y-4">
-          <Card className="bg-white shadow-xl rounded-2xl">
+          <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
             <CardHeader className="bg-gradient-to-r from-indigo-50 to-violet-50 rounded-t-2xl">
-              <h2 className="text-xl font-bold text-slate-900">{document.title}</h2>
+              <h2 className="text-xl font-bold text-[#22223b] font-sans">{document.title}</h2>
               <span className={`inline-block mt-2 px-3 py-1 text-xs font-semibold rounded-full ${statusColors[document.status]}`}>
                 {document.status}
               </span>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 font-sans">
               <div>
                 <h3 className="text-sm font-semibold text-slate-700 mb-2">Document Details</h3>
                 <div className="space-y-2 text-sm">
@@ -134,11 +134,11 @@ export const ViewDocument: React.FC = () => {
 
         {/* PDF Viewer */}
         <div className="lg:col-span-2">
-          <Card className="bg-white shadow-xl rounded-2xl">
+          <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
             <CardHeader className="bg-gradient-to-r from-indigo-50 to-violet-50 rounded-t-2xl">
-              <h3 className="font-semibold text-slate-900">Document Preview</h3>
+              <h3 className="font-semibold text-[#22223b] font-sans">Document Preview</h3>
             </CardHeader>
-            <CardContent className="p-4">
+            <CardContent className="p-4 font-sans">
               {pdfUrl ? (
                 <div className="bg-slate-100 p-4 rounded-xl overflow-auto max-h-[75vh]">
                   <PdfViewer

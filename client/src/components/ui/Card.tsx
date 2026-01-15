@@ -9,7 +9,7 @@ interface CardProps {
 export const Card: React.FC<CardProps> = ({ children, className = '', onClick }) => {
   return (
     <div
-      className={`bg-white rounded-lg shadow-md border border-gray-200 ${className}`}
+      className={`bg-white rounded-3xl shadow-xl border border-blue-100 p-6 transition-all duration-200 hover:shadow-2xl hover:-translate-y-1 ${className}`}
       onClick={onClick}
     >
       {children}

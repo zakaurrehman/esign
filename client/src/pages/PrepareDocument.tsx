@@ -297,14 +297,14 @@ export const PrepareDocument: React.FC = () => {
       <div className="flex gap-6">
         {/* Left sidebar - Recipients & Fields */}
         <div className="w-72 flex-shrink-0 space-y-4">
-          <Card className="bg-white/90 backdrop-blur-sm shadow-lg border-teal-100">
-            <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50">
+          <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
+            <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-t-2xl">
               <div className="flex justify-between items-center">
-                <h3 className="font-semibold text-teal-900">Recipients</h3>
+                <h3 className="font-semibold text-[#22223b] font-sans">Recipients</h3>
                 <Button size="sm" onClick={() => setShowAddRecipient(true)}>Add</Button>
               </div>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-2 font-sans">
               {document.recipients?.length === 0 ? (
                 <p className="text-sm text-gray-500">No recipients added yet</p>
               ) : (
@@ -338,11 +338,11 @@ export const PrepareDocument: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/90 backdrop-blur-sm shadow-lg border-teal-100">
-            <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50">
-              <h3 className="font-semibold text-teal-900">Signature Fields</h3>
+          <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
+            <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-t-2xl">
+              <h3 className="font-semibold text-[#22223b] font-sans">Signature Fields</h3>
             </CardHeader>
-            <CardContent>
+            <CardContent className="font-sans">
               <FieldPalette
                 selectedRecipientId={selectedRecipientId}
                 recipientColor={selectedRecipientIndex >= 0 ? getRecipientColor(selectedRecipientIndex) : '#888'}
@@ -357,11 +357,11 @@ export const PrepareDocument: React.FC = () => {
 
         {/* Main content - PDF viewer */}
         <div className="flex-1">
-          <Card className="bg-white/90 backdrop-blur-sm shadow-lg border-teal-100">
-            <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50">
-              <h2 className="text-lg font-semibold text-teal-900">{document.title}</h2>
+          <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
+            <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-t-2xl">
+              <h2 className="text-lg font-semibold text-[#22223b] font-sans">{document.title}</h2>
             </CardHeader>
-            <CardContent>
+            <CardContent className="font-sans">
               {pdfUrl ? (
                 <DroppablePdfArea>
                   <PdfViewer

@@ -129,8 +129,8 @@ export const SignDocument: React.FC = () => {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-indigo-50 to-violet-50 p-4">
-        <Card className="max-w-md rounded-2xl">
-          <CardContent className="text-center py-8">
+        <Card className="max-w-md rounded-2xl bg-white shadow-2xl border border-slate-100">
+          <CardContent className="text-center py-8 font-sans">
             <div className="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -154,7 +154,7 @@ export const SignDocument: React.FC = () => {
   const completedCount = data.fields.filter(f => f.isRequired && completedFields.has(f.id)).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-violet-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-violet-50 font-sans">
       <header className="bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 shadow-lg">
         <div className="max-w-5xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
@@ -180,8 +180,8 @@ export const SignDocument: React.FC = () => {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8">
-        <Card className="rounded-2xl shadow-xl">
-          <CardContent className="p-6">
+        <Card className="rounded-2xl shadow-2xl bg-white border border-slate-100">
+          <CardContent className="p-6 font-sans">
             <div className="bg-slate-100 p-4 rounded-xl overflow-auto max-h-[70vh]">
               <PdfViewer
                 url={pdfUrl}
@@ -247,7 +247,7 @@ export const SignDocument: React.FC = () => {
         size="lg"
       >
         {activeField && (
-          <div className="space-y-6 p-2 sm:p-4">
+          <div className="space-y-6 p-2 sm:p-4 font-sans">
             <div className="mb-2 text-center">
               <span className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold text-lg shadow-lg">
                 Signature
@@ -267,15 +267,15 @@ export const SignDocument: React.FC = () => {
         onClose={() => setShowDeclineModal(false)}
         title="Decline to Sign"
       >
-        <div className="space-y-4">
-          <p className="text-gray-600">
+        <div className="space-y-4 font-sans">
+          <p className="text-[#22223b]">
             Are you sure you want to decline signing this document?
           </p>
           <textarea
             value={declineReason}
             onChange={(e) => setDeclineReason(e.target.value)}
             placeholder="Reason for declining (optional)"
-            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
             rows={3}
           />
           <div className="flex justify-end space-x-2">

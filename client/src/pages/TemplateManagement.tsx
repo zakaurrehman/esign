@@ -73,13 +73,13 @@ export default function TemplateManagement() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Template Management</h2>
-        <p className="text-gray-600">
+        <h2 className="text-3xl font-extrabold text-[#22223b] font-sans mb-2">Template Management</h2>
+        <p className="text-[#2563eb] font-sans">
           Create and edit the company letterhead template that users can use when creating documents
         </p>
       </div>
 
-      <Card className="rounded-2xl">
+      <Card className="rounded-2xl bg-white shadow-2xl border border-slate-100">
         <CardHeader>
           <Input
             label="Template Name"
@@ -89,12 +89,12 @@ export default function TemplateManagement() {
             required
           />
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 font-sans">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-[#22223b] mb-2">
               Template Content
             </label>
-            <p className="text-xs text-gray-500 mb-3">
+            <p className="text-xs text-[#2563eb] mb-3">
               Design your letterhead template below. Users will be able to write their document content on this template.
             </p>
             <TipTapEditor content={templateContent} onChange={setTemplateContent} />

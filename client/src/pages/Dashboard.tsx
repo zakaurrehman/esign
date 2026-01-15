@@ -142,25 +142,25 @@ export const Dashboard: React.FC = () => {
     <div>
       {/* Stats Cards - Responsive and High Contrast */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        <div className="rounded-2xl shadow-2xl bg-blue-50 p-6 flex flex-col items-start min-w-0">
-          <span className="text-4xl font-extrabold mb-1 text-[#22223b]">{completedCount}</span>
-          <span className="font-bold text-lg text-[#22223b]">Completed</span>
-          <span className="mt-1 text-blue-700 text-sm">All finished documents</span>
+        <div className="rounded-2xl shadow-2xl bg-white p-6 flex flex-col items-start min-w-0 border border-slate-100">
+          <span className="text-4xl font-extrabold mb-1 text-[#2563eb] font-sans">{completedCount}</span>
+          <span className="font-bold text-lg text-[#22223b] font-sans">Completed</span>
+          <span className="mt-1 text-blue-700 text-sm font-sans">All finished documents</span>
         </div>
-        <div className="rounded-2xl shadow-2xl bg-blue-50 p-6 flex flex-col items-start min-w-0">
-          <span className="text-4xl font-extrabold mb-1 text-[#22223b]">{actionRequiredCount}</span>
-          <span className="font-bold text-lg text-[#22223b]">Action Required</span>
-          <span className="mt-1 text-blue-700 text-sm">Needs your attention</span>
+        <div className="rounded-2xl shadow-2xl bg-white p-6 flex flex-col items-start min-w-0 border border-slate-100">
+          <span className="text-4xl font-extrabold mb-1 text-[#2563eb] font-sans">{actionRequiredCount}</span>
+          <span className="font-bold text-lg text-[#22223b] font-sans">Action Required</span>
+          <span className="mt-1 text-blue-700 text-sm font-sans">Needs your attention</span>
         </div>
-        <div className="rounded-2xl shadow-2xl bg-blue-50 p-6 flex flex-col items-start min-w-0">
-          <span className="text-4xl font-extrabold mb-1 text-[#22223b]">{waitingCount}</span>
-          <span className="font-bold text-lg text-[#22223b]">Waiting for Others</span>
-          <span className="mt-1 text-blue-700 text-sm">Pending manager approval</span>
+        <div className="rounded-2xl shadow-2xl bg-white p-6 flex flex-col items-start min-w-0 border border-slate-100">
+          <span className="text-4xl font-extrabold mb-1 text-[#2563eb] font-sans">{waitingCount}</span>
+          <span className="font-bold text-lg text-[#22223b] font-sans">Waiting for Others</span>
+          <span className="mt-1 text-blue-700 text-sm font-sans">Pending manager approval</span>
         </div>
-        <div className="rounded-2xl shadow-2xl bg-blue-50 p-6 flex flex-col items-start min-w-0">
-          <span className="text-4xl font-extrabold mb-1 text-[#22223b]">{expiringCount}</span>
-          <span className="font-bold text-lg text-[#22223b]">Expiring Soon</span>
-          <span className="mt-1 text-blue-700 text-sm">Expiring documents</span>
+        <div className="rounded-2xl shadow-2xl bg-white p-6 flex flex-col items-start min-w-0 border border-slate-100">
+          <span className="text-4xl font-extrabold mb-1 text-[#2563eb] font-sans">{expiringCount}</span>
+          <span className="font-bold text-lg text-[#22223b] font-sans">Expiring Soon</span>
+          <span className="mt-1 text-blue-700 text-sm font-sans">Expiring documents</span>
         </div>
       </div>
 
@@ -228,8 +228,8 @@ export const Dashboard: React.FC = () => {
       {/* My Documents Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-700 to-violet-700 bg-clip-text text-transparent">My Documents</h1>
-          <p className="text-base text-slate-700 mt-1">Manage and track all your signature documents</p>
+          <h1 className="text-3xl font-extrabold text-[#22223b] font-sans">My Documents</h1>
+          <p className="text-base text-[#2563eb] mt-1 font-sans">Manage and track all your signature documents</p>
         </div>
         <Link to="/create">
           <Button size="lg" className="bg-gradient-to-r from-indigo-700 to-violet-700 text-white font-bold shadow-lg hover:scale-105 transition-transform">
@@ -239,15 +239,15 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {documents.length === 0 ? (
-        <Card className="bg-white shadow-xl rounded-2xl border-indigo-100">
+        <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
           <CardContent className="text-center py-16">
             <div className="bg-gradient-to-br from-indigo-100 to-violet-100 w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <svg className="h-12 w-12 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-slate-900">No documents yet</h3>
-            <p className="mt-2 text-sm text-slate-600 max-w-sm mx-auto">Get started by creating your first document. You can write your own or upload an existing PDF.</p>
+            <h3 className="text-2xl font-bold text-[#22223b] font-sans">No documents yet</h3>
+            <p className="mt-2 text-sm text-[#2563eb] max-w-sm mx-auto font-sans">Get started by creating your first document. You can write your own or upload an existing PDF.</p>
             <div className="mt-8">
               <Link to="/create">
                 <Button size="lg" className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold shadow-lg hover:scale-105 transition-transform">
@@ -260,16 +260,16 @@ export const Dashboard: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {documents.map((doc) => (
-            <Card key={doc.id} className="hover:shadow-2xl transition-all bg-white rounded-2xl border-slate-200 border-2">
+            <Card key={doc.id} className="hover:shadow-2xl transition-all bg-white rounded-2xl border border-slate-100">
               <CardContent className="py-6 px-4 flex flex-col h-full justify-between">
                 <div>
                   <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="text-xl font-bold text-slate-900">{doc.title}</h3>
-                    <span className={`px-3 py-1 text-xs font-semibold rounded-full ${statusColors[doc.status] || statusColors.DRAFT}`}>
+                    <h3 className="text-xl font-bold text-[#22223b] font-sans">{doc.title}</h3>
+                    <span className={`px-3 py-1 text-xs font-semibold rounded-full ${statusColors[doc.status] || statusColors.DRAFT}`}> 
                       {statusLabels[doc.status] || doc.status}
                     </span>
                   </div>
-                  <div className="mb-2 text-sm text-slate-500">
+                  <div className="mb-2 text-sm text-[#2563eb] font-sans">
                     <span>{doc.documentType === 'WRITTEN' ? 'Written' : 'Uploaded'}</span>
                     <span className="mx-2">•</span>
                     <span>{doc.recipients?.length || 0} recipient(s)</span>

@@ -140,47 +140,47 @@ export const CreateDocument: React.FC = () => {
     return (
       <div>
         <div className="mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">Create Document</h1>
-          <p className="text-sm text-slate-600 mt-1">Choose how you want to create your document</p>
+          <h1 className="text-3xl font-extrabold text-[#22223b] font-sans">Create Document</h1>
+          <p className="text-sm text-[#2563eb] mt-1 font-sans">Choose how you want to create your document</p>
         </div>
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          <Card className="cursor-pointer hover:shadow-2xl transition-all bg-white rounded-2xl border-2 border-violet-100 hover:border-violet-500" onClick={() => setMode('upload')}>
+          <Card className="cursor-pointer hover:shadow-2xl transition-all bg-white rounded-2xl border border-slate-100" onClick={() => setMode('upload')}>
             <CardContent className="text-center py-12">
               <div className="bg-gradient-to-br from-violet-100 to-purple-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <svg className="h-10 w-10 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-slate-900">Upload PDF</h3>
-              <p className="mt-2 text-sm text-slate-600">
+              <h3 className="text-xl font-bold text-[#22223b] font-sans">Upload PDF</h3>
+              <p className="mt-2 text-sm text-[#2563eb] font-sans">
                 Upload an existing PDF document for signing
               </p>
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer hover:shadow-2xl transition-all bg-white rounded-2xl border-2 border-indigo-100 hover:border-indigo-500" onClick={() => setMode('edit-pdf')}>
+          <Card className="cursor-pointer hover:shadow-2xl transition-all bg-white rounded-2xl border border-slate-100" onClick={() => setMode('edit-pdf')}>
             <CardContent className="text-center py-12">
               <div className="bg-gradient-to-br from-indigo-100 to-blue-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <svg className="h-10 w-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-slate-900">Annotate PDF</h3>
-              <p className="mt-2 text-sm text-slate-600">
+              <h3 className="text-xl font-bold text-[#22223b] font-sans">Annotate PDF</h3>
+              <p className="mt-2 text-sm text-[#2563eb] font-sans">
                 Add text and images on top of your PDF
               </p>
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer hover:shadow-2xl transition-all bg-white rounded-2xl border-2 border-emerald-100 hover:border-emerald-500" onClick={loadTemplate}>
+          <Card className="cursor-pointer hover:shadow-2xl transition-all bg-white rounded-2xl border border-slate-100" onClick={loadTemplate}>
             <CardContent className="text-center py-12">
               <div className="bg-gradient-to-br from-emerald-100 to-teal-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <svg className="h-10 w-10 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-slate-900">Use Template</h3>
-              <p className="mt-2 text-sm text-slate-600">
+              <h3 className="text-xl font-bold text-[#22223b] font-sans">Use Template</h3>
+              <p className="mt-2 text-sm text-[#2563eb] font-sans">
                 Start with company letterhead template
               </p>
             </CardContent>

@@ -144,11 +144,11 @@ export const AdminPanel: React.FC = () => {
       </div>
 
       {showCreateForm && (
-        <Card className="mb-6 bg-white shadow-xl rounded-2xl">
+        <Card className="mb-6 bg-white shadow-2xl rounded-2xl border border-slate-100">
           <CardHeader className="bg-gradient-to-r from-indigo-50 to-violet-50 rounded-t-2xl">
-            <h2 className="text-xl font-bold text-slate-900">Create New User</h2>
+            <h2 className="text-xl font-bold text-[#22223b] font-sans">Create New User</h2>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-6 font-sans">
             <form onSubmit={handleCreateUser} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
@@ -242,22 +242,22 @@ export const AdminPanel: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-          <CardContent className="p-4">
-            <div className="text-3xl font-bold">{users.filter(u => u.role === 'USER').length}</div>
-            <div className="text-blue-100">Users</div>
+        <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
+          <CardContent className="p-4 font-sans">
+            <div className="text-3xl font-extrabold text-[#2563eb]">{users.filter(u => u.role === 'USER').length}</div>
+            <div className="text-lg font-bold text-[#22223b]">Users</div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
-          <CardContent className="p-4">
-            <div className="text-3xl font-bold">{users.filter(u => u.role === 'MANAGER').length}</div>
-            <div className="text-green-100">Managers</div>
+        <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
+          <CardContent className="p-4 font-sans">
+            <div className="text-3xl font-extrabold text-[#2563eb]">{users.filter(u => u.role === 'MANAGER').length}</div>
+            <div className="text-lg font-bold text-[#22223b]">Managers</div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-          <CardContent className="p-4">
-            <div className="text-3xl font-bold">{users.filter(u => u.role === 'SUPER_ADMIN').length}</div>
-            <div className="text-purple-100">Super Admins</div>
+        <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
+          <CardContent className="p-4 font-sans">
+            <div className="text-3xl font-extrabold text-[#2563eb]">{users.filter(u => u.role === 'SUPER_ADMIN').length}</div>
+            <div className="text-lg font-bold text-[#22223b]">Super Admins</div>
           </CardContent>
         </Card>
       </div>
