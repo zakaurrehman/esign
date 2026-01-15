@@ -141,26 +141,26 @@ export const Dashboard: React.FC = () => {
   return (
     <div>
       {/* Stats Cards - Responsive and High Contrast */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        <div className="rounded-2xl shadow-2xl bg-white p-6 flex flex-col items-start min-w-0 border border-slate-100">
-          <span className="text-4xl font-extrabold mb-1 text-[#2563eb] font-sans">{completedCount}</span>
-          <span className="font-bold text-lg text-[#22223b] font-sans">Completed</span>
-          <span className="mt-1 text-blue-700 text-sm font-sans">All finished documents</span>
+      <div className="flex flex-row gap-4 mb-10 w-full">
+        <div className="flex-1 min-w-[140px] max-w-[180px] bg-white rounded-xl shadow-lg border border-slate-100 p-4 flex flex-col items-center justify-center hover:shadow-xl transition-all">
+          <span className="text-2xl font-extrabold text-[#2563eb] font-sans">{completedCount}</span>
+          <span className="font-bold text-base text-[#22223b] font-sans mt-1">Completed</span>
+          <span className="text-xs text-blue-700 font-sans mt-1 text-center">All finished documents</span>
         </div>
-        <div className="rounded-2xl shadow-2xl bg-white p-6 flex flex-col items-start min-w-0 border border-slate-100">
-          <span className="text-4xl font-extrabold mb-1 text-[#2563eb] font-sans">{actionRequiredCount}</span>
-          <span className="font-bold text-lg text-[#22223b] font-sans">Action Required</span>
-          <span className="mt-1 text-blue-700 text-sm font-sans">Needs your attention</span>
+        <div className="flex-1 min-w-[140px] max-w-[180px] bg-white rounded-xl shadow-lg border border-slate-100 p-4 flex flex-col items-center justify-center hover:shadow-xl transition-all">
+          <span className="text-2xl font-extrabold text-[#2563eb] font-sans">{actionRequiredCount}</span>
+          <span className="font-bold text-base text-[#22223b] font-sans mt-1">Action Required</span>
+          <span className="text-xs text-blue-700 font-sans mt-1 text-center">Needs your attention</span>
         </div>
-        <div className="rounded-2xl shadow-2xl bg-white p-6 flex flex-col items-start min-w-0 border border-slate-100">
-          <span className="text-4xl font-extrabold mb-1 text-[#2563eb] font-sans">{waitingCount}</span>
-          <span className="font-bold text-lg text-[#22223b] font-sans">Waiting for Others</span>
-          <span className="mt-1 text-blue-700 text-sm font-sans">Pending manager approval</span>
+        <div className="flex-1 min-w-[140px] max-w-[180px] bg-white rounded-xl shadow-lg border border-slate-100 p-4 flex flex-col items-center justify-center hover:shadow-xl transition-all">
+          <span className="text-2xl font-extrabold text-[#2563eb] font-sans">{waitingCount}</span>
+          <span className="font-bold text-base text-[#22223b] font-sans mt-1">Waiting for Others</span>
+          <span className="text-xs text-blue-700 font-sans mt-1 text-center">Pending manager approval</span>
         </div>
-        <div className="rounded-2xl shadow-2xl bg-white p-6 flex flex-col items-start min-w-0 border border-slate-100">
-          <span className="text-4xl font-extrabold mb-1 text-[#2563eb] font-sans">{expiringCount}</span>
-          <span className="font-bold text-lg text-[#22223b] font-sans">Expiring Soon</span>
-          <span className="mt-1 text-blue-700 text-sm font-sans">Expiring documents</span>
+        <div className="flex-1 min-w-[140px] max-w-[180px] bg-white rounded-xl shadow-lg border border-slate-100 p-4 flex flex-col items-center justify-center hover:shadow-xl transition-all">
+          <span className="text-2xl font-extrabold text-[#2563eb] font-sans">{expiringCount}</span>
+          <span className="font-bold text-base text-[#22223b] font-sans mt-1">Expiring Soon</span>
+          <span className="text-xs text-blue-700 font-sans mt-1 text-center">Expiring documents</span>
         </div>
       </div>
 
