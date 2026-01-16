@@ -34,22 +34,22 @@ export const Layout: React.FC = () => {
           </Link>
         </div>
         <nav className="flex-1 px-3 space-y-1">
-          <ul className="space-y-0.5 list-none">
-            <li>
-              <Link to="/" className={`flex items-center gap-3 px-4 py-2.5 rounded-md font-medium text-sm transition-all ${location.pathname === '/' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}>
+          <ul className="space-y-0.5">
+            <li style={{ listStyle: 'none' }}>
+              <Link to="/" className={`flex items-center gap-3 px-4 py-2.5 rounded-md font-medium text-sm transition-all ${location.pathname === '/' ? 'bg-blue-600 text-white' : 'text-slate-200 hover:text-white hover:bg-slate-800'}`}>
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
                 Dashboard
               </Link>
             </li>
-            <li>
-              <Link to="/create" className={`flex items-center gap-3 px-4 py-2.5 rounded-md font-medium text-sm transition-all ${location.pathname === '/create' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}>
+            <li style={{ listStyle: 'none' }}>
+              <Link to="/create" className={`flex items-center gap-3 px-4 py-2.5 rounded-md font-medium text-sm transition-all ${location.pathname === '/create' ? 'bg-blue-600 text-white' : 'text-slate-200 hover:text-white hover:bg-slate-800'}`}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                 Create Document
               </Link>
             </li>
             {isManager && (
-              <li>
-                <Link to="/manager/team" className={`flex items-center gap-3 px-4 py-2.5 rounded-md font-medium text-sm transition-all ${location.pathname === '/manager/team' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}>
+              <li style={{ listStyle: 'none' }}>
+                <Link to="/manager/team" className={`flex items-center gap-3 px-4 py-2.5 rounded-md font-medium text-sm transition-all ${location.pathname === '/manager/team' ? 'bg-blue-600 text-white' : 'text-slate-200 hover:text-white hover:bg-slate-800'}`}>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 12H9m6 0a6 6 0 11-12 0 6 6 0 0112 0z" /></svg>
                   Team Documents
                 </Link>
@@ -57,14 +57,14 @@ export const Layout: React.FC = () => {
             )}
             {isAdmin && (
               <>
-                <li>
-                  <Link to="/admin" className={`flex items-center gap-3 px-4 py-2.5 rounded-md font-medium text-sm transition-all ${location.pathname === '/admin' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}>
+                <li style={{ listStyle: 'none' }}>
+                  <Link to="/admin" className={`flex items-center gap-3 px-4 py-2.5 rounded-md font-medium text-sm transition-all ${location.pathname === '/admin' ? 'bg-blue-600 text-white' : 'text-slate-200 hover:text-white hover:bg-slate-800'}`}>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     User Management
                   </Link>
                 </li>
-                <li>
-                  <Link to="/admin/documents" className={`flex items-center gap-3 px-4 py-2.5 rounded-md font-medium text-sm transition-all ${location.pathname === '/admin/documents' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}>
+                <li style={{ listStyle: 'none' }}>
+                  <Link to="/admin/documents" className={`flex items-center gap-3 px-4 py-2.5 rounded-md font-medium text-sm transition-all ${location.pathname === '/admin/documents' ? 'bg-blue-600 text-white' : 'text-slate-200 hover:text-white hover:bg-slate-800'}`}>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                     All Documents
                   </Link>
@@ -97,15 +97,19 @@ export const Layout: React.FC = () => {
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-h-screen" style={{ marginLeft: '260px' }}>
         {/* Header */}
-        <header className="h-16 shadow-sm flex items-center px-8 justify-between border-b border-slate-200 bg-white">
-          <div className="flex items-center gap-3">
-            <span className="text-lg font-bold text-slate-900">E-Sign Platform</span>
-            <span className="text-sm text-slate-500 font-medium">Professional e-signature solution</span>
+        <header className="h-16 flex items-center px-8 justify-between border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
+          <div className="flex items-center gap-4">
+            <div className="w-1 h-8 bg-blue-600 rounded-full"></div>
+            <div>
+              <span className="text-base font-bold text-slate-900 block">E-Sign Platform</span>
+              <span className="text-xs text-slate-500 font-medium">Professional e-signature</span>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
+            <div className="h-8 w-0.5 bg-slate-200 rounded-full"></div>
             <span className="text-sm font-semibold text-slate-700">{user?.name}</span>
             {roleBadge && (
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">{roleBadge.text}</span>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-600 text-white">{roleBadge.text}</span>
             )}
           </div>
         </header>
