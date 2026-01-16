@@ -45,7 +45,7 @@ export const Login: React.FC = () => {
             </div>
             <div className="text-left">
               <div className="text-xl font-bold text-white">E-Sign</div>
-              <div className="text-xs text-slate-400">Professional e-signature</div>
+              <div className="text-xs text-white">Professional e-signature</div>
             </div>
           </div>
         </div>
@@ -56,8 +56,8 @@ export const Login: React.FC = () => {
             <h2 className="text-3xl font-bold text-slate-900">Welcome back</h2>
             <p className="text-slate-600 text-sm mt-2">Sign in to your account to continue</p>
           </CardHeader>
-          <CardContent className="px-8 py-8">
-            <form onSubmit={handleSubmit} className="space-y-5">
+          <CardContent className="px-10 py-10">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <Input
                   label="Email address"
@@ -66,6 +66,7 @@ export const Login: React.FC = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="your@email.com"
+                  className="px-5 py-3"
                 />
               </div>
               <div>
@@ -76,12 +77,13 @@ export const Login: React.FC = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••"
+                  className="px-5 py-3"
                 />
               </div>
 
               <Button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 text-base"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 text-base mt-2"
                 isLoading={isLoading}
               >
                 {isLoading ? 'Signing in...' : 'Sign in'}
