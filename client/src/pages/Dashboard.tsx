@@ -140,72 +140,72 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div>
-      {/* Stats Cards - Responsive and High Contrast */}
-      <div className="flex flex-row gap-4 mb-10 w-full">
-        <div className="flex-1 min-w-[140px] max-w-[180px] bg-white rounded-xl shadow-lg border border-slate-100 p-4 flex flex-col items-center justify-center hover:shadow-xl transition-all">
-          <span className="text-2xl font-extrabold text-[#2563eb] font-sans">{completedCount}</span>
-          <span className="font-bold text-base text-[#22223b] font-sans mt-1">Completed</span>
-          <span className="text-xs text-blue-700 font-sans mt-1 text-center">All finished documents</span>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 flex flex-col items-center justify-center hover:shadow-md transition-all">
+          <span className="text-3xl font-bold text-blue-600">{completedCount}</span>
+          <span className="font-semibold text-slate-900 mt-2">Completed</span>
+          <span className="text-xs text-slate-500 mt-1 text-center">All finished documents</span>
         </div>
-        <div className="flex-1 min-w-[140px] max-w-[180px] bg-white rounded-xl shadow-lg border border-slate-100 p-4 flex flex-col items-center justify-center hover:shadow-xl transition-all">
-          <span className="text-2xl font-extrabold text-[#2563eb] font-sans">{actionRequiredCount}</span>
-          <span className="font-bold text-base text-[#22223b] font-sans mt-1">Action Required</span>
-          <span className="text-xs text-blue-700 font-sans mt-1 text-center">Needs your attention</span>
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 flex flex-col items-center justify-center hover:shadow-md transition-all">
+          <span className="text-3xl font-bold text-orange-600">{actionRequiredCount}</span>
+          <span className="font-semibold text-slate-900 mt-2">Action Required</span>
+          <span className="text-xs text-slate-500 mt-1 text-center">Needs your attention</span>
         </div>
-        <div className="flex-1 min-w-[140px] max-w-[180px] bg-white rounded-xl shadow-lg border border-slate-100 p-4 flex flex-col items-center justify-center hover:shadow-xl transition-all">
-          <span className="text-2xl font-extrabold text-[#2563eb] font-sans">{waitingCount}</span>
-          <span className="font-bold text-base text-[#22223b] font-sans mt-1">Waiting for Others</span>
-          <span className="text-xs text-blue-700 font-sans mt-1 text-center">Pending manager approval</span>
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 flex flex-col items-center justify-center hover:shadow-md transition-all">
+          <span className="text-3xl font-bold text-purple-600">{waitingCount}</span>
+          <span className="font-semibold text-slate-900 mt-2">Waiting for Others</span>
+          <span className="text-xs text-slate-500 mt-1 text-center">Pending manager approval</span>
         </div>
-        <div className="flex-1 min-w-[140px] max-w-[180px] bg-white rounded-xl shadow-lg border border-slate-100 p-4 flex flex-col items-center justify-center hover:shadow-xl transition-all">
-          <span className="text-2xl font-extrabold text-[#2563eb] font-sans">{expiringCount}</span>
-          <span className="font-bold text-base text-[#22223b] font-sans mt-1">Expiring Soon</span>
-          <span className="text-xs text-blue-700 font-sans mt-1 text-center">Expiring documents</span>
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 flex flex-col items-center justify-center hover:shadow-md transition-all">
+          <span className="text-3xl font-bold text-red-600">{expiringCount}</span>
+          <span className="font-semibold text-slate-900 mt-2">Expiring Soon</span>
+          <span className="text-xs text-slate-500 mt-1 text-center">Expiring documents</span>
         </div>
       </div>
 
       {/* Manager: Pending Approvals Section */}
       {isManager && pendingApprovals.length > 0 && (
         <div className="mb-8">
-          <Card className="bg-gradient-to-r from-orange-100 to-amber-100 border-orange-200 shadow-xl rounded-2xl">
-            <CardHeader className="border-b border-orange-200">
-              <div className="flex items-center">
-                <span className="text-2xl mr-3">📋</span>
+          <Card variant="stat" className="bg-orange-50 border-orange-200">
+            <CardHeader className="border-b border-orange-200 bg-white">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 font-bold">!</div>
                 <div>
-                  <h2 className="text-xl font-bold text-orange-900">Pending Approvals</h2>
-                  <p className="text-sm text-orange-700">{pendingApprovals.length} document(s) awaiting your review</p>
+                  <h2 className="text-lg font-bold text-slate-900">Pending Approvals</h2>
+                  <p className="text-sm text-slate-600">{pendingApprovals.length} document(s) awaiting your review</p>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="divide-y divide-orange-200">
+              <div className="divide-y divide-orange-100">
                 {pendingApprovals.map((doc) => (
-                  <div key={doc.id} className="p-4 hover:bg-orange-200/40 transition-colors rounded-xl">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-slate-900">{doc.title}</h3>
-                        <div className="text-sm text-slate-600 mt-1">
+                  <div key={doc.id} className="p-4 hover:bg-orange-50 transition-colors">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-slate-900 truncate">{doc.title}</h3>
+                        <div className="text-xs text-slate-600 mt-1 flex flex-wrap gap-2">
                           <span>From: <strong>{doc.user?.name}</strong></span>
-                          <span className="mx-2">•</span>
+                          <span>•</span>
                           <span>{doc.recipients?.length || 0} recipient(s)</span>
-                          <span className="mx-2">•</span>
+                          <span>•</span>
                           <span>{new Date(doc.createdAt).toLocaleDateString()}</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         <Link to={`/document/${doc.id}`}>
-                          <Button variant="secondary" size="sm">View PDF</Button>
+                          <Button variant="secondary" size="sm">View</Button>
                         </Link>
-                        <Button 
-                          size="sm" 
-                          className="bg-green-600 hover:bg-green-700"
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700 text-white"
                           onClick={() => handleApprove(doc.id)}
                           disabled={isProcessing}
                         >
-                          ✓ Approve
+                          Approve
                         </Button>
-                        <Button 
-                          variant="danger" 
+                        <Button
+                          variant="danger"
                           size="sm"
                           onClick={() => {
                             setSelectedDocId(doc.id);
@@ -213,7 +213,7 @@ export const Dashboard: React.FC = () => {
                           }}
                           disabled={isProcessing}
                         >
-                          ✗ Deny
+                          Deny
                         </Button>
                       </div>
                     </div>
@@ -226,113 +226,101 @@ export const Dashboard: React.FC = () => {
       )}
 
       {/* My Documents Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-[#22223b] font-sans">My Documents</h1>
-          <p className="text-base text-[#2563eb] mt-1 font-sans">Manage and track all your signature documents</p>
+          <h1 className="text-2xl font-bold text-slate-900">My Documents</h1>
+          <p className="text-sm text-slate-600 mt-1">Manage and track all your signature documents</p>
         </div>
         <Link to="/create">
-          <Button size="lg" className="bg-gradient-to-r from-indigo-700 via-blue-600 to-blue-500 text-black font-bold shadow-lg hover:scale-105 hover:from-indigo-800 hover:to-blue-600 transition-transform border-0">
+          <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold">
             + Create Document
           </Button>
         </Link>
       </div>
 
       {documents.length === 0 ? (
-        <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
-          <CardContent className="text-center py-16">
-            <div className="bg-gradient-to-br from-indigo-100 to-violet-100 w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <svg className="h-12 w-12 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <Card variant="default" size="lg">
+          <CardContent className="text-center py-12">
+            <div className="bg-blue-100 w-20 h-20 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <svg className="h-10 w-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-[#22223b] font-sans">No documents yet</h3>
-            <p className="mt-2 text-sm text-[#2563eb] max-w-sm mx-auto font-sans">Get started by creating your first document. You can write your own or upload an existing PDF.</p>
-            <div className="mt-8">
+            <h3 className="text-xl font-bold text-slate-900">No documents yet</h3>
+            <p className="mt-2 text-sm text-slate-600 max-w-sm mx-auto">Get started by creating your first document. You can write your own or upload an existing PDF.</p>
+            <div className="mt-6">
               <Link to="/create">
-                <Button size="lg" className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold shadow-lg hover:scale-105 transition-transform">
-                  + Create Your First Document
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+                  Create Your First Document
                 </Button>
               </Link>
             </div>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {documents.map((doc) => (
-            <Card key={doc.id} className="hover:shadow-2xl transition-all bg-white rounded-2xl border border-slate-100">
-              <CardContent className="py-6 px-4 flex flex-col h-full justify-between">
+            <Card key={doc.id} variant="selectable" size="lg" className="hover:shadow-md transition-all">
+              <CardContent className="py-5 px-5 flex flex-col h-full justify-between">
                 <div>
-                  <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="text-xl font-bold text-[#22223b] font-sans">{doc.title}</h3>
-                    <span className={`px-3 py-1 text-xs font-semibold rounded-full ${statusColors[doc.status] || statusColors.DRAFT}`}> 
+                  <div className="flex items-start gap-2 mb-2">
+                    <h3 className="text-base font-bold text-slate-900 flex-1 line-clamp-2">{doc.title}</h3>
+                    <span className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap flex-shrink-0 ${statusColors[doc.status] || statusColors.DRAFT}`}>
                       {statusLabels[doc.status] || doc.status}
                     </span>
                   </div>
-                  <div className="mb-2 text-sm text-[#2563eb] font-sans">
-                    <span>{doc.documentType === 'WRITTEN' ? 'Written' : 'Uploaded'}</span>
-                    <span className="mx-2">•</span>
-                    <span>{doc.recipients?.length || 0} recipient(s)</span>
-                    <span className="mx-2">•</span>
-                    <span>{new Date(doc.createdAt).toLocaleDateString()}</span>
+                  <div className="mb-3 text-xs text-slate-600 space-y-0.5">
+                    <div>{doc.documentType === 'WRITTEN' ? 'Written' : 'Uploaded'} • {doc.recipients?.length || 0} recipient(s) • {new Date(doc.createdAt).toLocaleDateString()}</div>
                   </div>
                   {/* Manager Feedback for Denied Documents */}
                   {doc.status === 'DENIED' && doc.managerFeedback && (
-                    <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3">
+                    <div className="mt-3 bg-red-50 border border-red-200 rounded-md p-2.5">
                       <p className="text-xs font-semibold text-red-800 mb-1">Manager Feedback:</p>
-                      <p className="text-sm text-red-700">{doc.managerFeedback}</p>
+                      <p className="text-xs text-red-700 line-clamp-2">{doc.managerFeedback}</p>
                     </div>
                   )}
                   {/* Pending Approval Info */}
                   {doc.status === 'PENDING_APPROVAL' && (
-                    <div className="mt-3 bg-orange-50 border border-orange-200 rounded-lg p-3">
-                      <p className="text-sm text-orange-700">
-                        ⏳ This document is waiting for manager approval before being sent to recipients.
+                    <div className="mt-3 bg-orange-50 border border-orange-200 rounded-md p-2.5">
+                      <p className="text-xs text-orange-700">
+                        Waiting for manager approval before being sent to recipients.
                       </p>
                     </div>
                   )}
                 </div>
-                <div className="flex items-center space-x-2 mt-4">
+                <div className="flex items-center gap-2 mt-4">
                   {doc.status === 'DRAFT' && (
                     <>
-                      <Link to={`/prepare/${doc.id}`}>
-                        <Button size="sm">Prepare</Button>
+                      <Link to={`/prepare/${doc.id}`} className="flex-1">
+                        <Button size="sm" className="w-full">Prepare</Button>
                       </Link>
-                      <Button variant="danger" size="sm" onClick={() => handleDelete(doc.id)}>
-                        Delete
-                      </Button>
+                      <Button variant="danger" size="sm" onClick={() => handleDelete(doc.id)}>Delete</Button>
                     </>
                   )}
                   {doc.status === 'DENIED' && (
                     <>
-                      <Link to={`/prepare/${doc.id}`}>
-                        <Button size="sm" className="bg-orange-600 hover:bg-orange-700">
-                          Edit & Resubmit
-                        </Button>
+                      <Link to={`/prepare/${doc.id}`} className="flex-1">
+                        <Button size="sm" className="w-full bg-orange-600 hover:bg-orange-700">Edit & Resubmit</Button>
                       </Link>
-                      <Button variant="danger" size="sm" onClick={() => handleDelete(doc.id)}>
-                        Delete
-                      </Button>
+                      <Button variant="danger" size="sm" onClick={() => handleDelete(doc.id)}>Delete</Button>
                     </>
                   )}
                   {doc.status === 'PENDING_APPROVAL' && (
-                    <Link to={`/document/${doc.id}`}>
-                      <Button variant="secondary" size="sm">View</Button>
+                    <Link to={`/document/${doc.id}`} className="w-full">
+                      <Button variant="secondary" size="sm" className="w-full">View</Button>
                     </Link>
                   )}
                   {(doc.status === 'PENDING' || doc.status === 'IN_PROGRESS') && (
                     <>
-                      <Link to={`/document/${doc.id}`}>
-                        <Button variant="secondary" size="sm">View</Button>
+                      <Link to={`/document/${doc.id}`} className="flex-1">
+                        <Button variant="secondary" size="sm" className="w-full">View</Button>
                       </Link>
-                      <Button variant="danger" size="sm" onClick={() => handleVoid(doc.id)}>
-                        Void
-                      </Button>
+                      <Button variant="danger" size="sm" onClick={() => handleVoid(doc.id)}>Void</Button>
                     </>
                   )}
                   {doc.status === 'COMPLETED' && (
-                    <Link to={`/document/${doc.id}`}>
-                      <Button variant="secondary" size="sm">View</Button>
+                    <Link to={`/document/${doc.id}`} className="w-full">
+                      <Button variant="secondary" size="sm" className="w-full">View</Button>
                     </Link>
                   )}
                 </div>

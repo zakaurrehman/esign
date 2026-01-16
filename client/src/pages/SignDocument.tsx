@@ -129,7 +129,7 @@ export const SignDocument: React.FC = () => {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-indigo-50 to-violet-50 p-4">
-        <Card className="max-w-md rounded-2xl bg-white shadow-2xl border border-slate-100">
+        <Card size="md" variant="default" className="max-w-md">
           <CardContent className="text-center py-8 font-sans">
             <div className="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,7 +180,7 @@ export const SignDocument: React.FC = () => {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8">
-        <Card className="rounded-2xl shadow-2xl bg-white border border-slate-100">
+        <Card size="lg" variant="default">
           <CardContent className="p-6 font-sans">
             <div className="bg-slate-100 p-4 rounded-xl overflow-auto max-h-[70vh]">
               <PdfViewer

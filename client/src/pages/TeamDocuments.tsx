@@ -121,21 +121,21 @@ export const TeamDocuments: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Card className={`cursor-pointer transition-all ${filterStatus === 'all' ? 'ring-2 ring-indigo-500' : ''}`}
+        <Card size="sm" variant="selectable" className={`cursor-pointer transition-all ${filterStatus === 'all' ? 'ring-2 ring-indigo-500' : ''}`}
           onClick={() => setFilterStatus('all')}>
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-slate-900">{documents.length}</div>
             <div className="text-sm text-slate-600">Total Documents</div>
           </CardContent>
         </Card>
-        <Card className={`cursor-pointer transition-all bg-orange-50 ${filterStatus === 'PENDING_APPROVAL' ? 'ring-2 ring-orange-500' : ''}`}
+        <Card size="sm" variant="selectable" className={`cursor-pointer transition-all bg-orange-50 ${filterStatus === 'PENDING_APPROVAL' ? 'ring-2 ring-orange-500' : ''}`}
           onClick={() => setFilterStatus('PENDING_APPROVAL')}>
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-orange-600">{pendingCount}</div>
             <div className="text-sm text-orange-700">Pending Approval</div>
           </CardContent>
         </Card>
-        <Card className={`cursor-pointer transition-all bg-green-50 ${filterStatus === 'COMPLETED' ? 'ring-2 ring-green-500' : ''}`}
+        <Card size="sm" variant="selectable" className={`cursor-pointer transition-all bg-green-50 ${filterStatus === 'COMPLETED' ? 'ring-2 ring-green-500' : ''}`}
           onClick={() => setFilterStatus('COMPLETED')}>
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-green-600">
@@ -144,7 +144,7 @@ export const TeamDocuments: React.FC = () => {
             <div className="text-sm text-green-700">Completed</div>
           </CardContent>
         </Card>
-        <Card className={`cursor-pointer transition-all bg-blue-50 ${filterStatus === 'PENDING' ? 'ring-2 ring-blue-500' : ''}`}
+        <Card size="sm" variant="selectable" className={`cursor-pointer transition-all bg-blue-50 ${filterStatus === 'PENDING' ? 'ring-2 ring-blue-500' : ''}`}
           onClick={() => setFilterStatus('PENDING')}>
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-blue-600">
@@ -181,7 +181,7 @@ export const TeamDocuments: React.FC = () => {
 
       {/* Documents List */}
       {filteredDocuments.length === 0 ? (
-        <Card className="bg-white shadow-xl rounded-2xl">
+        <Card variant="default">
           <CardContent className="text-center py-16">
             <div className="text-4xl mb-4">📋</div>
             <h3 className="text-xl font-bold text-slate-900">
@@ -193,7 +193,7 @@ export const TeamDocuments: React.FC = () => {
           </CardContent>
         </Card>
       ) : (
-        <Card className="bg-white shadow-xl rounded-2xl">
+        <Card variant="default">
           <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 border-b">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold text-slate-900">

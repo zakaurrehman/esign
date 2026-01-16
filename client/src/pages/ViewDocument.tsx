@@ -66,7 +66,7 @@ export const ViewDocument: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Document Info */}
         <div className="lg:col-span-1 space-y-4">
-          <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
+          <Card size="lg" variant="default">
             <CardHeader className="bg-gradient-to-r from-indigo-50 to-violet-50 rounded-t-2xl">
               <h2 className="text-xl font-bold text-[#22223b] font-sans">{document.title}</h2>
               <span className={`inline-block mt-2 px-3 py-1 text-xs font-semibold rounded-full ${statusColors[document.status]}`}>
@@ -134,7 +134,7 @@ export const ViewDocument: React.FC = () => {
 
         {/* PDF Viewer */}
         <div className="lg:col-span-2">
-          <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
+          <Card size="lg" variant="default">
             <CardHeader className="bg-gradient-to-r from-indigo-50 to-violet-50 rounded-t-2xl">
               <h3 className="font-semibold text-[#22223b] font-sans">Document Preview</h3>
             </CardHeader>

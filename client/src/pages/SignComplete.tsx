@@ -4,7 +4,7 @@ import { Card, CardContent } from '../components/ui/Card';
 export const SignComplete: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="max-w-md">
+      <Card size="md" variant="default" className="max-w-md">
         <CardContent className="text-center py-12">
           <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
             <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -24,7 +24,7 @@ export const SignComplete: React.FC = () => {
 export const SignDeclined: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="max-w-md">
+      <Card size="md" variant="default" className="max-w-md">
         <CardContent className="text-center py-12">
           <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
             <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

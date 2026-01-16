@@ -23,7 +23,7 @@ export const Layout: React.FC = () => {
   return (
     <div className="min-h-screen flex bg-white">
       {/* Sidebar */}
-      <aside className="min-h-screen h-screen fixed inset-0 left-0 text-white flex flex-col py-6 px-0 shadow-2xl z-30 select-none" style={{ width: '260px', background: 'linear-gradient(to bottom, #312e81 0%, #3730a3 40%, #2563eb 100%)' }}>
+      <aside className="min-h-screen h-screen fixed inset-0 left-0 text-white flex flex-col py-6 px-0 shadow-lg z-30 select-none bg-slate-900" style={{ width: '260px' }}>
         <div className="flex flex-col items-center mb-8 px-6">
           <Link to="/" className="w-full flex items-center gap-3 mb-2">
             <span className="text-3xl">📝</span>
@@ -33,57 +33,62 @@ export const Layout: React.FC = () => {
             </div>
           </Link>
         </div>
-        <nav className="flex-1 px-2">
-          <ul className="space-y-1 list-none">
+        <nav className="flex-1 px-3 space-y-1">
+          <ul className="space-y-0.5 list-none">
             <li>
-              <Link to="/" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-semibold transition-all ${location.pathname === '/' ? 'bg-white/10 text-yellow-300 font-bold shadow' : 'hover:bg-white/5 text-white/90'}`}>
-                <span className="text-xl">🏠</span> Dashboard
+              <Link to="/" className={`flex items-center gap-3 px-4 py-2.5 rounded-md font-medium text-sm transition-all ${location.pathname === '/' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}>
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
+                Dashboard
               </Link>
             </li>
             <li>
-              <Link to="/create" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-semibold transition-all ${location.pathname === '/create' ? 'bg-white/10 text-pink-200 font-bold shadow' : 'hover:bg-white/5 text-white/90'}`}>
-                <span className="text-xl">➕</span> Create Document
+              <Link to="/create" className={`flex items-center gap-3 px-4 py-2.5 rounded-md font-medium text-sm transition-all ${location.pathname === '/create' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                Create Document
               </Link>
             </li>
             {isManager && (
               <li>
-                <Link to="/manager/team" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-semibold transition-all ${location.pathname === '/manager/team' ? 'bg-white/10 text-green-200 font-bold shadow' : 'hover:bg-white/5 text-white/90'}`}>
-                  <span className="text-xl">👥</span> Team Documents
+                <Link to="/manager/team" className={`flex items-center gap-3 px-4 py-2.5 rounded-md font-medium text-sm transition-all ${location.pathname === '/manager/team' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 12H9m6 0a6 6 0 11-12 0 6 6 0 0112 0z" /></svg>
+                  Team Documents
                 </Link>
               </li>
             )}
             {isAdmin && (
               <>
                 <li>
-                  <Link to="/admin" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-semibold transition-all ${location.pathname === '/admin' ? 'bg-white/10 text-blue-200 font-bold shadow' : 'hover:bg-white/5 text-white/90'}`}>
-                    <span className="text-xl">👤</span> User Management
+                  <Link to="/admin" className={`flex items-center gap-3 px-4 py-2.5 rounded-md font-medium text-sm transition-all ${location.pathname === '/admin' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    User Management
                   </Link>
                 </li>
                 <li>
-                  <Link to="/admin/documents" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-semibold transition-all ${location.pathname === '/admin/documents' ? 'bg-white/10 text-purple-200 font-bold shadow' : 'hover:bg-white/5 text-white/90'}`}>
-                    <span className="text-xl">📄</span> View All Documents
+                  <Link to="/admin/documents" className={`flex items-center gap-3 px-4 py-2.5 rounded-md font-medium text-sm transition-all ${location.pathname === '/admin/documents' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    All Documents
                   </Link>
                 </li>
               </>
             )}
           </ul>
-          <div className="border-t border-white/20 my-6"></div>
+          <div className="border-t border-slate-700 my-6 mx-2"></div>
         </nav>
-        <div className="flex flex-col items-center px-6 pb-2 mt-auto">
-          <div className="flex items-center gap-3 w-full mb-2">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 text-white font-bold text-lg">
+        <div className="flex flex-col px-3 pb-2 mt-auto">
+          <div className="flex items-center gap-3 w-full mb-3 bg-slate-800 rounded-md p-3">
+            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-600 text-white font-semibold text-sm">
               {user?.name?.[0] || 'U'}
             </div>
-            <div className="flex-1">
-              <div className="text-sm font-semibold text-white/90">{user?.name}</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-semibold text-white truncate">{user?.name}</div>
               {roleBadge && (
-                <span className="text-xs font-bold text-white/60">{roleBadge.text}</span>
+                <span className="text-xs text-slate-400">{roleBadge.text}</span>
               )}
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="w-full bg-white/10 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-white/20 transition-all"
+            className="w-full bg-slate-700 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-600 transition-all"
           >
             Logout
           </button>
@@ -92,15 +97,15 @@ export const Layout: React.FC = () => {
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-h-screen" style={{ marginLeft: '260px' }}>
         {/* Header */}
-        <header className="h-20 shadow-lg flex items-center px-8 justify-between border-b-2 border-blue-800/20" style={{ background: 'linear-gradient(to bottom, #312e81 0%, #3730a3 40%, #2563eb 100%)' }}>
-          <div className="flex items-center gap-4">
-            <span className="text-2xl font-extrabold text-white drop-shadow">E-Sign Platform</span>
-            <span className="text-base text-blue-100 font-medium">Professional e-signature solution</span>
+        <header className="h-16 shadow-sm flex items-center px-8 justify-between border-b border-slate-200 bg-white">
+          <div className="flex items-center gap-3">
+            <span className="text-lg font-bold text-slate-900">E-Sign Platform</span>
+            <span className="text-sm text-slate-500 font-medium">Professional e-signature solution</span>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-base font-semibold text-white">{user?.name}</span>
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-semibold text-slate-700">{user?.name}</span>
             {roleBadge && (
-              <span className={`px-3 py-1 rounded-full text-xs font-bold bg-blue-700 text-white shadow`}>{roleBadge.text}</span>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">{roleBadge.text}</span>
             )}
           </div>
         </header>

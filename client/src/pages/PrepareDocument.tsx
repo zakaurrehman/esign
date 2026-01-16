@@ -23,7 +23,7 @@ const DroppablePdfArea: React.FC<{ children: React.ReactNode }> = ({ children })
   });
 
   return (
-    <div ref={setNodeRef} className="pdf-drop-area overflow-auto max-h-[70vh] bg-gray-100 p-4 rounded">
+    <div ref={setNodeRef} className="pdf-drop-area overflow-auto max-h-[70vh] bg-slate-50 p-4 rounded-lg border border-slate-200">
       {children}
     </div>
   );
@@ -297,7 +297,7 @@ export const PrepareDocument: React.FC = () => {
       <div className="flex gap-6">
         {/* Left sidebar - Recipients & Fields */}
         <div className="w-72 flex-shrink-0 space-y-4">
-          <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
+          <Card size="md" variant="default">
             <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-t-2xl">
               <div className="flex justify-between items-center">
                 <h3 className="font-semibold text-[#22223b] font-sans">Recipients</h3>
@@ -338,7 +338,7 @@ export const PrepareDocument: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
+          <Card size="md" variant="default">
             <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-t-2xl">
               <h3 className="font-semibold text-[#22223b] font-sans">Signature Fields</h3>
             </CardHeader>
@@ -357,7 +357,7 @@ export const PrepareDocument: React.FC = () => {
 
         {/* Main content - PDF viewer */}
         <div className="flex-1">
-          <Card className="bg-white shadow-2xl rounded-2xl border border-slate-100">
+          <Card size="lg" variant="default">
             <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-t-2xl">
               <h2 className="text-lg font-semibold text-[#22223b] font-sans">{document.title}</h2>
             </CardHeader>

@@ -48,23 +48,22 @@ export const Modal: React.FC<ModalProps> = ({
           onClick={onClose}
         />
         <div
-          className={`relative w-full ${sizes[size]} bg-white/90 rounded-2xl shadow-2xl transform transition-all duration-300 border border-indigo-100`}
-          style={{backdropFilter: 'blur(8px)'}}
+          className={`relative w-full ${sizes[size]} bg-white rounded-lg shadow-xl transform transition-all duration-300 border border-slate-200`}
         >
           {title && (
-            <div className="flex items-center justify-between px-8 py-5 border-b border-indigo-100">
-              <h3 className="text-xl font-bold text-indigo-800 tracking-tight">{title}</h3>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+              <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
               <button
                 onClick={onClose}
-                className="text-indigo-400 hover:text-indigo-700 transition-colors"
+                className="text-slate-400 hover:text-slate-600 transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
           )}
-          <div className="px-6 py-4">{children}</div>
+          <div className="px-6 py-5">{children}</div>
         </div>
       </div>
     </div>

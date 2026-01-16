@@ -118,7 +118,7 @@ export const AdminPanel: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -127,26 +127,26 @@ export const AdminPanel: React.FC = () => {
     <div className="max-w-6xl mx-auto">
       <div className="mb-6 flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">User Management</h1>
-          <p className="text-slate-600 mt-2">Manage system users, managers, and their access</p>
+          <h1 className="text-2xl font-bold text-slate-900">User Management</h1>
+          <p className="text-sm text-slate-600 mt-1">Manage system users, managers, and their access</p>
         </div>
         <div className="flex gap-3">
           <Button
             onClick={() => navigate('/admin/documents')}
-            className="bg-indigo-600 hover:bg-indigo-700"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
           >
             View All Documents
           </Button>
-          <Button onClick={() => setShowCreateForm(!showCreateForm)} className="bg-gradient-to-r from-indigo-700 via-blue-600 to-blue-500 text-black font-bold shadow-lg hover:scale-105 hover:from-indigo-800 hover:to-blue-600 transition-transform border-0">
+          <Button onClick={() => setShowCreateForm(!showCreateForm)} className="bg-blue-600 hover:bg-blue-700 text-white font-semibold">
             {showCreateForm ? 'Cancel' : '+ Create User'}
           </Button>
         </div>
       </div>
 
       {showCreateForm && (
-        <Card className="mb-6 bg-white shadow-2xl rounded-2xl border border-slate-100">
-          <CardHeader className="bg-gradient-to-r from-indigo-50 to-violet-50 rounded-t-2xl">
-            <h2 className="text-xl font-bold text-[#22223b] font-sans">Create New User</h2>
+        <Card size="lg" variant="default" className="mb-6">
+          <CardHeader className="bg-blue-50">
+            <h2 className="text-lg font-bold text-slate-900">Create New User</h2>
           </CardHeader>
           <CardContent className="p-6 font-sans">
             <form onSubmit={handleCreateUser} className="space-y-4">
@@ -184,7 +184,7 @@ export const AdminPanel: React.FC = () => {
                   <select
                     value={newUser.role}
                     onChange={(e) => setNewUser({ ...newUser, role: e.target.value as UserRole, managerId: '' })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="USER">User</option>
                     <option value="MANAGER">Manager</option>
@@ -200,7 +200,7 @@ export const AdminPanel: React.FC = () => {
                   <select
                     value={newUser.managerId}
                     onChange={(e) => setNewUser({ ...newUser, managerId: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="">No Manager (Direct Send)</option>
                     {managers.map((manager) => (
@@ -242,19 +242,19 @@ export const AdminPanel: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="flex flex-row gap-4 mb-6 w-full">
-          <Card className="flex-1 min-w-[220px] max-w-[260px] h-32 bg-white rounded-2xl shadow-2xl border border-slate-100 flex flex-col items-center justify-center hover:shadow-2xl transition-all">
+          <Card size="md" variant="selectable" className="flex-1">
             <CardContent className="flex flex-col items-center justify-center font-sans p-0">
               <div className="text-4xl font-extrabold text-[#2563eb]">{users.filter(u => u.role === 'USER').length}</div>
               <div className="font-bold text-lg text-[#22223b] mt-2">Users</div>
             </CardContent>
           </Card>
-          <Card className="flex-1 min-w-[220px] max-w-[260px] h-32 bg-white rounded-2xl shadow-2xl border border-slate-100 flex flex-col items-center justify-center hover:shadow-2xl transition-all">
+          <Card size="md" variant="selectable" className="flex-1">
             <CardContent className="flex flex-col items-center justify-center font-sans p-0">
               <div className="text-4xl font-extrabold text-[#2563eb]">{users.filter(u => u.role === 'MANAGER').length}</div>
               <div className="font-bold text-lg text-[#22223b] mt-2">Managers</div>
             </CardContent>
           </Card>
-          <Card className="flex-1 min-w-[220px] max-w-[260px] h-32 bg-white rounded-2xl shadow-2xl border border-slate-100 flex flex-col items-center justify-center hover:shadow-2xl transition-all">
+          <Card size="md" variant="selectable" className="flex-1">
             <CardContent className="flex flex-col items-center justify-center font-sans p-0">
               <div className="text-4xl font-extrabold text-[#2563eb]">{users.filter(u => u.role === 'SUPER_ADMIN').length}</div>
               <div className="font-bold text-lg text-[#22223b] mt-2">Super Admins</div>
@@ -262,7 +262,7 @@ export const AdminPanel: React.FC = () => {
           </Card>
       </div>
 
-      <Card className="bg-white shadow-xl rounded-2xl">
+      <Card variant="default">
         <CardHeader className="bg-gradient-to-r from-indigo-50 to-violet-50 rounded-t-2xl">
           <h2 className="text-xl font-bold text-slate-900">All Users ({users.length})</h2>
         </CardHeader>

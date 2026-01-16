@@ -79,7 +79,7 @@ export default function TemplateManagement() {
         </p>
       </div>
 
-      <Card className="rounded-2xl bg-white shadow-2xl border border-slate-100">
+      <Card size="lg" variant="default">
         <CardHeader>
           <Input
             label="Template Name"
