@@ -35,6 +35,7 @@ export default function AllDocuments() {
   const [showDeleted, setShowDeleted] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchDocuments();
@@ -52,6 +53,30 @@ export default function AllDocuments() {
       console.error('Error fetching documents:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    if (!confirm('Are you sure you want to DELETE ALL DOCUMENTS? This action cannot be undone!')) {
+      return;
+    }
+    if (!confirm('This will permanently delete ALL documents, recipients, fields, and audit logs. Are you ABSOLUTELY sure?')) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_URL}/api/documents/admin/all`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert('All documents deleted successfully');
+      fetchDocuments();
+    } catch (error) {
+      console.error('Error deleting all documents:', error);
+      alert('Failed to delete all documents');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -84,9 +109,18 @@ export default function AllDocuments() {
 
   return (
     <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 py-4">
-        <div className="mb-4">
-          <h2 className="text-3xl font-extrabold text-[#22223b] font-sans mb-1">All Documents</h2>
-          <p className="text-[#2563eb] font-sans text-base">View and manage all documents from all users</p>
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h2 className="text-3xl font-extrabold text-[#22223b] font-sans mb-1">All Documents</h2>
+            <p className="text-[#2563eb] font-sans text-base">View and manage all documents from all users</p>
+          </div>
+          <button
+            onClick={handleDeleteAll}
+            disabled={isDeleting}
+            className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2.5 rounded-lg transition-all disabled:opacity-50"
+          >
+            {isDeleting ? 'Deleting...' : 'Delete All Documents'}
+          </button>
         </div>
 
         {/* Filters */}

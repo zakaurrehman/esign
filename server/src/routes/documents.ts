@@ -13,6 +13,7 @@ import {
   getDocument,
   updateDocument,
   deleteDocument,
+  deleteAllDocuments,
   getPdf,
   addRecipient,
   updateRecipient,
@@ -84,6 +85,7 @@ const uploadDoc = multer({
 // Document routes
 router.get('/', auth, listDocuments);
 router.get('/admin/all', auth, listAllDocuments); // Super Admin: view all documents
+router.delete('/admin/all', auth, deleteAllDocuments); // Super Admin: delete all documents
 router.get('/pending-approvals', auth, getPendingApprovals); // Manager: get pending approvals
 router.get('/team', auth, getTeamDocuments); // Manager: get team documents
 router.post('/convert-doc', auth, uploadDoc.single('file'), convertDocToHtml);

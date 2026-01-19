@@ -966,3 +966,23 @@ export const convertDocToHtml = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({ error: 'Failed to convert document' });
   }
 };
+
+// Admin only: Delete all documents
+export const deleteAllDocuments = async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user!.role !== 'SUPER_ADMIN') {
+      return res.status(403).json({ error: 'Only super admins can delete all documents' });
+    }
+
+    // Delete all related data first (due to foreign key constraints)
+    await prisma.auditLog.deleteMany({});
+    await prisma.signatureField.deleteMany({});
+    await prisma.recipient.deleteMany({});
+    await prisma.document.deleteMany({});
+
+    return res.json({ message: 'All documents deleted successfully' });
+  } catch (error) {
+    console.error('Delete all documents error:', error);
+    return res.status(500).json({ error: 'Failed to delete all documents' });
+  }
+};
