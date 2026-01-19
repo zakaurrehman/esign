@@ -141,26 +141,26 @@ export const Dashboard: React.FC = () => {
   return (
     <div>
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 flex flex-col items-center justify-center hover:shadow-md transition-all">
-          <span className="text-3xl font-bold text-blue-600">{completedCount}</span>
-          <span className="font-semibold text-slate-900 mt-2">Completed</span>
-          <span className="text-xs text-slate-500 mt-1 text-center">All finished documents</span>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div className="bg-white rounded-xl shadow-md border-2 border-blue-100 p-6 flex flex-col items-center justify-center hover:shadow-lg hover:border-blue-200 transition-all">
+          <span className="text-4xl font-bold text-blue-600">{completedCount}</span>
+          <span className="font-bold text-slate-800 mt-3 text-base">Completed</span>
+          <span className="text-sm text-slate-500 mt-1 text-center">All finished documents</span>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 flex flex-col items-center justify-center hover:shadow-md transition-all">
-          <span className="text-3xl font-bold text-orange-600">{actionRequiredCount}</span>
-          <span className="font-semibold text-slate-900 mt-2">Action Required</span>
-          <span className="text-xs text-slate-500 mt-1 text-center">Needs your attention</span>
+        <div className="bg-white rounded-xl shadow-md border-2 border-orange-100 p-6 flex flex-col items-center justify-center hover:shadow-lg hover:border-orange-200 transition-all">
+          <span className="text-4xl font-bold text-orange-600">{actionRequiredCount}</span>
+          <span className="font-bold text-slate-800 mt-3 text-base">Action Required</span>
+          <span className="text-sm text-slate-500 mt-1 text-center">Needs your attention</span>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 flex flex-col items-center justify-center hover:shadow-md transition-all">
-          <span className="text-3xl font-bold text-purple-600">{waitingCount}</span>
-          <span className="font-semibold text-slate-900 mt-2">Waiting for Others</span>
-          <span className="text-xs text-slate-500 mt-1 text-center">Pending manager approval</span>
+        <div className="bg-white rounded-xl shadow-md border-2 border-purple-100 p-6 flex flex-col items-center justify-center hover:shadow-lg hover:border-purple-200 transition-all">
+          <span className="text-4xl font-bold text-purple-600">{waitingCount}</span>
+          <span className="font-bold text-slate-800 mt-3 text-base">Waiting for Others</span>
+          <span className="text-sm text-slate-500 mt-1 text-center">Pending manager approval</span>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 flex flex-col items-center justify-center hover:shadow-md transition-all">
-          <span className="text-3xl font-bold text-red-600">{expiringCount}</span>
-          <span className="font-semibold text-slate-900 mt-2">Expiring Soon</span>
-          <span className="text-xs text-slate-500 mt-1 text-center">Expiring documents</span>
+        <div className="bg-white rounded-xl shadow-md border-2 border-red-100 p-6 flex flex-col items-center justify-center hover:shadow-lg hover:border-red-200 transition-all">
+          <span className="text-4xl font-bold text-red-600">{expiringCount}</span>
+          <span className="font-bold text-slate-800 mt-3 text-base">Expiring Soon</span>
+          <span className="text-sm text-slate-500 mt-1 text-center">Expiring documents</span>
         </div>
       </div>
 

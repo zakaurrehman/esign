@@ -80,19 +80,19 @@ export const Layout: React.FC = () => {
         </nav>
         <div className="flex flex-col px-4 pb-4 mt-auto gap-3">
           <div className="flex items-center gap-3 w-full bg-slate-700 rounded-lg p-3">
-            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-500 text-white font-bold text-sm flex-shrink-0">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white font-bold text-base flex-shrink-0">
               {user?.name?.[0] || 'U'}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-white truncate">{user?.name}</div>
+              <div className="text-sm font-semibold text-slate-300 truncate">{user?.name}</div>
               {roleBadge && (
-                <span className="text-xs text-slate-200">{roleBadge.text}</span>
+                <span className="text-xs text-slate-400">{roleBadge.text}</span>
               )}
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="w-full bg-red-600 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-red-700 transition-all"
+            className="w-full bg-red-600 text-white px-4 py-3.5 rounded-lg text-sm font-semibold hover:bg-red-700 transition-all"
           >
             Logout
           </button>
