@@ -226,69 +226,65 @@ export const Dashboard: React.FC = () => {
       )}
 
       {/* My Documents Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">My Documents</h1>
-          <p className="text-sm text-slate-600 mt-1">Manage and track all your signature documents</p>
+      <div className="bg-white rounded-xl border-2 border-slate-200 p-6 mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <div>
+            <h1 className="text-xl font-bold text-slate-900">My Documents</h1>
+            <p className="text-sm text-slate-500 mt-1">Manage and track all your signature documents</p>
+          </div>
+          <Link to="/create">
+            <Button size="md" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5">
+              + Create Document
+            </Button>
+          </Link>
         </div>
-        <Link to="/create">
-          <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold">
-            + Create Document
-          </Button>
-        </Link>
-      </div>
 
-      {documents.length === 0 ? (
-        <Card variant="default" size="lg">
-          <CardContent className="text-center py-12">
-            <div className="bg-blue-100 w-20 h-20 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <svg className="h-10 w-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {documents.length === 0 ? (
+          <div className="text-center py-12 bg-slate-50 rounded-xl border border-slate-200">
+            <div className="bg-blue-100 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <svg className="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-slate-900">No documents yet</h3>
-            <p className="mt-2 text-sm text-slate-600 max-w-sm mx-auto">Get started by creating your first document. You can write your own or upload an existing PDF.</p>
-            <div className="mt-6">
+            <h3 className="text-lg font-bold text-slate-900">No documents yet</h3>
+            <p className="mt-2 text-sm text-slate-500 max-w-sm mx-auto">Get started by creating your first document.</p>
+            <div className="mt-5">
               <Link to="/create">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+                <Button size="md" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold">
                   Create Your First Document
                 </Button>
               </Link>
             </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {documents.map((doc) => (
-            <Card key={doc.id} variant="selectable" size="lg" className="hover:shadow-md transition-all">
-              <CardContent className="py-5 px-5 flex flex-col h-full justify-between">
-                <div>
-                  <div className="flex items-start gap-2 mb-2">
-                    <h3 className="text-base font-bold text-slate-900 flex-1 line-clamp-2">{doc.title}</h3>
-                    <span className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap flex-shrink-0 ${statusColors[doc.status] || statusColors.DRAFT}`}>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {documents.map((doc) => (
+              <div key={doc.id} className="bg-slate-50 rounded-xl border border-slate-200 p-5 hover:border-blue-300 hover:shadow-md transition-all flex flex-col h-full min-h-[200px]">
+                <div className="flex-1">
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <h3 className="text-sm font-bold text-slate-900 line-clamp-2 flex-1">{doc.title}</h3>
+                    <span className={`px-2.5 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${statusColors[doc.status] || statusColors.DRAFT}`}>
                       {statusLabels[doc.status] || doc.status}
                     </span>
                   </div>
-                  <div className="mb-3 text-xs text-slate-600 space-y-0.5">
-                    <div>{doc.documentType === 'WRITTEN' ? 'Written' : 'Uploaded'} • {doc.recipients?.length || 0} recipient(s) • {new Date(doc.createdAt).toLocaleDateString()}</div>
+                  <div className="text-xs text-slate-500 mb-4">
+                    {doc.documentType === 'WRITTEN' ? 'Written' : 'Uploaded'} • {doc.recipients?.length || 0} recipient(s) • {new Date(doc.createdAt).toLocaleDateString()}
                   </div>
                   {/* Manager Feedback for Denied Documents */}
                   {doc.status === 'DENIED' && doc.managerFeedback && (
-                    <div className="mt-3 bg-red-50 border border-red-200 rounded-md p-2.5">
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
                       <p className="text-xs font-semibold text-red-800 mb-1">Manager Feedback:</p>
                       <p className="text-xs text-red-700 line-clamp-2">{doc.managerFeedback}</p>
                     </div>
                   )}
                   {/* Pending Approval Info */}
                   {doc.status === 'PENDING_APPROVAL' && (
-                    <div className="mt-3 bg-orange-50 border border-orange-200 rounded-md p-2.5">
-                      <p className="text-xs text-orange-700">
-                        Waiting for manager approval before being sent to recipients.
-                      </p>
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
+                      <p className="text-xs text-orange-700">Awaiting manager approval</p>
                     </div>
                   )}
                 </div>
-                <div className="flex items-center gap-2 mt-4">
+                <div className="flex items-center gap-2 mt-auto pt-3 border-t border-slate-200">
                   {doc.status === 'DRAFT' && (
                     <>
                       <Link to={`/prepare/${doc.id}`} className="flex-1">
@@ -324,11 +320,11 @@ export const Dashboard: React.FC = () => {
                     </Link>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Deny Modal */}
       <Modal
