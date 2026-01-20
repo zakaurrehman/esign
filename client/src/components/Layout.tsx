@@ -79,14 +79,14 @@ export const Layout: React.FC = () => {
           <div className="border-t border-slate-700 my-6"></div>
         </nav>
         <div className="flex flex-col px-4 pb-4 mt-auto gap-3">
-          <div className="flex items-center gap-3 w-full bg-slate-700 rounded-lg p-3">
+          <div className="flex items-center gap-3 w-full bg-slate-800 rounded-lg p-3 border border-slate-600">
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white font-bold text-base flex-shrink-0">
               {user?.name?.[0] || 'U'}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-slate-300 truncate">{user?.name}</div>
+              <div className="text-sm font-semibold text-white truncate">{user?.name}</div>
               {roleBadge && (
-                <span className="text-xs text-slate-400">{roleBadge.text}</span>
+                <span className="text-xs text-blue-300">{roleBadge.text}</span>
               )}
             </div>
           </div>
