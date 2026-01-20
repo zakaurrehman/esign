@@ -89,6 +89,18 @@ app.get('/init-db', async (req: Request, res: Response) => {
       console.log('pdfData column may already exist or error:', e);
     }
 
+    try {
+      await prisma.$executeRaw`ALTER TABLE "Document" ADD COLUMN IF NOT EXISTS "emailSubject" TEXT`;
+    } catch (e) {
+      console.log('emailSubject column may already exist or error:', e);
+    }
+
+    try {
+      await prisma.$executeRaw`ALTER TABLE "Document" ADD COLUMN IF NOT EXISTS "emailMessage" TEXT`;
+    } catch (e) {
+      console.log('emailMessage column may already exist or error:', e);
+    }
+
     // Create super admin if doesn't exist
     const existingAdmin = await prisma.user.findUnique({
       where: { email: 'management@hiredbillingsupport.com' }
