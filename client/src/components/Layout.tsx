@@ -92,7 +92,7 @@ export const Layout: React.FC = () => {
           </div>
           <button
             onClick={handleLogout}
-            className="w-full bg-red-600 text-white px-4 py-3.5 rounded-lg text-sm font-semibold hover:bg-red-700 transition-all"
+            className="w-full bg-red-600 text-white px-4 py-4 rounded-lg text-base font-semibold hover:bg-red-700 transition-all"
           >
             Logout
           </button>
