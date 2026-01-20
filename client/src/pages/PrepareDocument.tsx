@@ -42,6 +42,9 @@ export const PrepareDocument: React.FC = () => {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string>('');
   const [, setPageCount] = useState(1);
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailMessage, setEmailMessage] = useState('');
   
   // Track mouse position globally for accurate drop positioning
   const mousePosition = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -253,8 +256,7 @@ export const PrepareDocument: React.FC = () => {
     }
   };
 
-  const handleSend = async () => {
-    if (!id) return;
+  const openSendModal = () => {
     if (!document?.recipients?.length) {
       toast.error('Please add at least one recipient');
       return;
@@ -263,15 +265,27 @@ export const PrepareDocument: React.FC = () => {
       toast.error('Please add at least one signature field');
       return;
     }
+    // Set default subject
+    setEmailSubject(`Please sign: ${document.title}`);
+    setEmailMessage('');
+    setShowSendModal(true);
+  };
+
+  const handleSend = async () => {
+    if (!id) return;
 
     setIsSending(true);
     try {
-      const response = await documentApi.send(id);
+      const response = await documentApi.send(id, {
+        emailSubject: emailSubject || `Please sign: ${document?.title}`,
+        emailMessage: emailMessage || ''
+      });
       if (response.data.requiresApproval) {
         toast.success('Document sent to your manager for approval!', { duration: 5000 });
       } else {
         toast.success('Document sent for signing!');
       }
+      setShowSendModal(false);
       navigate('/');
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Failed to send document');
@@ -350,7 +364,7 @@ export const PrepareDocument: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Button className="w-full shadow-lg" onClick={handleSend} isLoading={isSending}>
+          <Button className="w-full shadow-lg" onClick={openSendModal}>
             Send for Signing
           </Button>
         </div>
@@ -444,6 +458,58 @@ export const PrepareDocument: React.FC = () => {
               Cancel
             </Button>
             <Button onClick={handleAddRecipient}>Add Recipient</Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Send Document Modal */}
+      <Modal
+        isOpen={showSendModal}
+        onClose={() => setShowSendModal(false)}
+        title="Send for Signing"
+      >
+        <div className="space-y-5">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Subject <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={emailSubject}
+              onChange={(e) => setEmailSubject(e.target.value.slice(0, 100))}
+              placeholder="Please sign this document"
+              className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              maxLength={100}
+            />
+            <p className="text-xs text-slate-500 mt-1 text-right">{emailSubject.length}/100</p>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Message
+            </label>
+            <textarea
+              value={emailMessage}
+              onChange={(e) => setEmailMessage(e.target.value.slice(0, 10000))}
+              placeholder="Enter a message for the recipients..."
+              rows={5}
+              className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
+              maxLength={10000}
+            />
+            <p className="text-xs text-slate-500 mt-1 text-right">{emailMessage.length}/10000</p>
+          </div>
+          <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+            <p className="text-sm text-slate-600">
+              <span className="font-semibold">Recipients:</span>{' '}
+              {document?.recipients?.map(r => r.name).join(', ')}
+            </p>
+          </div>
+          <div className="flex justify-end space-x-3 pt-2">
+            <Button variant="secondary" onClick={() => setShowSendModal(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSend} isLoading={isSending}>
+              Send Document
+            </Button>
           </div>
         </div>
       </Modal>

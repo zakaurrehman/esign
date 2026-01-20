@@ -55,7 +55,8 @@ export const documentApi = {
   delete: (id: string) => api.delete(`/api/documents/${id}`),
   getPdfUrl: (id: string) => `${API_URL}/api/documents/${id}/pdf`,
   generatePdf: (id: string) => api.post(`/api/documents/${id}/generate-pdf`),
-  send: (id: string) => api.post(`/api/documents/${id}/send`),
+  send: (id: string, data?: { emailSubject?: string; emailMessage?: string }) =>
+    api.post(`/api/documents/${id}/send`, data || {}),
   void: (id: string) => api.post(`/api/documents/${id}/void`),
   getAudit: (id: string) => api.get(`/api/documents/${id}/audit`)
 };

@@ -494,6 +494,8 @@ export const deleteField = async (req: AuthRequest, res: Response) => {
 
 export const sendDocument = async (req: AuthRequest, res: Response) => {
   try {
+    const { emailSubject, emailMessage } = req.body || {};
+
     const document = await prisma.document.findFirst({
       where: { id: req.params.id, userId: req.user!.id },
       include: { recipients: true, fields: true, user: true }
@@ -529,10 +531,12 @@ export const sendDocument = async (req: AuthRequest, res: Response) => {
       // User has a manager - send for approval first
       await prisma.document.update({
         where: { id: document.id },
-        data: { 
+        data: {
           status: 'PENDING_APPROVAL',
           approvalStatus: 'PENDING',
-          managerFeedback: null // Clear any previous feedback
+          managerFeedback: null, // Clear any previous feedback
+          emailSubject: emailSubject || null,
+          emailMessage: emailMessage || null
         }
       });
 
@@ -569,7 +573,7 @@ export const sendDocument = async (req: AuthRequest, res: Response) => {
     }
 
     // No manager assigned or user is Manager/Admin - send directly
-    await sendDocumentToRecipients(document, req.user!);
+    await sendDocumentToRecipients(document, req.user!, emailSubject, emailMessage);
 
     return res.json({ message: 'Document sent for signing' });
   } catch (error) {
@@ -579,13 +583,15 @@ export const sendDocument = async (req: AuthRequest, res: Response) => {
 };
 
 // Helper function to send document to recipients
-async function sendDocumentToRecipients(document: any, user: any) {
+async function sendDocumentToRecipients(document: any, user: any, emailSubject?: string, emailMessage?: string) {
   // Update document status
   await prisma.document.update({
     where: { id: document.id },
-    data: { 
+    data: {
       status: 'PENDING',
-      approvalStatus: 'APPROVED'
+      approvalStatus: 'APPROVED',
+      emailSubject: emailSubject || null,
+      emailMessage: emailMessage || null
     }
   });
 
@@ -600,16 +606,27 @@ async function sendDocumentToRecipients(document: any, user: any) {
   const firstRecipients = document.recipients.filter((r: any) => r.signingOrder === minOrder);
   for (const recipient of firstRecipients) {
     const signingUrl = `${process.env.FRONTEND_URL}/sign/${document.id}/${recipient.accessToken}`;
-    const emailHtml = generateSigningEmail(
-      recipient.name,
-      document.title,
-      signingUrl,
-      user.name
-    );
+
+    // Build custom email HTML with optional message
+    let emailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #1e293b;">Signature Request</h2>
+        <p>Hello ${recipient.name},</p>
+        <p><strong>${user.name}</strong> has requested your signature on the document: <strong>${document.title}</strong></p>
+        ${emailMessage ? `
+        <div style="background: #f8fafc; border-left: 4px solid #3b82f6; padding: 16px; margin: 20px 0;">
+          <p style="margin: 0; color: #475569; white-space: pre-wrap;">${emailMessage}</p>
+        </div>
+        ` : ''}
+        <p>Please click the button below to review and sign the document:</p>
+        <a href="${signingUrl}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0;">Review & Sign</a>
+        <p style="color: #64748b; font-size: 14px; margin-top: 24px;">If you have any questions, please contact the sender directly.</p>
+      </div>
+    `;
 
     await sendEmail({
       to: recipient.email,
-      subject: `Signature Request: ${document.title}`,
+      subject: emailSubject || `Signature Request: ${document.title}`,
       html: emailHtml
     }).catch(err => console.error('Failed to send email to', recipient.email, err));
   }

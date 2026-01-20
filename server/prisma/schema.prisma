@@ -39,6 +39,8 @@ model Document {
   reviewedById     String?        // Manager who reviewed
   reviewedBy       User?          @relation("ManagerReviews", fields: [reviewedById], references: [id])
   reviewedAt       DateTime?      // When it was reviewed
+  emailSubject     String?        // Custom email subject for recipients
+  emailMessage     String?        @db.Text // Custom email message for recipients
   expiresAt        DateTime?
   completedAt      DateTime?
   userId           String
