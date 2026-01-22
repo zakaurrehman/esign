@@ -302,9 +302,12 @@ export const Dashboard: React.FC = () => {
                     </>
                   )}
                   {doc.status === 'PENDING_APPROVAL' && (
-                    <Link to={`/document/${doc.id}`} className="w-full">
-                      <Button variant="secondary" size="sm" className="w-full">View</Button>
-                    </Link>
+                    <>
+                      <Link to={`/document/${doc.id}`} className="flex-1">
+                        <Button variant="secondary" size="sm" className="w-full">View</Button>
+                      </Link>
+                      <Button variant="danger" size="sm" onClick={() => handleDelete(doc.id)}>Delete</Button>
+                    </>
                   )}
                   {(doc.status === 'PENDING' || doc.status === 'IN_PROGRESS') && (
                     <>
@@ -312,12 +315,24 @@ export const Dashboard: React.FC = () => {
                         <Button variant="secondary" size="sm" className="w-full">View</Button>
                       </Link>
                       <Button variant="danger" size="sm" onClick={() => handleVoid(doc.id)}>Void</Button>
+                      <Button variant="danger" size="sm" onClick={() => handleDelete(doc.id)}>Delete</Button>
                     </>
                   )}
                   {doc.status === 'COMPLETED' && (
-                    <Link to={`/document/${doc.id}`} className="w-full">
-                      <Button variant="secondary" size="sm" className="w-full">View</Button>
-                    </Link>
+                    <>
+                      <Link to={`/document/${doc.id}`} className="flex-1">
+                        <Button variant="secondary" size="sm" className="w-full">View</Button>
+                      </Link>
+                      <Button variant="danger" size="sm" onClick={() => handleDelete(doc.id)}>Delete</Button>
+                    </>
+                  )}
+                  {doc.status === 'VOIDED' && (
+                    <>
+                      <Link to={`/document/${doc.id}`} className="flex-1">
+                        <Button variant="secondary" size="sm" className="w-full">View</Button>
+                      </Link>
+                      <Button variant="danger" size="sm" onClick={() => handleDelete(doc.id)}>Delete</Button>
+                    </>
                   )}
                 </div>
               </div>
