@@ -60,6 +60,7 @@ model Recipient {
   document       Document        @relation(fields: [documentId], references: [id], onDelete: Cascade)
   name           String
   email          String
+  role           String          @default("SIGNER") // SIGNER, VIEWER, APPROVER, CC
   signingOrder   Int             @default(1)
   accessToken    String          @unique @default(uuid())
   tokenExpiresAt DateTime?

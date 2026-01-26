@@ -48,6 +48,7 @@ export interface Recipient {
   documentId: string;
   name: string;
   email: string;
+  role: 'SIGNER' | 'VIEWER' | 'APPROVER' | 'CC';
   signingOrder: number;
   accessToken: string;
   status: RecipientStatus;

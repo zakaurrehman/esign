@@ -101,6 +101,12 @@ app.get('/init-db', async (req: Request, res: Response) => {
       console.log('emailMessage column may already exist or error:', e);
     }
 
+    try {
+      await prisma.$executeRaw`ALTER TABLE "Recipient" ADD COLUMN IF NOT EXISTS "role" TEXT DEFAULT 'SIGNER'`;
+    } catch (e) {
+      console.log('role column may already exist or error:', e);
+    }
+
     // Create super admin if doesn't exist
     const existingAdmin = await prisma.user.findUnique({
       where: { email: 'management@hiredbillingsupport.com' }

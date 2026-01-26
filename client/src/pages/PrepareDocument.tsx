@@ -37,7 +37,7 @@ export const PrepareDocument: React.FC = () => {
   const [selectedRecipientId, setSelectedRecipientId] = useState<string | null>(null);
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const [showAddRecipient, setShowAddRecipient] = useState(false);
-  const [newRecipient, setNewRecipient] = useState({ name: '', email: '' });
+  const [newRecipient, setNewRecipient] = useState({ name: '', email: '', role: 'SIGNER' });
   const [isSending, setIsSending] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string>('');
@@ -98,10 +98,11 @@ export const PrepareDocument: React.FC = () => {
       await recipientApi.add(id, {
         name: newRecipient.name,
         email: newRecipient.email,
+        role: newRecipient.role,
         signingOrder: (document?.recipients?.length || 0) + 1
       });
       toast.success('Recipient added');
-      setNewRecipient({ name: '', email: '' });
+      setNewRecipient({ name: '', email: '', role: 'SIGNER' });
       setShowAddRecipient(false);
       fetchDocument();
     } catch (error: any) {
@@ -335,6 +336,19 @@ export const PrepareDocument: React.FC = () => {
                       <div>
                         <div className="font-medium text-sm">{recipient.name}</div>
                         <div className="text-xs text-gray-500">{recipient.email}</div>
+                        <div className="text-xs mt-1">
+                          <span className={`px-2 py-0.5 rounded-full ${
+                            recipient.role === 'SIGNER' ? 'bg-blue-100 text-blue-700' :
+                            recipient.role === 'VIEWER' ? 'bg-gray-100 text-gray-700' :
+                            recipient.role === 'APPROVER' ? 'bg-purple-100 text-purple-700' :
+                            'bg-green-100 text-green-700'
+                          }`}>
+                            {recipient.role === 'SIGNER' ? 'Needs to Sign' :
+                             recipient.role === 'VIEWER' ? 'Needs to View' :
+                             recipient.role === 'APPROVER' ? 'Needs to Approve' :
+                             recipient.role === 'CC' ? 'Receives a Copy' : recipient.role}
+                          </span>
+                        </div>
                       </div>
                       <button
                         onClick={(e) => {
@@ -453,6 +467,19 @@ export const PrepareDocument: React.FC = () => {
             onChange={(e) => setNewRecipient({ ...newRecipient, email: e.target.value })}
             placeholder="john@example.com"
           />
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Role</label>
+            <select
+              value={newRecipient.role}
+              onChange={(e) => setNewRecipient({ ...newRecipient, role: e.target.value })}
+              className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+            >
+              <option value="SIGNER">Needs to Sign</option>
+              <option value="VIEWER">Needs to View</option>
+              <option value="APPROVER">Needs to Approve</option>
+              <option value="CC">Receives a Copy</option>
+            </select>
+          </div>
           <div className="flex justify-end space-x-2">
             <Button variant="secondary" onClick={() => setShowAddRecipient(false)}>
               Cancel

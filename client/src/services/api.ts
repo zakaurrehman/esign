@@ -63,9 +63,9 @@ export const documentApi = {
 
 // Recipients
 export const recipientApi = {
-  add: (documentId: string, data: { name: string; email: string; signingOrder?: number }) =>
+  add: (documentId: string, data: { name: string; email: string; role?: string; signingOrder?: number }) =>
     api.post(`/api/documents/${documentId}/recipients`, data),
-  update: (recipientId: string, data: { name?: string; email?: string; signingOrder?: number }) =>
+  update: (recipientId: string, data: { name?: string; email?: string; role?: string; signingOrder?: number }) =>
     api.put(`/api/documents/recipients/${recipientId}`, data),
   delete: (recipientId: string) =>
     api.delete(`/api/documents/recipients/${recipientId}`)
