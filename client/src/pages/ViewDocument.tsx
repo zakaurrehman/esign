@@ -14,12 +14,41 @@ const statusColors: Record<string, string> = {
   VOIDED: 'bg-red-100 text-red-800'
 };
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 export const ViewDocument: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [document, setDocument] = useState<Document | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [pdfUrl, setPdfUrl] = useState<string>('');
+
+  const handleDownload = async () => {
+    if (!id) return;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/documents/${id}/pdf`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to download');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = window.document.createElement('a');
+      a.href = url;
+      a.download = `${document?.title || 'document'}.pdf`;
+      window.document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      window.document.body.removeChild(a);
+      toast.success('Document downloaded');
+    } catch (error) {
+      toast.error('Failed to download document');
+    }
+  };
 
   const fetchDocument = useCallback(async () => {
     if (!id) return;
@@ -57,10 +86,15 @@ export const ViewDocument: React.FC = () => {
 
   return (
     <div>
-      <div className="mb-6">
+      <div className="mb-6 flex items-center gap-4">
         <Button variant="secondary" onClick={() => navigate('/')}>
           ← Back to Dashboard
         </Button>
+        {document.status === 'COMPLETED' && (
+          <Button variant="primary" onClick={handleDownload}>
+            Download PDF
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
