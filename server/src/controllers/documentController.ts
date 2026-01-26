@@ -306,7 +306,7 @@ export const getPdf = async (req: AuthRequest, res: Response) => {
 
 export const addRecipient = async (req: AuthRequest, res: Response) => {
   try {
-    const { name, email, signingOrder } = req.body as AddRecipientInput;
+    const { name, email, role, signingOrder } = req.body;
 
     const document = await prisma.document.findFirst({
       where: { id: req.params.id, userId: req.user!.id }
@@ -325,6 +325,7 @@ export const addRecipient = async (req: AuthRequest, res: Response) => {
         documentId: document.id,
         name,
         email,
+        role: role || 'SIGNER',
         signingOrder: signingOrder || 1,
         tokenExpiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
       }
@@ -339,7 +340,7 @@ export const addRecipient = async (req: AuthRequest, res: Response) => {
 
 export const updateRecipient = async (req: AuthRequest, res: Response) => {
   try {
-    const { name, email, signingOrder } = req.body;
+    const { name, email, role, signingOrder } = req.body;
 
     const recipient = await prisma.recipient.findFirst({
       where: { id: req.params.recipientId },
@@ -356,7 +357,7 @@ export const updateRecipient = async (req: AuthRequest, res: Response) => {
 
     const updated = await prisma.recipient.update({
       where: { id: req.params.recipientId },
-      data: { name, email, signingOrder }
+      data: { name, email, role, signingOrder }
     });
 
     return res.json({ recipient: updated });
