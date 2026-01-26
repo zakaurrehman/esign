@@ -236,10 +236,6 @@ export const deleteDocument = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'Document not found' });
     }
 
-    if (existing.status !== 'DRAFT') {
-      return res.status(400).json({ error: 'Can only delete draft documents' });
-    }
-
     // Soft delete - mark as deleted with timestamp and user email
     await prisma.document.update({
       where: { id: req.params.id },
