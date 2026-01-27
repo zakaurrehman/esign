@@ -4,11 +4,21 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
-const prismaClient = global.prisma || new PrismaClient();
+// Lazy initialization for serverless environments
+let prismaClient: PrismaClient;
 
-if (process.env.NODE_ENV !== 'production') {
-  global.prisma = prismaClient;
-}
+const getPrismaClient = () => {
+  if (!prismaClient) {
+    prismaClient = global.prisma || new PrismaClient({
+      log: ['error'],
+    });
+    global.prisma = prismaClient;
+  }
+  return prismaClient;
+};
+
+// Initialize on first import
+prismaClient = getPrismaClient();
 
 // Support both named and default imports
 export const prisma = prismaClient;

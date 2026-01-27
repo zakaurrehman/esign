@@ -1,13 +1,16 @@
 import { Request, Response } from 'express';
 import * as bcryptModule from 'bcryptjs';
 import * as jwtModule from 'jsonwebtoken';
-import prisma from '../lib/prisma';
+import { PrismaClient } from '@prisma/client';
 import { RegisterInput, LoginInput } from '../schemas/auth';
 import { AuthRequest } from '../middleware/auth';
 
 // Handle both ESM and CommonJS module formats
 const bcrypt = (bcryptModule as any).default || bcryptModule;
 const jwt = (jwtModule as any).default || jwtModule;
+
+// Create a fresh Prisma client for auth operations
+const prisma = new PrismaClient();
 
 // Admin-only user creation endpoint
 export const createUser = async (req: AuthRequest, res: Response) => {
@@ -74,7 +77,12 @@ export const login = async (req: Request, res: Response) => {
       user = await prisma.user.findUnique({ where: { email } });
     } catch (dbError: any) {
       console.error('Database error during login:', dbError);
-      return res.status(500).json({ error: 'Database error', details: dbError.message });
+      return res.status(500).json({
+        error: 'Database error',
+        details: dbError.message,
+        code: dbError.code,
+        meta: dbError.meta
+      });
     }
 
     if (!user) {
