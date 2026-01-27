@@ -107,6 +107,12 @@ app.get('/init-db', async (req: Request, res: Response) => {
       console.log('role column may already exist or error:', e);
     }
 
+    try {
+      await prisma.$executeRaw`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "isActive" BOOLEAN DEFAULT true`;
+    } catch (e) {
+      console.log('isActive column may already exist or error:', e);
+    }
+
     // Create super admin if doesn't exist
     const existingAdmin = await prisma.user.findUnique({
       where: { email: 'management@hiredbillingsupport.com' }

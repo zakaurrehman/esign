@@ -66,6 +66,11 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    // Check if user is active
+    if ((user as any).isActive === false) {
+      return res.status(401).json({ error: 'Your account has been deactivated. Please contact administrator.' });
+    }
+
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -106,22 +111,33 @@ export const logout = async (req: Request, res: Response) => {
 export const listUsers = async (req: AuthRequest, res: Response) => {
   try {
     const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        managerId: true,
-        manager: {
-          select: { id: true, name: true, email: true }
-        },
-        createdAt: true,
-        _count: { select: { documents: true, managedUsers: true } }
-      },
       orderBy: { createdAt: 'desc' }
     });
 
-    return res.json({ users });
+    // Map users with isActive field (default true if not exists)
+    const usersWithStatus = users.map((user: any) => ({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      isActive: user.isActive ?? true,
+      managerId: user.managerId,
+      createdAt: user.createdAt
+    }));
+
+    // Get manager info and counts separately
+    const usersWithDetails = await Promise.all(usersWithStatus.map(async (user: any) => {
+      const details = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: {
+          manager: { select: { id: true, name: true, email: true } },
+          _count: { select: { documents: true, managedUsers: true } }
+        }
+      });
+      return { ...user, manager: details?.manager, _count: details?._count };
+    }));
+
+    return res.json({ users: usersWithDetails });
   } catch (error) {
     console.error('List users error:', error);
     return res.status(500).json({ error: 'Failed to list users' });
@@ -149,11 +165,11 @@ export const getManagers = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// Update user (for changing manager assignment)
+// Update user (for changing profile, role, status, etc.)
 export const updateUser = async (req: AuthRequest, res: Response) => {
   try {
     const { userId } = req.params;
-    const { name, role, managerId } = req.body;
+    const { name, email, password, role, managerId, isActive } = req.body;
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
@@ -164,6 +180,14 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Cannot modify super admin' });
     }
 
+    // Check if email is being changed and if it's already taken
+    if (email && email !== user.email) {
+      const existingUser = await prisma.user.findUnique({ where: { email } });
+      if (existingUser) {
+        return res.status(400).json({ error: 'Email already in use' });
+      }
+    }
+
     // Validate manager if provided
     if (managerId) {
       const manager = await prisma.user.findUnique({ where: { id: managerId } });
@@ -172,13 +196,26 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
       }
     }
 
+    // Build update data
+    const updateData: any = {};
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (role !== undefined) updateData.role = role;
+    if (isActive !== undefined) updateData.isActive = isActive;
+    if (role !== undefined) {
+      updateData.managerId = role === 'USER' ? (managerId || null) : null;
+    } else if (managerId !== undefined) {
+      updateData.managerId = managerId || null;
+    }
+
+    // Hash password if provided
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: {
-        name: name || undefined,
-        role: role || undefined,
-        managerId: role === 'USER' ? managerId : null
-      },
+      data: updateData,
       select: {
         id: true,
         email: true,
@@ -191,6 +228,11 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
         createdAt: true
       }
     });
+
+    // Add isActive to response (may not exist in older schema)
+    (updatedUser as any).isActive = (await prisma.user.findUnique({
+      where: { id: userId }
+    }) as any)?.isActive ?? true;
 
     return res.json({ user: updatedUser });
   } catch (error) {

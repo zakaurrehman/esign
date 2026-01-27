@@ -13,6 +13,7 @@ model User {
   name          String
   password      String
   role          String     @default("USER") // USER, MANAGER, or SUPER_ADMIN
+  isActive      Boolean    @default(true) // Active or Inactive status
   managerId     String?    // For USER role - assigned manager
   manager       User?      @relation("UserManager", fields: [managerId], references: [id])
   managedUsers  User[]     @relation("UserManager") // For MANAGER role - users under them

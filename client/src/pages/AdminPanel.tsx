@@ -4,12 +4,14 @@ import { useAuthStore } from '../store/authStore';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
+import { Modal } from '../components/ui/Modal';
 import toast from 'react-hot-toast';
 import api, { managerApi } from '../services/api';
 import type { User, UserRole } from '../types/index';
 
 interface ExtendedUser extends User {
   _count?: { documents: number; managedUsers?: number };
+  isActive?: boolean;
 }
 
 export const AdminPanel: React.FC = () => {
@@ -27,6 +29,17 @@ export const AdminPanel: React.FC = () => {
     managerId: '' 
   });
   const [isCreating, setIsCreating] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingUser, setEditingUser] = useState<ExtendedUser | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'USER' as UserRole,
+    managerId: '',
+    isActive: true
+  });
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -76,6 +89,53 @@ export const AdminPanel: React.FC = () => {
       toast.error(error.response?.data?.error || 'Failed to create user');
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  const handleEditUser = (user: ExtendedUser) => {
+    setEditingUser(user);
+    setEditForm({
+      name: user.name,
+      email: user.email,
+      password: '',
+      role: (user.role as UserRole) || 'USER',
+      managerId: user.managerId || '',
+      isActive: user.isActive ?? true
+    });
+    setShowEditModal(true);
+  };
+
+  const handleUpdateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+
+    setIsUpdating(true);
+    try {
+      const payload: any = {
+        name: editForm.name,
+        email: editForm.email,
+        role: editForm.role,
+        isActive: editForm.isActive
+      };
+
+      if (editForm.password) {
+        payload.password = editForm.password;
+      }
+
+      if (editForm.role === 'USER') {
+        payload.managerId = editForm.managerId || null;
+      }
+
+      await api.put(`/api/auth/users/${editingUser.id}`, payload);
+      toast.success('User updated successfully');
+      setShowEditModal(false);
+      setEditingUser(null);
+      fetchUsers();
+      fetchManagers();
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to update user');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -287,6 +347,9 @@ export const AdminPanel: React.FC = () => {
                     Documents
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
                     Created
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
@@ -324,18 +387,34 @@ export const AdminPanel: React.FC = () => {
                     <td className="px-6 py-4 text-sm text-slate-600">
                       {user._count?.documents || 0}
                     </td>
+                    <td className="px-6 py-4 text-sm">
+                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                        user.isActive !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {user.isActive !== false ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
                     <td className="px-6 py-4 text-sm text-slate-600">
                       {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-'}
                     </td>
                     <td className="px-6 py-4 text-sm">
                       {user.role !== 'SUPER_ADMIN' && (
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          onClick={() => handleDeleteUser(user.id, user.name)}
-                        >
-                          Delete
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => handleEditUser(user)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => handleDeleteUser(user.id, user.name)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
                       )}
                     </td>
                   </tr>
@@ -345,6 +424,85 @@ export const AdminPanel: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Edit User Modal */}
+      <Modal
+        isOpen={showEditModal}
+        onClose={() => { setShowEditModal(false); setEditingUser(null); }}
+        title={`Edit User: ${editingUser?.name || ''}`}
+      >
+        <form onSubmit={handleUpdateUser} className="space-y-4">
+          <Input
+            label="Name"
+            type="text"
+            value={editForm.name}
+            onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+            required
+          />
+          <Input
+            label="Email"
+            type="email"
+            value={editForm.email}
+            onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+            required
+          />
+          <Input
+            label="New Password (leave blank to keep current)"
+            type="text"
+            value={editForm.password}
+            onChange={(e) => setEditForm({ ...editForm, password: e.target.value })}
+            placeholder="Enter new password"
+          />
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Role</label>
+            <select
+              value={editForm.role}
+              onChange={(e) => setEditForm({ ...editForm, role: e.target.value as UserRole, managerId: '' })}
+              className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+            >
+              <option value="USER">User</option>
+              <option value="MANAGER">Manager</option>
+            </select>
+          </div>
+          {editForm.role === 'USER' && (
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Assign to Manager</label>
+              <select
+                value={editForm.managerId}
+                onChange={(e) => setEditForm({ ...editForm, managerId: e.target.value })}
+                className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              >
+                <option value="">No Manager (Direct Send)</option>
+                {managers.map((manager) => (
+                  <option key={manager.id} value={manager.id}>
+                    {manager.name} ({manager.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Status</label>
+            <select
+              value={editForm.isActive ? 'active' : 'inactive'}
+              onChange={(e) => setEditForm({ ...editForm, isActive: e.target.value === 'active' })}
+              className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+            <p className="text-xs text-slate-500 mt-1">Inactive users cannot log in</p>
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="button" variant="secondary" onClick={() => { setShowEditModal(false); setEditingUser(null); }}>
+              Cancel
+            </Button>
+            <Button type="submit" isLoading={isUpdating}>
+              Save Changes
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };
