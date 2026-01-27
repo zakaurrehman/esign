@@ -23,15 +23,24 @@ export const auth = async (req: AuthRequest, res: Response, next: NextFunction) 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as { userId: string };
 
     const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
-      select: { id: true, email: true, name: true, role: true }
+      where: { id: decoded.userId }
     });
 
     if (!user) {
       return res.status(401).json({ error: 'User not found' });
     }
 
-    req.user = user;
+    // Check if user is active
+    if ((user as any).isActive === false) {
+      return res.status(401).json({ error: 'Your account has been deactivated' });
+    }
+
+    req.user = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: (user as any).role || 'USER'
+    };
     next();
   } catch (error) {
     return res.status(401).json({ error: 'Invalid token' });
