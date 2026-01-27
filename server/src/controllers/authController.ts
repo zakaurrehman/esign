@@ -1,9 +1,13 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import * as bcryptModule from 'bcryptjs';
+import * as jwtModule from 'jsonwebtoken';
 import prisma from '../lib/prisma';
 import { RegisterInput, LoginInput } from '../schemas/auth';
 import { AuthRequest } from '../middleware/auth';
+
+// Handle both ESM and CommonJS module formats
+const bcrypt = (bcryptModule as any).default || bcryptModule;
+const jwt = (jwtModule as any).default || jwtModule;
 
 // Admin-only user creation endpoint
 export const createUser = async (req: AuthRequest, res: Response) => {
@@ -61,13 +65,25 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body as LoginInput;
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    let user;
+    try {
+      user = await prisma.user.findUnique({ where: { email } });
+    } catch (dbError: any) {
+      console.error('Database error during login:', dbError);
+      return res.status(500).json({ error: 'Database error', details: dbError.message });
+    }
+
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Check if user is active
-    if ((user as any).isActive === false) {
+    // Check if user is active (safely handle if column doesn't exist)
+    const isActive = (user as any).isActive;
+    if (isActive === false) {
       return res.status(401).json({ error: 'Your account has been deactivated. Please contact administrator.' });
     }
 

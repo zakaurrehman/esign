@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import * as jwtModule from 'jsonwebtoken';
 import prisma from '../lib/prisma';
+
+// Handle both ESM and CommonJS module formats
+const jwt = (jwtModule as any).default || jwtModule;
 
 export interface AuthRequest extends Request {
   user?: {

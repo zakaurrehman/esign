@@ -65,8 +65,65 @@ app.get('/health', (req: Request, res: Response) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     routesLoaded,
-    loadError: loadError?.message
+    loadError: loadError?.message,
+    loadErrorStack: loadError?.stack
   });
+});
+
+// Debug login endpoint - bypasses routes to test directly
+app.post('/debug-login', async (req: Request, res: Response) => {
+  try {
+    const { PrismaClient } = await import('@prisma/client');
+    const bcrypt = (await import('bcryptjs')).default;
+    const jwt = (await import('jsonwebtoken')).default;
+    const prisma = new PrismaClient();
+
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password required' });
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      await prisma.$disconnect();
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Check if user is active
+    if ((user as any).isActive === false) {
+      await prisma.$disconnect();
+      return res.status(401).json({ error: 'Account deactivated' });
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      await prisma.$disconnect();
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET || 'secret',
+      { expiresIn: '7d' }
+    );
+
+    const userRole = (user as any).role || 'USER';
+
+    await prisma.$disconnect();
+    return res.json({
+      user: { id: user.id, email: user.email, name: user.name, role: userRole },
+      token
+    });
+  } catch (error: any) {
+    console.error('Debug login error:', error);
+    return res.status(500).json({
+      error: 'Debug login failed',
+      message: error.message,
+      stack: error.stack
+    });
+  }
 });
 
 // Database initialization endpoint (run once to set up schema)
