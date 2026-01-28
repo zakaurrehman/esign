@@ -76,20 +76,23 @@ app.get('/test-db', async (req: Request, res: Response) => {
     const { PrismaClient } = await import('@prisma/client');
     const prisma = new PrismaClient();
 
-    // Simple query to test connection
-    const userCount = await prisma.user.count();
+    // Use raw query to avoid Prisma trying to select isActive
+    const users: any[] = await prisma.$queryRaw`SELECT id, email, name, role FROM "User" LIMIT 1`;
+    const userCount: any[] = await prisma.$queryRaw`SELECT COUNT(*) as count FROM "User"`;
 
-    // Try to get a user to test full query
-    const users = await prisma.user.findMany({ take: 1 });
-    const sampleUser = users[0];
+    // Check what columns exist
+    const columns: any[] = await prisma.$queryRaw`
+      SELECT column_name FROM information_schema.columns
+      WHERE table_name = 'User'
+    `;
 
     await prisma.$disconnect();
 
     return res.json({
       success: true,
-      userCount,
-      sampleUserFields: sampleUser ? Object.keys(sampleUser) : [],
-      hasIsActive: sampleUser ? 'isActive' in sampleUser : false,
+      userCount: parseInt(userCount[0]?.count || '0'),
+      existingColumns: columns.map((c: any) => c.column_name),
+      sampleUser: users[0] ? { email: users[0].email, role: users[0].role } : null,
       dbUrl: process.env.DATABASE_URL ? 'Set (hidden)' : 'NOT SET'
     });
   } catch (error: any) {
@@ -99,6 +102,52 @@ app.get('/test-db', async (req: Request, res: Response) => {
       code: error.code,
       meta: error.meta,
       stack: error.stack
+    });
+  }
+});
+
+// Add missing columns endpoint
+app.get('/add-columns', async (req: Request, res: Response) => {
+  try {
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+
+    const results: string[] = [];
+
+    // Add isActive column to User
+    try {
+      await prisma.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN "isActive" BOOLEAN DEFAULT true`);
+      results.push('Added isActive column to User');
+    } catch (e: any) {
+      if (e.code === '42701') {
+        results.push('isActive column already exists');
+      } else {
+        results.push(`isActive error: ${e.message}`);
+      }
+    }
+
+    // Add role column to Recipient
+    try {
+      await prisma.$executeRawUnsafe(`ALTER TABLE "Recipient" ADD COLUMN "role" TEXT DEFAULT 'SIGNER'`);
+      results.push('Added role column to Recipient');
+    } catch (e: any) {
+      if (e.code === '42701') {
+        results.push('Recipient role column already exists');
+      } else {
+        results.push(`Recipient role error: ${e.message}`);
+      }
+    }
+
+    await prisma.$disconnect();
+
+    return res.json({
+      success: true,
+      results
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: error.message
     });
   }
 });

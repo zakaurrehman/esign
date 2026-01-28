@@ -72,17 +72,42 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    let user;
+    let user: any;
     try {
-      user = await prisma.user.findUnique({ where: { email } });
+      // Use raw query to avoid Prisma expecting isActive column
+      const users: any[] = await prisma.$queryRaw`
+        SELECT id, email, name, password, role, "isActive"
+        FROM "User"
+        WHERE email = ${email}
+        LIMIT 1
+      `;
+      user = users[0];
     } catch (dbError: any) {
-      console.error('Database error during login:', dbError);
-      return res.status(500).json({
-        error: 'Database error',
-        details: dbError.message,
-        code: dbError.code,
-        meta: dbError.meta
-      });
+      // If isActive column doesn't exist, try without it
+      if (dbError.code === 'P2022' || dbError.message?.includes('isActive')) {
+        try {
+          const users: any[] = await prisma.$queryRaw`
+            SELECT id, email, name, password, role
+            FROM "User"
+            WHERE email = ${email}
+            LIMIT 1
+          `;
+          user = users[0];
+        } catch (innerError: any) {
+          console.error('Database error during login:', innerError);
+          return res.status(500).json({
+            error: 'Database error',
+            details: innerError.message
+          });
+        }
+      } else {
+        console.error('Database error during login:', dbError);
+        return res.status(500).json({
+          error: 'Database error',
+          details: dbError.message,
+          code: dbError.code
+        });
+      }
     }
 
     if (!user) {
@@ -90,8 +115,7 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // Check if user is active (safely handle if column doesn't exist)
-    const isActive = (user as any).isActive;
-    if (isActive === false) {
+    if (user.isActive === false) {
       return res.status(401).json({ error: 'Your account has been deactivated. Please contact administrator.' });
     }
 
@@ -107,7 +131,7 @@ export const login = async (req: Request, res: Response) => {
     );
 
     // Handle case where role might not exist yet in database
-    const userRole = (user as any).role || 'USER';
+    const userRole = user.role || 'USER';
 
     return res.json({
       user: { id: user.id, email: user.email, name: user.name, role: userRole },
