@@ -70,6 +70,39 @@ app.get('/health', (req: Request, res: Response) => {
   });
 });
 
+// Database connection test
+app.get('/test-db', async (req: Request, res: Response) => {
+  try {
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+
+    // Simple query to test connection
+    const userCount = await prisma.user.count();
+
+    // Try to get a user to test full query
+    const users = await prisma.user.findMany({ take: 1 });
+    const sampleUser = users[0];
+
+    await prisma.$disconnect();
+
+    return res.json({
+      success: true,
+      userCount,
+      sampleUserFields: sampleUser ? Object.keys(sampleUser) : [],
+      hasIsActive: sampleUser ? 'isActive' in sampleUser : false,
+      dbUrl: process.env.DATABASE_URL ? 'Set (hidden)' : 'NOT SET'
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      code: error.code,
+      meta: error.meta,
+      stack: error.stack
+    });
+  }
+});
+
 // Debug login endpoint - bypasses routes to test directly
 app.post('/debug-login', async (req: Request, res: Response) => {
   try {
